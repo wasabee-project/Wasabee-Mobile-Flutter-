@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
-
-import 'dart:async';
+import 'auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key, this.title}) : super(key: key);
@@ -22,7 +21,12 @@ class _LoginPageState extends State<LoginPage> {
           title: Text(widget.title + titleString),
         ),
         body: Center(
-          child: GoogleSignInButton(onPressed: () {}, darkMode: true),
+          child: GoogleSignInButton(
+              onPressed: () {
+                Auth(googleSignIn: GoogleSignIn()).signInWithGoogle().then(
+                    (GoogleSignInAuthentication googleAuth) => print('Hi $googleAuth'));
+              },
+              darkMode: true),
         ));
   }
 
