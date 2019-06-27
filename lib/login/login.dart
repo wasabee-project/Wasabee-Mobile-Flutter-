@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
 import 'auth.dart';
-import '../map/map.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'dart:convert' as convert;
-import 'package:dio/dio.dart';
-import 'package:cookie_jar/cookie_jar.dart';
-import '../network/cookies.dart';
+import '../network/networkcalls.dart';
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key, this.title}) : super(key: key);
@@ -21,8 +17,26 @@ class _LoginPageState extends State<LoginPage> {
   String api = "https://server.wasabee.rocks";
   bool isLoading = false;
 
-  void callMe() {
-    //TODO do a call to /me here
+  void callMe(String response) {
+    var url = api + "/me";
+
+    try {
+      NetworkCalls.doNetworkCall(url, Map<String, String>(), finishedCallMe, true, NetWorkCallType.GET);
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print(e);
+    }
+  }
+
+  void finishedCallMe(String response) {
+    print('got me response -> $response');
+    setState(() {
+        isLoading = false;
+      });
+    // Navigator.of(context).pushReplacement(
+    //     new MaterialPageRoute(builder: (BuildContext context) => MapPage()));
   }
 
   @override
@@ -53,28 +67,12 @@ class _LoginPageState extends State<LoginPage> {
 
   doLogin(String accessToken) async {
     var url = api + "/aptok";
-    String sendData = convert.jsonEncode({
-      'accessToken': '$accessToken',
-    });
+    var data = {
+      'accessToken' : '$accessToken',
+    };
 
-    print('URL: $url');
-    print('sendData: $sendData');
     try {
-      var dio = new Dio();
-      var cj = CookieJar();
-      var cm = CookieManager(cj);
-      dio.interceptors.add(cm);
-
-      Response response = await dio.post(url, data: sendData);
-
-      // print('cookies are -> $cookieList');
-      // print(response);
-      if (response.statusCode == 200) {
-        var cookieList = cj.loadForRequest(Uri.parse(url));
-        CookieUtils.saveWasabeeCookieFromList(cookieList, cm);
-        Navigator.of(context).pushReplacement(new MaterialPageRoute(
-            builder: (BuildContext context) => MapPage()));
-      }
+      NetworkCalls.doNetworkCall(url, data, callMe, false, NetWorkCallType.POST);
     } catch (e) {
       setState(() {
         isLoading = false;

@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:dio/src/interceptors/cookie_mgr.dart';
 import '../storage/localstorage.dart';
 import '../network/urlmanager.dart';
 
@@ -23,7 +22,7 @@ class CookieUtils {
     listOfUrls.add(UrlManager.URL_ME);
 
     for (var url in listOfUrls) {
-      //cm.cookieJar.loadForRequest(uri)
+      cm.cookieJar.loadForRequest(Uri.parse(url));
     }
   }
 }
