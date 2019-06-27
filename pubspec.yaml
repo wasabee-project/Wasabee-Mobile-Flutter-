@@ -23,6 +23,8 @@ dependencies:
   flutter_auth_buttons: ^0.5.0
   dio: 2.1.7
   cookie_jar: ^1.0.0
+  google_maps_flutter: ^0.5.11
+  shared_preferences: ^0.5.3+1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -31,8 +33,16 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: "^0.7.0"
 
-
+flutter_icons:
+  ios: false
+  android: true
+  image_path_ios: "assets/wasabee_flat.png"
+  image_path_android: "assets/wasabee_flat.png"
+  adaptive_icon_background: "assets/wasabee_mobile_background.png"
+  adaptive_icon_foreground: "assets/wasabee_flat.png"
+  
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
 
