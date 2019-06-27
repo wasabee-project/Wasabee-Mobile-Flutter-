@@ -1,0 +1,78 @@
+{
+	"ID": "679dfb1a6127b2c5f9717826e979d74fcb7fc457",
+	"name": "testOp1234",
+	"creator": "113891827784514931834",
+	"color": "groupa",
+	"opportals": [
+		{
+			"id": "aecdd82b4be744b4ab286bf9fc9cf9f3.16",
+			"name": "Blue Bike at Ten",
+			"lat": "33.057431",
+			"lng": "-96.862107",
+			"comment": "",
+			"hardness": ""
+		},
+		{
+			"id": "b8dc076bcdd645b786a2659c6ba3dcdc.16",
+			"name": "Frito Lay Entrance",
+			"lat": "33.079968",
+			"lng": "-96.843031",
+			"comment": "",
+			"hardness": ""
+		},
+		{
+			"id": "320b3850a00440d2a339bb72626a150d.16",
+			"name": "TC Visitors Center",
+			"lat": "33.098413",
+			"lng": "-96.892297",
+			"comment": "",
+			"hardness": ""
+		},
+		{
+			"id": "93f0e777107c47138d9336fefe34bd3a.16",
+			"name": "William Blake Heaven in a Wild Flower Plaque",
+			"lat": "33.062354",
+			"lng": "-96.963805",
+			"comment": "",
+			"hardness": ""
+		}
+	],
+	"anchors": [
+		"93f0e777107c47138d9336fefe34bd3a.16",
+		"aecdd82b4be744b4ab286bf9fc9cf9f3.16",
+		"b8dc076bcdd645b786a2659c6ba3dcdc.16"
+	],
+	"links": [
+		{
+			"ID": "e89d150d04f58cff94671ac5236e96b4a28f9c02",
+			"fromPortalId": "aecdd82b4be744b4ab286bf9fc9cf9f3.16",
+			"toPortalId": "93f0e777107c47138d9336fefe34bd3a.16",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "73002d243c2644b2c01f5cc724251439dfaff82e",
+			"fromPortalId": "aecdd82b4be744b4ab286bf9fc9cf9f3.16",
+			"toPortalId": "b8dc076bcdd645b786a2659c6ba3dcdc.16",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		}
+	],
+	"markers": [
+		{
+			"ID": "8293c317e5ff55850dc1157ba4768b80d72b1b1a",
+			"portalId": "320b3850a00440d2a339bb72626a150d.16",
+			"type": "DestroyPortalAlert",
+			"comment": "",
+			"assignedTo": "",
+			"complete": false
+		}
+	],
+	"teamid": "catalog-untie-ofip",
+	"modified": "2019-06-27 16:09:58",
+	"comment": "",
+	"keysonhand": null,
+	"fetched": "2019-06-27T16:10:00-05:00"
+}

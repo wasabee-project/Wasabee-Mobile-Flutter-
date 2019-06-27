@@ -1,0 +1,116 @@
+{
+	"GoogleID": "113891827784514931834",
+	"IngressName": "Phtiv",
+	"Level": 9,
+	"LocationKey": "oblong-viewer-ku5n",
+	"OwnTracksPW": "",
+	"VVerified": true,
+	"VBlacklisted": false,
+	"Vid": "f519e8509ea9180269bd1226ba5f20f9c62febca",
+	"OwnTracksJSON": "{\"_type\":\"location\",\"lat\":0,\"lon\":0,\"topic\":\"owntracks/oblong-viewer-ku5n/reaper\",\"tid\":\"ob\",\"tst\":1557584038}",
+	"RocksVerified": true,
+	"RAID": false,
+	"RISC": false,
+	"OwnedTeams": [
+		{
+			"ID": "iphone-flounder-5zr8",
+			"Name": "Many Links, Much Ap",
+			"RocksComm": "",
+			"RocksKey": ""
+		},
+		{
+			"ID": "ambitious-daringly-bh7k",
+			"Name": "Phtiv Main Op",
+			"RocksComm": "",
+			"RocksKey": ""
+		},
+		{
+			"ID": "catalog-untie-ofip",
+			"Name": "testOp1234",
+			"RocksComm": "",
+			"RocksKey": ""
+		}
+	],
+	"Teams": [
+		{
+			"ID": "iphone-flounder-5zr8",
+			"Name": "Many Links, Much Ap",
+			"State": "On",
+			"RocksComm": ""
+		},
+		{
+			"ID": "ambitious-daringly-bh7k",
+			"Name": "Phtiv Main Op",
+			"State": "On",
+			"RocksComm": ""
+		},
+		{
+			"ID": "pregnant-dash-qy76",
+			"Name": "Skunkworks",
+			"State": "Primary",
+			"RocksComm": "adFyCSzV.com"
+		},
+		{
+			"ID": "catalog-untie-ofip",
+			"Name": "testOp1234",
+			"State": "On",
+			"RocksComm": ""
+		},
+		{
+			"ID": "stopping-caboose-l114",
+			"Name": "WASABI Guinea Pigs",
+			"State": "Off",
+			"RocksComm": "7yjSBXkI.com"
+		}
+	],
+	"Ops": [
+		{
+			"ID": "175e4d1a6cea678f82f46114c17ac8008682b3d8",
+			"Name": "Many Links, Much Ap",
+			"Color": "groupa",
+			"TeamName": "Many Links, Much Ap",
+			"TeamID": "iphone-flounder-5zr8"
+		},
+		{
+			"ID": "679dfb1a6127b2c5f9717826e979d74fcb7fc457",
+			"Name": "testOp1234",
+			"Color": "groupa",
+			"TeamName": "testOp1234",
+			"TeamID": "catalog-untie-ofip"
+		}
+	],
+	"OwnedOps": [
+		{
+			"ID": "175e4d1a6cea678f82f46114c17ac8008682b3d8",
+			"Name": "Many Links, Much Ap",
+			"Color": "groupa",
+			"TeamName": "Many Links, Much Ap",
+			"TeamID": "iphone-flounder-5zr8"
+		},
+		{
+			"ID": "679dfb1a6127b2c5f9717826e979d74fcb7fc457",
+			"Name": "testOp1234",
+			"Color": "groupa",
+			"TeamName": "testOp1234",
+			"TeamID": "catalog-untie-ofip"
+		}
+	],
+	"Telegram": {
+		"UserName": "Phtiv",
+		"ID": 130021156,
+		"Verified": true,
+		"Authtoken": ""
+	},
+	"Assignments": [
+		{
+			"OpID": "2390341a678a56484186ad9b594bb3dd586bfb63",
+			"OperationName": "Splat testing",
+			"Type": "Marker"
+		},
+		{
+			"OpID": "2390341a678a56484186ad9b594bb3dd586bfb63",
+			"OperationName": "Splat testing",
+			"Type": "Link"
+		}
+	]
+}

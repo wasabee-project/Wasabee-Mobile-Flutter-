@@ -1,0 +1,427 @@
+{
+	"ID": "175e4d1a6cea678f82f46114c17ac8008682b3d8",
+	"name": "Many Links, Much Ap",
+	"creator": "113891827784514931834",
+	"color": "groupa",
+	"opportals": [
+		{
+			"id": "d47a0930422f47639b033666542672f2.11",
+			"name": "Arbor Hills Nature Preserve",
+			"lat": "33.047556",
+			"lng": "-96.848484",
+			"comment": "",
+			"hardness": ""
+		},
+		{
+			"id": "1f522d43a336484b99aafc47f4d2f6dd.16",
+			"name": "Arbor Hills Nature Preserve",
+			"lat": "33.048519",
+			"lng": "-96.848086",
+			"comment": "",
+			"hardness": ""
+		},
+		{
+			"id": "01671b3a0d8f4227a9718c23709c4a74.16",
+			"name": "Arbor Hills Playgrounds",
+			"lat": "33.046838",
+			"lng": "-96.849226",
+			"comment": "",
+			"hardness": ""
+		},
+		{
+			"id": "e91c260294ab4ebfb8dbd4e388332905.16",
+			"name": "Beach Volleyball Court",
+			"lat": "33.053125",
+			"lng": "-96.848968",
+			"comment": "",
+			"hardness": ""
+		},
+		{
+			"id": "56ee26aa1fd94e7eac3f2091287cce2d.16",
+			"name": "Caliche Cut Trail Head",
+			"lat": "33.049771",
+			"lng": "-96.847915",
+			"comment": "",
+			"hardness": ""
+		},
+		{
+			"id": "7e9f7b7a97f0479ea5195279601a2a6a.16",
+			"name": "Cedar Ridge Trailhead",
+			"lat": "33.048117",
+			"lng": "-96.848413",
+			"comment": "",
+			"hardness": ""
+		},
+		{
+			"id": "0898e95244e540a9a7a4be3035401c4b.11",
+			"name": "Frisco Kiddie Korral",
+			"lat": "33.147149",
+			"lng": "-96.879951",
+			"comment": "",
+			"hardness": ""
+		},
+		{
+			"id": "5bf36a118ccc4e16bbf5411be17c550b.16",
+			"name": "Lamp Art - Leaves",
+			"lat": "33.031194",
+			"lng": "-96.831888",
+			"comment": "",
+			"hardness": ""
+		},
+		{
+			"id": "c397f75d34e84b60b673d3f498f08a50.16",
+			"name": "Mockingbird Alley",
+			"lat": "33.049245",
+			"lng": "-96.848042",
+			"comment": "",
+			"hardness": ""
+		},
+		{
+			"id": "0dd20e59d0c54fe4922c5478ee464ab6.16",
+			"name": "Off Road Bike Trail Entrance",
+			"lat": "33.046065",
+			"lng": "-96.849195",
+			"comment": "",
+			"hardness": ""
+		},
+		{
+			"id": "47fd3f3636464b0b8e80145d6eb39db9.16",
+			"name": "Outer Loop Trail",
+			"lat": "33.050697",
+			"lng": "-96.848177",
+			"comment": "",
+			"hardness": ""
+		},
+		{
+			"id": "8590ab60265f4e9bb11879eb3da52982.16",
+			"name": "Pat Evans Playground",
+			"lat": "33.047308",
+			"lng": "-96.84862",
+			"comment": "",
+			"hardness": ""
+		},
+		{
+			"id": "12b5f55c82574cb699cf1356c40ecea9.16",
+			"name": "Red Tornado",
+			"lat": "33.054988",
+			"lng": "-96.848839",
+			"comment": "",
+			"hardness": ""
+		},
+		{
+			"id": "180309b111cd4c7b8b0aae6cd279204c.16",
+			"name": "Thrice Falls",
+			"lat": "33.05359",
+			"lng": "-96.849098",
+			"comment": "",
+			"hardness": ""
+		},
+		{
+			"id": "8694065bd64549b7bf981553243ab0c6.16",
+			"name": "Water Fountain",
+			"lat": "33.0552",
+			"lng": "-96.848644",
+			"comment": "",
+			"hardness": ""
+		},
+		{
+			"id": "1d1d8a63b6014dcf8ecd54f5d060b124.16",
+			"name": "Woods Davy",
+			"lat": "33.053959",
+			"lng": "-96.849038",
+			"comment": "",
+			"hardness": ""
+		},
+		{
+			"id": "d9e61b561e4e4a8f9ebc2806108dacd6.11",
+			"name": "Yellow Tornado Sculpture",
+			"lat": "33.054434",
+			"lng": "-96.848785",
+			"comment": "",
+			"hardness": ""
+		}
+	],
+	"anchors": [
+		"01671b3a0d8f4227a9718c23709c4a74.16",
+		"0898e95244e540a9a7a4be3035401c4b.11",
+		"0dd20e59d0c54fe4922c5478ee464ab6.16",
+		"12b5f55c82574cb699cf1356c40ecea9.16",
+		"180309b111cd4c7b8b0aae6cd279204c.16",
+		"1d1d8a63b6014dcf8ecd54f5d060b124.16",
+		"1f522d43a336484b99aafc47f4d2f6dd.16",
+		"47fd3f3636464b0b8e80145d6eb39db9.16",
+		"56ee26aa1fd94e7eac3f2091287cce2d.16",
+		"5bf36a118ccc4e16bbf5411be17c550b.16",
+		"7e9f7b7a97f0479ea5195279601a2a6a.16",
+		"8590ab60265f4e9bb11879eb3da52982.16",
+		"8694065bd64549b7bf981553243ab0c6.16",
+		"c397f75d34e84b60b673d3f498f08a50.16",
+		"d47a0930422f47639b033666542672f2.11",
+		"d9e61b561e4e4a8f9ebc2806108dacd6.11",
+		"e91c260294ab4ebfb8dbd4e388332905.16"
+	],
+	"links": [
+		{
+			"ID": "f41d9bcff8e2be50390fb57c706574009be256ea",
+			"fromPortalId": "0898e95244e540a9a7a4be3035401c4b.11",
+			"toPortalId": "5bf36a118ccc4e16bbf5411be17c550b.16",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "b3274b5e2fb4ae9558b0ee5f80e44090fdea3767",
+			"fromPortalId": "0898e95244e540a9a7a4be3035401c4b.11",
+			"toPortalId": "0898e95244e540a9a7a4be3035401c4b.11",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "85c3543c8031cd4f576d0a5bbdb885955f46113a",
+			"fromPortalId": "0dd20e59d0c54fe4922c5478ee464ab6.16",
+			"toPortalId": "5bf36a118ccc4e16bbf5411be17c550b.16",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "675da06f7939e89a8438feb5a948d3ba355647fc",
+			"fromPortalId": "0dd20e59d0c54fe4922c5478ee464ab6.16",
+			"toPortalId": "0898e95244e540a9a7a4be3035401c4b.11",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "73e9fb4b4df299dc7ffb539a246107092548feef",
+			"fromPortalId": "01671b3a0d8f4227a9718c23709c4a74.16",
+			"toPortalId": "5bf36a118ccc4e16bbf5411be17c550b.16",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "6d33e987d8e9be9e36bbc7cd6e81ac8b69dd813a",
+			"fromPortalId": "01671b3a0d8f4227a9718c23709c4a74.16",
+			"toPortalId": "0898e95244e540a9a7a4be3035401c4b.11",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "5edd807d3802a9ba2daa055a554490bbf4606e3e",
+			"fromPortalId": "d47a0930422f47639b033666542672f2.11",
+			"toPortalId": "5bf36a118ccc4e16bbf5411be17c550b.16",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "d2dcd386bfd43545121fe0a3713e6c64b71cd461",
+			"fromPortalId": "d47a0930422f47639b033666542672f2.11",
+			"toPortalId": "0898e95244e540a9a7a4be3035401c4b.11",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "37edbc7ebf957e014279174e976dbd0abf2ef0c6",
+			"fromPortalId": "8590ab60265f4e9bb11879eb3da52982.16",
+			"toPortalId": "5bf36a118ccc4e16bbf5411be17c550b.16",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "89a1e6e1b83411acfa5fc2a9ff7cab2113a0d183",
+			"fromPortalId": "8590ab60265f4e9bb11879eb3da52982.16",
+			"toPortalId": "0898e95244e540a9a7a4be3035401c4b.11",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "5eca72ac8f164da85c160dadbba2374fe6d2cd2e",
+			"fromPortalId": "7e9f7b7a97f0479ea5195279601a2a6a.16",
+			"toPortalId": "5bf36a118ccc4e16bbf5411be17c550b.16",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "f1103374335b9a6ea7ed3aad8bd0f3a2455a0491",
+			"fromPortalId": "7e9f7b7a97f0479ea5195279601a2a6a.16",
+			"toPortalId": "0898e95244e540a9a7a4be3035401c4b.11",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "011bade3a1ab4f3d2dd63a36a54595731006f77a",
+			"fromPortalId": "1f522d43a336484b99aafc47f4d2f6dd.16",
+			"toPortalId": "5bf36a118ccc4e16bbf5411be17c550b.16",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "7ed526e39909c3aa4d2d5415f6bbda12760f4a3e",
+			"fromPortalId": "1f522d43a336484b99aafc47f4d2f6dd.16",
+			"toPortalId": "0898e95244e540a9a7a4be3035401c4b.11",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "cada96f86eb1c09f5c8637b1ac81ddbce49cd811",
+			"fromPortalId": "c397f75d34e84b60b673d3f498f08a50.16",
+			"toPortalId": "5bf36a118ccc4e16bbf5411be17c550b.16",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "1c2febdab2692ad0fb3456741f8058338fd7f5c7",
+			"fromPortalId": "c397f75d34e84b60b673d3f498f08a50.16",
+			"toPortalId": "0898e95244e540a9a7a4be3035401c4b.11",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "dc4083e30add97c4d51411ff242baed0a4300342",
+			"fromPortalId": "56ee26aa1fd94e7eac3f2091287cce2d.16",
+			"toPortalId": "5bf36a118ccc4e16bbf5411be17c550b.16",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "630604223578fcd90834c964db9e729766be8da0",
+			"fromPortalId": "56ee26aa1fd94e7eac3f2091287cce2d.16",
+			"toPortalId": "0898e95244e540a9a7a4be3035401c4b.11",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "a3c4d7d24a4ad0d8948a6555d9139be0c523865b",
+			"fromPortalId": "47fd3f3636464b0b8e80145d6eb39db9.16",
+			"toPortalId": "5bf36a118ccc4e16bbf5411be17c550b.16",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "bd3a8cfe56d7fff6f343f72ddb830405fa1da74e",
+			"fromPortalId": "47fd3f3636464b0b8e80145d6eb39db9.16",
+			"toPortalId": "0898e95244e540a9a7a4be3035401c4b.11",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "38ca2809c04021c1747c3246e8a7c7a02e3694a7",
+			"fromPortalId": "e91c260294ab4ebfb8dbd4e388332905.16",
+			"toPortalId": "5bf36a118ccc4e16bbf5411be17c550b.16",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "3a3726c67343d3352f7849a4866e42f3e75e4179",
+			"fromPortalId": "e91c260294ab4ebfb8dbd4e388332905.16",
+			"toPortalId": "0898e95244e540a9a7a4be3035401c4b.11",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "255ac984c2e4a3653fd91231c459599ce1f1994a",
+			"fromPortalId": "180309b111cd4c7b8b0aae6cd279204c.16",
+			"toPortalId": "5bf36a118ccc4e16bbf5411be17c550b.16",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "702a2b831fa1f77d294361bbcc9839b02098e6fa",
+			"fromPortalId": "180309b111cd4c7b8b0aae6cd279204c.16",
+			"toPortalId": "0898e95244e540a9a7a4be3035401c4b.11",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "568d85be8846b8b00a70d1948bd547b6a38c73cb",
+			"fromPortalId": "1d1d8a63b6014dcf8ecd54f5d060b124.16",
+			"toPortalId": "5bf36a118ccc4e16bbf5411be17c550b.16",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "67913e0ccbc4aa1b71ce6dd530a410b2a6a37ecd",
+			"fromPortalId": "1d1d8a63b6014dcf8ecd54f5d060b124.16",
+			"toPortalId": "0898e95244e540a9a7a4be3035401c4b.11",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "3ac0ee18d723ccd8f3b47fbe7286f02e8e5c30fd",
+			"fromPortalId": "d9e61b561e4e4a8f9ebc2806108dacd6.11",
+			"toPortalId": "5bf36a118ccc4e16bbf5411be17c550b.16",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "084589ba1fe6fcbd306f71f1957f02e9d70f9136",
+			"fromPortalId": "d9e61b561e4e4a8f9ebc2806108dacd6.11",
+			"toPortalId": "0898e95244e540a9a7a4be3035401c4b.11",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "e110cf65c05d4a02e8b481505d767c0a38c4f873",
+			"fromPortalId": "12b5f55c82574cb699cf1356c40ecea9.16",
+			"toPortalId": "5bf36a118ccc4e16bbf5411be17c550b.16",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "1d951ba0ffaa6588103e79ef70a7a40080360266",
+			"fromPortalId": "12b5f55c82574cb699cf1356c40ecea9.16",
+			"toPortalId": "0898e95244e540a9a7a4be3035401c4b.11",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "80e028e2a9b8fa1f56c327e773f94f749378a5a5",
+			"fromPortalId": "8694065bd64549b7bf981553243ab0c6.16",
+			"toPortalId": "5bf36a118ccc4e16bbf5411be17c550b.16",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		},
+		{
+			"ID": "306ab07b8e0b4d49fc970af59d8adbe0ea9777df",
+			"fromPortalId": "8694065bd64549b7bf981553243ab0c6.16",
+			"toPortalId": "0898e95244e540a9a7a4be3035401c4b.11",
+			"description": "",
+			"assignedTo": "",
+			"throwOrderPos": 0
+		}
+	],
+	"markers": null,
+	"teamid": "iphone-flounder-5zr8",
+	"modified": "2019-06-21 21:24:22",
+	"comment": "",
+	"keysonhand": null,
+	"fetched": "2019-06-27T16:10:00-05:00"
+}

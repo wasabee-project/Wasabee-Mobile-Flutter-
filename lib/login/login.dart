@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
+import 'package:wasabee/network/responses/meResponse.dart';
 import 'auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../network/networkcalls.dart';
+import '../map/map.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'dart:convert';
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key, this.title}) : super(key: key);
@@ -21,7 +25,8 @@ class _LoginPageState extends State<LoginPage> {
     var url = api + "/me";
 
     try {
-      NetworkCalls.doNetworkCall(url, Map<String, String>(), finishedCallMe, true, NetWorkCallType.GET);
+      NetworkCalls.doNetworkCall(url, Map<String, String>(), finishedCallMe,
+          true, NetWorkCallType.GET);
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -30,19 +35,23 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void finishedCallMe(String response) {
+  void finishedCallMe(String response) async {
     print('got me response -> $response');
+    //TODO replace the assets/me.json with the response.
+    String jsonResult =
+        await rootBundle.loadString('assets/me.json');
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => MapPage(ops: MeResponse.fromJson(json.decode(jsonResult)).ops)),
+    );
     setState(() {
-        isLoading = false;
-      });
-    // Navigator.of(context).pushReplacement(
-    //     new MaterialPageRoute(builder: (BuildContext context) => MapPage()));
+      isLoading = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     String titleString = " - Authenticate";
-    //TODO check if cookie exists, and if it does, call me with a progress indicator
     return Scaffold(
         appBar: AppBar(
           title: Text(widget.title + titleString),
@@ -68,11 +77,12 @@ class _LoginPageState extends State<LoginPage> {
   doLogin(String accessToken) async {
     var url = api + "/aptok";
     var data = {
-      'accessToken' : '$accessToken',
+      'accessToken': '$accessToken',
     };
 
     try {
-      NetworkCalls.doNetworkCall(url, data, callMe, false, NetWorkCallType.POST);
+      NetworkCalls.doNetworkCall(
+          url, data, callMe, false, NetWorkCallType.POST);
     } catch (e) {
       setState(() {
         isLoading = false;

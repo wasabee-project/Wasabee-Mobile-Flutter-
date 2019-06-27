@@ -2,8 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import '../network/cookies.dart';
 import 'dart:convert' as convert;
-import '../storage/localstorage.dart';
-import '../network/cookies.dart';
 
 class NetworkCalls {
   static void doNetworkCall(

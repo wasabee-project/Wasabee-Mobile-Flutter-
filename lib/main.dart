@@ -12,6 +12,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.green,
       ),
       home: LoginPage(title: 'Wasabee'),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
