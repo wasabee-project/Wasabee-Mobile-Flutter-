@@ -21,9 +21,14 @@ class _LoginPageState extends State<LoginPage> {
   String api = "https://server.wasabee.rocks";
   bool isLoading = false;
 
+  void callMe() {
+    //TODO do a call to /me here
+  }
+
   @override
   Widget build(BuildContext context) {
     String titleString = " - Authenticate";
+    //TODO check if cookie exists, and if it does, call me with a progress indicator
     return Scaffold(
         appBar: AppBar(
           title: Text(widget.title + titleString),
@@ -61,14 +66,15 @@ class _LoginPageState extends State<LoginPage> {
       dio.interceptors.add(cm);
 
       Response response = await dio.post(url, data: sendData);
-      var cookieList = cj.loadForRequest(Uri.parse(url));
-      CookieUtils.saveWasabeeCookieFromList(cookieList, cm);
 
       // print('cookies are -> $cookieList');
       // print(response);
-      if (response.statusCode == 200)
+      if (response.statusCode == 200) {
+        var cookieList = cj.loadForRequest(Uri.parse(url));
+        CookieUtils.saveWasabeeCookieFromList(cookieList, cm);
         Navigator.of(context).pushReplacement(new MaterialPageRoute(
             builder: (BuildContext context) => MapPage()));
+      }
     } catch (e) {
       setState(() {
         isLoading = false;
