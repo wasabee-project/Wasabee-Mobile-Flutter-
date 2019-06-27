@@ -41,7 +41,7 @@ flutter_icons:
   image_path_ios: "assets/wasabee_flat.png"
   image_path_android: "assets/wasabee_flat.png"
   adaptive_icon_background: "assets/wasabee_mobile_background.png"
-  adaptive_icon_foreground: "assets/wasabee_flat.png"
+  adaptive_icon_foreground: "assets/wasabee_mobile_foreground.png"
   
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec

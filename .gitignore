@@ -20,3 +20,4 @@ doc/api/
 *.js.deps
 *.js.map
 android/app/src/main/AndroidManifest.xml
+*.xml
