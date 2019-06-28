@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:cookie_jar/cookie_jar.dart';
-import '../network/cookies.dart';
 import 'dart:convert' as convert;
 import 'package:path_provider/path_provider.dart';
 
 class NetworkCalls {
+  
   static void doNetworkCall(
       String url,
       Map<String, String> sendData,
@@ -43,8 +43,6 @@ class NetworkCalls {
     }
     print('Response for $url is -> $response');
     if (response != null && response.statusCode == 200) {
-      var cookieList = cj.loadForRequest(Uri.parse(url));
-      CookieUtils.saveWasabeeCookieFromList(cookieList, cm);
       callback('$response');
     }
   }

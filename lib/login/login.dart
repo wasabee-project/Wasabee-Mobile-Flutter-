@@ -1,3 +1,4 @@
+import 'package:cookie_jar/cookie_jar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
 import 'package:wasabee/network/responses/meResponse.dart';
@@ -7,6 +8,10 @@ import '../network/networkcalls.dart';
 import '../map/map.dart';
 import 'dart:convert';
 import 'package:permission_handler/permission_handler.dart';
+import '../network/urlmanager.dart';
+import '../network/cookies.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
 class LoginPage extends StatefulWidget {
   LoginPage({Key key, this.title}) : super(key: key);
@@ -18,11 +23,11 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  String api = "https://server.wasabee.rocks";
-  bool isLoading = false;
+  bool isLoading = true;
+  bool isInitialLoad = true;
 
   void callMe(String response) {
-    var url = api + "/me";
+    var url = UrlManager.BASE_API_URL + "/me";
 
     try {
       NetworkCalls.doNetworkCall(url, Map<String, String>(), finishedCallMe,
@@ -48,27 +53,18 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<bool> checkPermissions() async {
-    ServiceStatus locationStatus =
-        await PermissionHandler().checkServiceStatus(PermissionGroup.location);
-    ServiceStatus localFileStatus =
-        await PermissionHandler().checkServiceStatus(PermissionGroup.storage);
+    PermissionStatus locationPermission = await PermissionHandler().checkPermissionStatus(PermissionGroup.location);
+    PermissionStatus filePermission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
 
-    var listOfStatuses = List<ServiceStatus>();
-    listOfStatuses.add(localFileStatus);
-    listOfStatuses.add(locationStatus);
-    return findNonEnabled(listOfStatuses, null);
+    var listOfPermissions = List<PermissionStatus>();
+    listOfPermissions.add(locationPermission);
+    listOfPermissions.add(filePermission);
+    return findNonEnabled(listOfPermissions);
   }
 
-  bool findNonEnabled(List<ServiceStatus> listOfStatuses,
-      List<PermissionStatus> listOfPermStatuses) {
+  bool findNonEnabled(List<PermissionStatus> listOfPermStatuses) {
     var foundNonEnabled = false;
-    print("listOfStatuses -> $listOfStatuses");
     print("listOfPermStatuses -> $listOfPermStatuses");
-    if (listOfStatuses != null)
-      for (var status in listOfStatuses) {
-        if (status != ServiceStatus.enabled &&
-            status != ServiceStatus.notApplicable) foundNonEnabled = true;
-      }
     if (listOfPermStatuses != null)
       for (var status in listOfPermStatuses) {
         if (status != PermissionStatus.granted) foundNonEnabled = true;
@@ -115,16 +111,41 @@ class _LoginPageState extends State<LoginPage> {
         await PermissionHandler().requestPermissions(
             [PermissionGroup.location, PermissionGroup.storage]);
     print('PERMISSION RESULTS: $permissions');
-    if (findNonEnabled(null, permissions.values.toList())) {
+    if (findNonEnabled(permissions.values.toList())) {
       showNonEnabledDialog();
     } else {
       initiateSignIn();
     }
   }
 
+  Future<bool> checkWasabeeCookie() async {
+    Directory appDocDirectory = await getApplicationDocumentsDirectory();
+
+    var directory = await new Directory(appDocDirectory.path + '/' + 'cookies')
+        .create(recursive: true);
+    var cj = new PersistCookieJar(
+      dir: directory.path,
+      ignoreExpires: false,
+    );
+    return await CookieUtils.hasWasabeeCookie(cj);
+  }
+
   @override
   Widget build(BuildContext context) {
     String titleString = " - Authenticate";
+    if (isInitialLoad == true) {
+      isInitialLoad = false;
+      checkWasabeeCookie().then((foundCookie) {
+        if (foundCookie) {
+          print('FOUND COOKIE!');
+          callMe(null);
+        } else {
+          setState(() {
+            isLoading = false;
+          });
+        }
+      });
+    }
     return Scaffold(
         appBar: AppBar(
           title: Text(widget.title + titleString),
@@ -166,7 +187,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   doLogin(String accessToken) async {
-    var url = api + "/aptok";
+    var url = UrlManager.FULL_APTOK_URL;
     var data = {
       'accessToken': '$accessToken',
     };

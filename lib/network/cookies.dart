@@ -1,28 +1,20 @@
-import 'dart:io';
-import 'package:dio/dio.dart';
 import '../storage/localstorage.dart';
+import 'package:cookie_jar/cookie_jar.dart';
 import '../network/urlmanager.dart';
 
-class CookieUtils {
-  static const KEY_WASABEE_COOKIE = "WASABEE";
 
-  static void saveWasabeeCookieFromList(List<Cookie> cookieList, CookieManager cm) {
+class CookieUtils {
+  static const KEY_WASABEE_COOKIE = "WASABI";
+
+  static Future<bool> hasWasabeeCookie(CookieJar cj) async {
+    var cookieList = cj.loadForRequest(Uri.parse(UrlManager.BASE_API_URL));
     for (var cookie in cookieList) {
-      print('Cookie -> $cookie');
+      print('cookie Name -> ${cookie.name}');
       if (cookie.name == KEY_WASABEE_COOKIE) {
         LocalStorageUtils.storeWasabeeCookie(cookie.value);
-        return;
+        return true;
       }
     }
-    setCookieForUrls(cm);
-  }
-
-  static void setCookieForUrls(CookieManager cm) {
-    var listOfUrls = List();
-    listOfUrls.add(UrlManager.URL_ME);
-
-    for (var url in listOfUrls) {
-      cm.cookieJar.loadForRequest(Uri.parse(url));
-    }
+    return false;
   }
 }

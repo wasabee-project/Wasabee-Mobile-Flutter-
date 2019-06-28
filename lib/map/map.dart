@@ -4,6 +4,7 @@ import 'package:wasabee/network/responses/meResponse.dart';
 import 'package:flutter/foundation.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
 import '../network/networkcalls.dart';
+import '../network/urlmanager.dart';
 import 'dart:convert';
 
 class MapPage extends StatefulWidget {
@@ -72,7 +73,7 @@ class _MapPageState extends State<MapPage> {
     isLoading = true;
     pendingGrab = null;
     try {
-      var url = "https://server.wasabee.rocks/api/v1/draw/${op.iD}";
+      var url = "${UrlManager.FULL_OPERATION_URL}/${op.iD}";
       NetworkCalls.doNetworkCall(
           url, Map<String, String>(), gotOperation, false, NetWorkCallType.GET);
     } catch (e) {
