@@ -5,7 +5,6 @@ import 'auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../network/networkcalls.dart';
 import '../map/map.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'dart:convert';
 
 class LoginPage extends StatefulWidget {
@@ -36,13 +35,9 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void finishedCallMe(String response) async {
-    print('got me response -> $response');
-    //TODO replace the assets/me.json with the response.
-    String jsonResult =
-        await rootBundle.loadString('assets/me.json');
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => MapPage(ops: MeResponse.fromJson(json.decode(jsonResult)).ops)),
+      MaterialPageRoute(builder: (context) => MapPage(ops: MeResponse.fromJson(json.decode(response)).ops)),
     );
     setState(() {
       isLoading = false;

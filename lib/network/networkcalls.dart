@@ -36,7 +36,7 @@ class NetworkCalls {
     if (response != null && response.statusCode == 200) {
       var cookieList = cj.loadForRequest(Uri.parse(url));
       CookieUtils.saveWasabeeCookieFromList(cookieList, cm);
-      callback(response.data.toString());
+      callback('$response');
     }
   }
 }

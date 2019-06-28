@@ -178,6 +178,7 @@ class Ops {
   String color;
   String teamName;
   String teamID;
+  bool isSelected = false;
 
   Ops({this.iD, this.name, this.color, this.teamName, this.teamID});
 

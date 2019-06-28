@@ -4,7 +4,9 @@ import 'dart:async';
 import 'package:location/location.dart';
 import 'package:wasabee/network/responses/meResponse.dart';
 import 'package:flutter/foundation.dart';
+import 'package:wasabee/network/responses/operationFullResponse.dart';
 import '../network/networkcalls.dart';
+import 'dart:convert';
 
 class MapPage extends StatefulWidget {
   final List<Ops> ops;
@@ -18,12 +20,16 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   var isLoading = false;
   var pendingGrab;
-  Completer<GoogleMapController> _controller = Completer();
+  GoogleMapController _controller;
   final LatLng _center = const LatLng(32.7766642, -96.7969879);
   List<Ops> operationList = List();
+  Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
+  Map<PolylineId, Polyline> polylines = <PolylineId, Polyline>{};
+
   _MapPageState(List<Ops> ops) {
     this.operationList = ops;
     if (this.operationList.length > 0) {
+      operationList.first.isSelected = true;
       this.pendingGrab = operationList.first;
     }
   }
@@ -31,36 +37,36 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     if (pendingGrab != null) getFullOperation(pendingGrab);
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Wasabee - Map'),
-          backgroundColor: Colors.green[700],
-        ),
-        body: isLoading
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : GoogleMap(
-                onMapCreated: (GoogleMapController controller) {
-                  _controller.complete(controller);
-                },
-                myLocationEnabled: true,
-                myLocationButtonEnabled: true,
-                initialCameraPosition: CameraPosition(
-                  target: _center,
-                  zoom: 11.0,
-                ),
-              ),
-        drawer: isLoading
-            ? null
-            : Drawer(
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  children: getDrawerElements(),
-                ),
-              ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Wasabee - Map'),
+        backgroundColor: Colors.green[700],
       ),
+      body: isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : GoogleMap(
+              onMapCreated: (GoogleMapController controller) {
+                _controller = controller;
+              },
+              myLocationEnabled: true,
+              myLocationButtonEnabled: true,
+              markers: Set<Marker>.of(markers.values),
+              polylines: Set<Polyline>.of(polylines.values),
+              initialCameraPosition: CameraPosition(
+                target: _center,
+                zoom: 11.0,
+              ),
+            ),
+      drawer: isLoading
+          ? null
+          : Drawer(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: getDrawerElements(),
+              ),
+            ),
     );
   }
 
@@ -80,14 +86,70 @@ class _MapPageState extends State<MapPage> {
   }
 
   gotOperation(response) {
-    print("RESPONSE! -> $response");
+    var operation = OperationFullResponse.fromJson(json.decode(response));
+    markers.clear();
+    populateAnchors(operation);
+    populateLinks(operation);
+
     setState(() {
       isLoading = false;
     });
   }
 
+  populateAnchors(OperationFullResponse operation) {
+    for (var anchor in operation.anchors) {
+      final MarkerId markerId = MarkerId(anchor);
+      final Portal portal = operation.getPortalFromID(anchor);
+      final Marker marker = Marker(
+        markerId: markerId,
+        position: LatLng(
+          double.parse(portal.lat),
+          double.parse(portal.lng),
+        ),
+        infoWindow: InfoWindow(
+            title: portal.name, snippet: 'Links: ${operation.links.length}'),
+        onTap: () {
+          _onMarkerTapped(markerId);
+        },
+      );
+      markers[markerId] = marker;
+      print('markers = $markers');
+    }
+  }
+
+  _onMarkerTapped(MarkerId markerId) {
+    print('Tapped Marker: ${markerId.value}');
+  }
+
+  populateLinks(OperationFullResponse operation) {
+    for (var link in operation.links) {
+      final PolylineId polylineId = PolylineId(link.iD);
+      final Portal fromPortal = operation.getPortalFromID(link.fromPortalId);
+      final Portal toPortal = operation.getPortalFromID(link.toPortalId);
+      final List<LatLng> points = <LatLng>[];
+      points.add(LatLng(double.parse(fromPortal.lat),double.parse(fromPortal.lng)));
+      points.add(LatLng(double.parse(toPortal.lat),double.parse(toPortal.lng)));
+      final Polyline polyline = Polyline(
+        polylineId: polylineId,
+        consumeTapEvents: true,
+        color: Colors.orange,
+        width: 5,
+        points: points,
+        geodesic: true,
+        onTap: () {
+          _onPolylineTapped(polylineId);
+        },
+      );
+      polylines[polylineId] = polyline;
+      print('markers = $markers');
+    }
+  }
+
+  void _onPolylineTapped(PolylineId polylineId) {
+    print('Tapped Polyline: ${polylineId.value}');
+  }
+
   List<Widget> getDrawerElements() {
-    print("Operation List Size = " + operationList.length.toString());
     if (operationList.isEmpty) {
       return <Widget>[
         DrawerHeader(
@@ -114,10 +176,9 @@ class _MapPageState extends State<MapPage> {
       for (var op in operationList) {
         listOfElements.add(ListTile(
           title: Text(op.name),
+          selected: op.isSelected,
           onTap: () {
-            // Update the state of the app
-            // ...
-            // Then close the drawer
+            tappedOp(op, operationList);
             Navigator.pop(context);
           },
         ));
@@ -126,9 +187,21 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
+  tappedOp(Ops op, List<Ops> operationList) {
+    setState(() {
+      pendingGrab = op;
+      for (var ops in operationList) {
+        if (op.iD == ops.iD)
+          ops.isSelected = true;
+        else
+          ops.isSelected = false;
+      }
+    });
+  }
+
   void _currentLocation() async {
-    final GoogleMapController controller = await _controller.future;
-    var currentLocation = LocationData;
+    //final GoogleMapController controller = await _controller.future;
+    //var currentLocation = LocationData;
 
     // var location = new Location();
 
