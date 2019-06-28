@@ -1,4 +1,6 @@
 google_maps_flutter=C:\\src\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\google_maps_flutter-0.5.19\\
-google_sign_in=C:\\src\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\google_sign_in-3.3.0+1\\
+google_sign_in=C:\\src\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\google_sign_in-3.2.4\\
 location=C:\\src\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\location-2.3.5\\
+path_provider=C:\\src\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\path_provider-1.1.0\\
+permission_handler=C:\\src\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\permission_handler-2.2.0\\
 shared_preferences=C:\\src\\flutter\\.pub-cache\\hosted\\pub.dartlang.org\\shared_preferences-0.5.3+1\\

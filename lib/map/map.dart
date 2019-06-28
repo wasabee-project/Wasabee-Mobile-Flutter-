@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'dart:async';
-import 'package:location/location.dart';
 import 'package:wasabee/network/responses/meResponse.dart';
 import 'package:flutter/foundation.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
@@ -88,6 +86,7 @@ class _MapPageState extends State<MapPage> {
   gotOperation(response) {
     var operation = OperationFullResponse.fromJson(json.decode(response));
     markers.clear();
+    polylines.clear();
     populateAnchors(operation);
     populateLinks(operation);
 
@@ -197,22 +196,5 @@ class _MapPageState extends State<MapPage> {
           ops.isSelected = false;
       }
     });
-  }
-
-  void _currentLocation() async {
-    //final GoogleMapController controller = await _controller.future;
-    //var currentLocation = LocationData;
-
-    // var location = new Location();
-
-// Platform messages may fail, so we use a try/catch PlatformException.
-    // try {
-    //   currentLocation = await location.getLocation();
-    // } on PlatformException catch (e) {
-    //   if (e.code == 'PERMISSION_DENIED') {
-    //     error = 'Permission denied';
-    //   }
-    //   currentLocation = null;
-    // }
   }
 }

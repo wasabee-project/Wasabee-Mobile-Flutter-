@@ -9,9 +9,18 @@ class Auth {
   final GoogleSignIn googleSignIn;
 
   Future<GoogleSignInAuthentication> signInWithGoogle() async {
-    final GoogleSignInAccount googleAccount = await googleSignIn.signIn();
-    final GoogleSignInAuthentication googleAuth =
-        await googleAccount.authentication;
-    return googleAuth;
+    try {
+      final GoogleSignInAccount googleAccount =
+          await googleSignIn.signIn().catchError((onError) {
+        print("error $onError");
+        return null;
+      });
+      final GoogleSignInAuthentication googleAuth =
+          await googleAccount.authentication;
+      return googleAuth;
+    } catch (e) {
+      print(e);
+      return null;
+    }
   }
 }
