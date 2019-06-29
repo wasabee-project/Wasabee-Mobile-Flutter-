@@ -5,6 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
 import '../network/networkcalls.dart';
 import '../network/urlmanager.dart';
+import '../storage/localstorage.dart';
+import '../map/utilities.dart';
 import 'dart:convert';
 
 class MapPage extends StatefulWidget {
@@ -17,8 +19,10 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
+  var firstLoad = true;
   var isLoading = false;
   var pendingGrab;
+  var selectedOperation;
   GoogleMapController _controller;
   final LatLng _center = const LatLng(32.7766642, -96.7969879);
   List<Ops> operationList = List();
@@ -27,19 +31,30 @@ class _MapPageState extends State<MapPage> {
 
   _MapPageState(List<Ops> ops) {
     this.operationList = ops;
-    if (this.operationList.length > 0) {
-      operationList.first.isSelected = true;
-      this.pendingGrab = operationList.first;
-    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (firstLoad == true) {
+      firstLoad = false;
+      doInitialLoadThings();
+    }
+    return checkPendingGrabAndGetPageContent();
+  }
+
+  Scaffold checkPendingGrabAndGetPageContent() {
     if (pendingGrab != null) getFullOperation(pendingGrab);
+    return getPageContent();
+  }
+
+  Scaffold getPageContent() {
+    var center = MapUtilities.computeCentroid(List<Marker>.of(markers.values));
     return Scaffold(
       appBar: AppBar(
-        title: Text('Wasabee - Map'),
-        backgroundColor: Colors.green[700],
+        title: Text(selectedOperation == null
+            ? 'Wasabee - Map'
+            : 'Wasabee - ${selectedOperation.name}'),
+        backgroundColor: Colors.green,
       ),
       body: isLoading
           ? Center(
@@ -54,9 +69,8 @@ class _MapPageState extends State<MapPage> {
               markers: Set<Marker>.of(markers.values),
               polylines: Set<Polyline>.of(polylines.values),
               initialCameraPosition: CameraPosition(
-                target: _center,
-                zoom: 11.0,
-              ),
+                  target: center, zoom: MapUtilities.getViewCircleZoomLevel(center, List<Marker>.of(markers.values))),
+              //cameraTargetBounds: CameraTargetBounds(getBounds()),
             ),
       drawer: isLoading
           ? null
@@ -69,7 +83,45 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  getFullOperation(Ops op) {
+  doSelectOperationThing(Ops operation) {
+    print('setting pending grab');
+    operation.isSelected = true;
+    this.pendingGrab = operation;
+    this.selectedOperation = operation;
+  }
+
+  doInitialLoadThings() async {
+    if (operationList.length > 0) {
+      var foundOperation = await checkForSelectedOp(operationList);
+      if (foundOperation == null) {
+        print('FOUND operation is null!');
+        doSelectOperationThing(operationList.first);
+      } else {
+        doSelectOperationThing(foundOperation);
+      }
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  Future<Ops> checkForSelectedOp(List<Ops> operationList) async {
+    var selectedOpId = await LocalStorageUtils.getSelectedOpId();
+    print('selectedOpId -> $selectedOpId');
+    if (selectedOpId != null) {
+      Ops foundOperation;
+      for (var listOp in operationList) {
+        if (listOp.iD == selectedOpId) foundOperation = listOp;
+      }
+      print('foundOperation -> ${foundOperation.iD}');
+
+      return foundOperation;
+    } else {
+      return null;
+    }
+  }
+
+  getFullOperation(Ops op) async {
     isLoading = true;
     pendingGrab = null;
     try {
@@ -85,15 +137,22 @@ class _MapPageState extends State<MapPage> {
   }
 
   gotOperation(response) {
-    var operation = OperationFullResponse.fromJson(json.decode(response));
-    markers.clear();
-    polylines.clear();
-    populateAnchors(operation);
-    populateLinks(operation);
+    try {
+      var operation = OperationFullResponse.fromJson(json.decode(response));
+      markers.clear();
+      polylines.clear();
+      populateAnchors(operation);
+      populateLinks(operation);
 
-    setState(() {
-      isLoading = false;
-    });
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      //TODO go back to login here.
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   populateAnchors(OperationFullResponse operation) {
@@ -127,8 +186,10 @@ class _MapPageState extends State<MapPage> {
       final Portal fromPortal = operation.getPortalFromID(link.fromPortalId);
       final Portal toPortal = operation.getPortalFromID(link.toPortalId);
       final List<LatLng> points = <LatLng>[];
-      points.add(LatLng(double.parse(fromPortal.lat),double.parse(fromPortal.lng)));
-      points.add(LatLng(double.parse(toPortal.lat),double.parse(toPortal.lng)));
+      points.add(
+          LatLng(double.parse(fromPortal.lat), double.parse(fromPortal.lng)));
+      points
+          .add(LatLng(double.parse(toPortal.lat), double.parse(toPortal.lng)));
       final Polyline polyline = Polyline(
         polylineId: polylineId,
         consumeTapEvents: true,
@@ -187,8 +248,10 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  tappedOp(Ops op, List<Ops> operationList) {
+  tappedOp(Ops op, List<Ops> operationList) async {
+    await LocalStorageUtils.storeSelectedOpId(op.iD);
     setState(() {
+      doSelectOperationThing(op);
       pendingGrab = op;
       for (var ops in operationList) {
         if (op.iD == ops.iD)

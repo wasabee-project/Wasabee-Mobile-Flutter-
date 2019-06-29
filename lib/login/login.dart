@@ -27,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
   bool isInitialLoad = true;
 
   void callMe(String response) {
-    var url = UrlManager.BASE_API_URL + "/me";
+    var url = UrlManager.FULL_ME_URL;
 
     try {
       NetworkCalls.doNetworkCall(url, Map<String, String>(), finishedCallMe,
@@ -41,20 +41,27 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void finishedCallMe(String response) async {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-          builder: (context) =>
-              MapPage(ops: MeResponse.fromJson(json.decode(response)).ops)),
-    );
-    setState(() {
-      isLoading = false;
-    });
+    try {
+      var opList = MeResponse.fromJson(json.decode(response)).ops;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                MapPage(ops: opList)),
+      );
+    } catch (e) {
+      await CookieUtils.clearAllCookies();
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   Future<bool> checkPermissions() async {
-    PermissionStatus locationPermission = await PermissionHandler().checkPermissionStatus(PermissionGroup.location);
-    PermissionStatus filePermission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
+    PermissionStatus locationPermission = await PermissionHandler()
+        .checkPermissionStatus(PermissionGroup.location);
+    PermissionStatus filePermission = await PermissionHandler()
+        .checkPermissionStatus(PermissionGroup.storage);
 
     var listOfPermissions = List<PermissionStatus>();
     listOfPermissions.add(locationPermission);

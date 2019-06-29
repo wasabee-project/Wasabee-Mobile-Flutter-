@@ -13,8 +13,8 @@ class NetworkCalls {
       bool includeCookie,
       NetWorkCallType callType) async {
     var dio = new Dio();
-    Directory appDocDirectory = await getApplicationDocumentsDirectory();
 
+    Directory appDocDirectory = await getApplicationDocumentsDirectory();
     var directory = await new Directory(appDocDirectory.path + '/' + 'cookies')
         .create(recursive: true);
     var cj = new PersistCookieJar(
@@ -41,7 +41,8 @@ class NetworkCalls {
       default:
         break;
     }
-    print('Response for $url is -> $response');
+    
+    //print('Response for $url is -> $response');
     if (response != null && response.statusCode == 200) {
       callback('$response');
     }

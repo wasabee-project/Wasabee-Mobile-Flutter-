@@ -1,6 +1,7 @@
-import '../storage/localstorage.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import '../network/urlmanager.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
 
 class CookieUtils {
@@ -11,10 +12,20 @@ class CookieUtils {
     for (var cookie in cookieList) {
       print('cookie Name -> ${cookie.name}');
       if (cookie.name == KEY_WASABEE_COOKIE) {
-        LocalStorageUtils.storeWasabeeCookie(cookie.value);
         return true;
       }
     }
     return false;
+  }
+
+  static clearAllCookies() async {
+    Directory appDocDirectory = await getApplicationDocumentsDirectory();
+    var directory = await new Directory(appDocDirectory.path + '/' + 'cookies')
+        .create(recursive: true);
+    var cj = new PersistCookieJar(
+      dir: directory.path,
+      ignoreExpires: false,
+    );
+    cj.deleteAll();
   }
 }

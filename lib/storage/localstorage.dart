@@ -1,14 +1,16 @@
 import 'package:shared_preferences/shared_preferences.dart';
-import '../network/cookies.dart';
 
 class LocalStorageUtils {
-  static Future<String> getWasabeeCookie() async {
+
+  static const KEY_SELECTED_OPERATION = "KEY_SELECTED_OPERATION";
+
+  static Future<String> getSelectedOpId() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return prefs.getString(CookieUtils.KEY_WASABEE_COOKIE) ?? '';
+    return prefs.getString(KEY_SELECTED_OPERATION) ?? '';
   }
 
-  static storeWasabeeCookie(String cookie) async {
+  static storeSelectedOpId(String operationId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString(CookieUtils.KEY_WASABEE_COOKIE, cookie);
+    prefs.setString(KEY_SELECTED_OPERATION, operationId);
   }
 }
