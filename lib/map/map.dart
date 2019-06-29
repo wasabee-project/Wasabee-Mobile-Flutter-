@@ -22,7 +22,7 @@ class _MapPageState extends State<MapPage> {
   var firstLoad = true;
   var isLoading = false;
   var pendingGrab;
-  var selectedOperation;
+  Ops selectedOperation;
   GoogleMapController _controller;
   final LatLng _center = const LatLng(32.7766642, -96.7969879);
   List<Ops> operationList = List();
@@ -107,13 +107,11 @@ class _MapPageState extends State<MapPage> {
 
   Future<Ops> checkForSelectedOp(List<Ops> operationList) async {
     var selectedOpId = await LocalStorageUtils.getSelectedOpId();
-    print('selectedOpId -> $selectedOpId');
     if (selectedOpId != null) {
       Ops foundOperation;
       for (var listOp in operationList) {
         if (listOp.iD == selectedOpId) foundOperation = listOp;
       }
-      print('foundOperation -> ${foundOperation.iD}');
 
       return foundOperation;
     } else {
@@ -136,7 +134,7 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  gotOperation(response) {
+  gotOperation(response) async {
     try {
       var operation = OperationFullResponse.fromJson(json.decode(response));
       markers.clear();
@@ -155,12 +153,13 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  populateAnchors(OperationFullResponse operation) {
+  populateAnchors(OperationFullResponse operation) async {
     for (var anchor in operation.anchors) {
       final MarkerId markerId = MarkerId(anchor);
       final Portal portal = operation.getPortalFromID(anchor);
       final Marker marker = Marker(
         markerId: markerId,
+        icon: await this.selectedOperation.getIconFromColor(),
         position: LatLng(
           double.parse(portal.lat),
           double.parse(portal.lng),
@@ -172,7 +171,6 @@ class _MapPageState extends State<MapPage> {
         },
       );
       markers[markerId] = marker;
-      print('markers = $markers');
     }
   }
 
@@ -193,7 +191,7 @@ class _MapPageState extends State<MapPage> {
       final Polyline polyline = Polyline(
         polylineId: polylineId,
         consumeTapEvents: true,
-        color: Colors.orange,
+        color: this.selectedOperation.getLinkColor(),
         width: 5,
         points: points,
         geodesic: true,

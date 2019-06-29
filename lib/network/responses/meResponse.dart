@@ -1,3 +1,8 @@
+import 'dart:ui';
+
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:wasabee/map/utilities.dart';
+
 class MeResponse {
   String googleID;
   String ingressName;
@@ -198,6 +203,56 @@ class Ops {
     data['TeamName'] = this.teamName;
     data['TeamID'] = this.teamID;
     return data;
+  }
+
+  Color getLinkColor() {
+    String hexString = "";
+    switch (this.color) {
+      case "groupa":
+        hexString = 'ff6600';
+        break;
+      case "groupb":
+        hexString = 'ff9900';
+        break;
+      case "groupc":
+        hexString = 'BB9900';
+        break;
+      case "groupd":
+        hexString = 'bb22cc';
+        break;
+      case "groupe":
+        hexString = '33cccc';
+        break;
+      case "groupf":
+        hexString = 'ff55ff';
+        break;
+    }
+    return HexColor(hexString);
+  }
+
+  Future<BitmapDescriptor> getIconFromColor() async {
+    String path = 'assets/icons/groupa_2.bmp';
+    switch (this.color) {
+      case "groupa":
+        path = 'assets/icons/groupa_2.bmp';
+        break;
+      case "groupb":
+        path = 'assets/icons/groupb.bmp';
+        break;
+      case "groupc":
+        path = 'assets/icons/groupc.bmp';
+        break;
+      case "groupd":
+        path = 'assets/icons/groupd.bmp';
+        break;
+      case "groupe":
+        path = 'assets/icons/groupe.bmp';
+        break;
+      case "groupf":
+        path = 'assets/icons/groupf.bmp';
+        break;
+    }
+    return BitmapDescriptor.fromAsset(path);
   }
 }
 

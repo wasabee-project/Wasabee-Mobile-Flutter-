@@ -54,6 +54,13 @@ flutter_icons:
 flutter:
   assets:
       - assets/me.json
+      - assets/icons/groupa.bmp
+      - assets/icons/groupb.bmp
+      - assets/icons/groupc.bmp
+      - assets/icons/groupd.bmp
+      - assets/icons/groupe.bmp
+      - assets/icons/groupf.bmp
+      - assets/icons/groupa_2.bmp
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

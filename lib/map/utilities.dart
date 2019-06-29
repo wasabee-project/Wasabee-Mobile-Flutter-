@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:ui';
 import 'package:vector_math/vector_math.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -27,7 +28,6 @@ class MapUtilities {
         sin(dLon / 2) * sin(dLon / 2) * cos(lat1) * cos(lat2);
     var c = 2 * atan2(sqrt(a), sqrt(1 - a));
     var distance = earthRadiusKm * c * 1000;
-    print('calculated distance -> $distance');
     return distance;
   }
 
@@ -38,7 +38,6 @@ class MapUtilities {
       double scale = radius / 500;
       zoomlevel = (16 - log(scale) / log(2));
     }
-    print('zoomlevel -> $zoomlevel');
     return zoomlevel;
   }
 
@@ -74,7 +73,6 @@ class MapUtilities {
       else if (marker.position.longitude > finalLon)
         finalLon = marker.position.longitude;
     }
-    print('NorthEast -> Lat: $finalLat, Lon: $finalLon');
     return LatLng(finalLat, finalLon);
   }
 
@@ -92,8 +90,18 @@ class MapUtilities {
       else if (marker.position.longitude < finalLon)
         finalLon = marker.position.longitude;
     }
-
-    print('SouthWest -> Lat: $finalLat, Lon: $finalLon');
     return LatLng(finalLat, finalLon);
   }
+}
+
+class HexColor extends Color {
+  static int _getColorFromHex(String hexColor) {
+    hexColor = hexColor.toUpperCase().replaceAll("#", "");
+    if (hexColor.length == 6) {
+      hexColor = "FF" + hexColor;
+    }
+    return int.parse(hexColor, radix: 16);
+  }
+
+  HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
 }
