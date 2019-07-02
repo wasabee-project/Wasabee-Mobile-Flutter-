@@ -1,3 +1,5 @@
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 class OperationFullResponse {
   String iD;
   String name;
@@ -160,6 +162,10 @@ class Links {
 }
 
 class Markers {
+  static const DestroyPortalAlert = "DestroyPortalAlert";
+  static const UseVirusPortalAlert = "UseVirusPortalAlert";
+  static const LetDecayPortalAlert = "LetDecayPortalAlert";
+
   String iD;
   String portalId;
   String type;
@@ -193,5 +199,38 @@ class Markers {
     data['assignedTo'] = this.assignedTo;
     data['complete'] = this.complete;
     return data;
+  }
+
+  Future<BitmapDescriptor> getIcon() async {
+    String path = 'assets/icons/unknown.bmp';
+    switch (this.type) {
+      case LetDecayPortalAlert:
+        path = 'assets/icons/decay.bmp';
+        break;
+      case DestroyPortalAlert:
+        path = 'assets/icons/destroy.bmp';
+        break;
+      case UseVirusPortalAlert:
+        path = 'assets/icons/virus.bmp';
+        break;
+    }
+    return BitmapDescriptor.fromAsset(path);
+  }
+
+  getMarkerTitle(String portalName) {
+    var title = "";
+    switch (this.type) {
+      case DestroyPortalAlert:
+        title = "Destroy - ";
+        break;
+      case UseVirusPortalAlert:
+        title = "Virus - ";
+        break;
+      case LetDecayPortalAlert:
+        title = "Let Decay - ";
+        break;
+    }
+    title = "$title$portalName";
+    return title;
   }
 }

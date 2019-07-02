@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:wasabee/login/login.dart';
 import 'package:wasabee/network/responses/meResponse.dart';
 import 'package:flutter/foundation.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
@@ -7,6 +8,7 @@ import '../network/networkcalls.dart';
 import '../network/urlmanager.dart';
 import '../storage/localstorage.dart';
 import '../map/utilities.dart';
+import '../main.dart';
 import 'dart:convert';
 
 class MapPage extends StatefulWidget {
@@ -28,6 +30,7 @@ class _MapPageState extends State<MapPage> {
   List<Ops> operationList = List();
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   Map<PolylineId, Polyline> polylines = <PolylineId, Polyline>{};
+  Map<MarkerId, Marker> targets = <MarkerId, Marker>{};
 
   _MapPageState(List<Ops> ops) {
     this.operationList = ops;
@@ -49,6 +52,20 @@ class _MapPageState extends State<MapPage> {
 
   Scaffold getPageContent() {
     var center = MapUtilities.computeCentroid(List<Marker>.of(markers.values));
+    var map = GoogleMap(
+      onMapCreated: (GoogleMapController controller) {
+        _controller = controller;
+      },
+      mapType: MapType.normal,
+      myLocationEnabled: true,
+      myLocationButtonEnabled: true,
+      markers: Set<Marker>.of(markers.values),
+      polylines: Set<Polyline>.of(polylines.values),
+      initialCameraPosition: CameraPosition(
+          target: center,
+          zoom: MapUtilities.getViewCircleZoomLevel(
+              center, List<Marker>.of(markers.values))),
+    );
     return Scaffold(
       appBar: AppBar(
         title: Text(selectedOperation == null
@@ -60,18 +77,7 @@ class _MapPageState extends State<MapPage> {
           ? Center(
               child: CircularProgressIndicator(),
             )
-          : GoogleMap(
-              onMapCreated: (GoogleMapController controller) {
-                _controller = controller;
-              },
-              myLocationEnabled: true,
-              myLocationButtonEnabled: true,
-              markers: Set<Marker>.of(markers.values),
-              polylines: Set<Polyline>.of(polylines.values),
-              initialCameraPosition: CameraPosition(
-                  target: center, zoom: MapUtilities.getViewCircleZoomLevel(center, List<Marker>.of(markers.values))),
-              //cameraTargetBounds: CameraTargetBounds(getBounds()),
-            ),
+          : map,
       drawer: isLoading
           ? null
           : Drawer(
@@ -141,16 +147,46 @@ class _MapPageState extends State<MapPage> {
       polylines.clear();
       populateAnchors(operation);
       populateLinks(operation);
+      populateTargets(operation);
 
       setState(() {
         isLoading = false;
       });
     } catch (e) {
-      //TODO go back to login here.
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage(title: MyApp.APP_TITLE,)),
+      );
       setState(() {
         isLoading = false;
       });
     }
+  }
+
+  populateTargets(OperationFullResponse operation) async {
+    for (var target in operation.markers) {
+      final MarkerId targetId = MarkerId(target.iD);
+      final Portal portal = operation.getPortalFromID(target.portalId);
+      final Marker marker = Marker(
+          markerId: targetId,
+          icon: await target.getIcon(), 
+          position: LatLng(
+            double.parse(portal.lat),
+            double.parse(portal.lng),
+          ),
+          infoWindow: InfoWindow(
+            title: portal.name,
+            snippet: target.getMarkerTitle(portal.name),
+            onTap: () {
+              _onTargetTapped(targetId);
+            },
+          ));
+      markers[targetId] = marker;
+    }
+  }
+
+  _onTargetTapped(MarkerId targetId) {
+    print('Tapped Target: ${targetId.value}');
   }
 
   populateAnchors(OperationFullResponse operation) async {
@@ -209,7 +245,7 @@ class _MapPageState extends State<MapPage> {
   }
 
   List<Widget> getDrawerElements() {
-    if (operationList.isEmpty) {
+    if (operationList == null || operationList.isEmpty) {
       return <Widget>[
         DrawerHeader(
           child: Text(

@@ -61,6 +61,10 @@ flutter:
       - assets/icons/groupe.bmp
       - assets/icons/groupf.bmp
       - assets/icons/groupa_2.bmp
+      - assets/icons/destroy.bmp
+      - assets/icons/decay.bmp
+      - assets/icons/virus.bmp
+      - assets/icons/unknown.bmp
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
