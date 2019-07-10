@@ -23,7 +23,7 @@ dependencies:
   flutter_auth_buttons: ^0.5.0
   dio: 2.1.7
   cookie_jar: ^1.0.0
-  google_maps_flutter: ^0.5.11
+  google_maps_flutter: ^0.5.19
   shared_preferences: ^0.5.3+1
   location: ^2.3.5
   permission_handler: '^2.2.0'

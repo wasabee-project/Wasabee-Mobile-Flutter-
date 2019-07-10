@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:wasabee/login/login.dart';
@@ -219,27 +221,27 @@ class _MapPageState extends State<MapPage> {
   }
 
   populateLinks(OperationFullResponse operation) {
+    var lineWidth = 5;
+    if (Platform.isIOS) lineWidth = 2;
     for (var link in operation.links) {
       final PolylineId polylineId = PolylineId(link.iD);
       final Portal fromPortal = operation.getPortalFromID(link.fromPortalId);
       final Portal toPortal = operation.getPortalFromID(link.toPortalId);
       final List<LatLng> points = <LatLng>[];
-      points.add(
-          LatLng(double.parse(fromPortal.lat), double.parse(fromPortal.lng)));
-      points
-          .add(LatLng(double.parse(toPortal.lat), double.parse(toPortal.lng)));
+      points.add(LatLng(double.parse(fromPortal.lat), double.parse(fromPortal.lng)));
+      points.add(LatLng(double.parse(toPortal.lat), double.parse(toPortal.lng)));
       final Polyline polyline = Polyline(
+        geodesic: true,
         polylineId: polylineId,
         consumeTapEvents: true,
         color: this.selectedOperation.getLinkColor(),
-        width: 5,
+        width: lineWidth,
         points: points,
-        geodesic: true,
         onTap: () {
           _onPolylineTapped(polylineId);
         },
       );
-      polylines[polylineId] = polyline;
+      polylines[polylineId] = polyline.copyWith(geodesicParam: true);
     }
   }
 
