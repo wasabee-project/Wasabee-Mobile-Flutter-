@@ -41,11 +41,11 @@ class NetworkCalls {
       default:
         break;
     }
-    
-    //print('Response for $url is -> $response');
+
+    print('Response for $url is -> $response');
     if (response != null && response.statusCode == 200) {
       callback('$response');
-    }
+    } 
   }
 }
 

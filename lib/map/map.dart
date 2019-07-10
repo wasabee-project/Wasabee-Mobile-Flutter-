@@ -129,7 +129,7 @@ class _MapPageState extends State<MapPage> {
     isLoading = true;
     pendingGrab = null;
     try {
-      var url = "${UrlManager.FULL_OPERATION_URL}/${op.iD}";
+      var url = "${UrlManager.FULL_OPERATION_URL}${op.iD}";
       NetworkCalls.doNetworkCall(
           url, Map<String, String>(), gotOperation, false, NetWorkCallType.GET);
     } catch (e) {
@@ -155,7 +155,10 @@ class _MapPageState extends State<MapPage> {
     } catch (e) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => LoginPage(title: MyApp.APP_TITLE,)),
+        MaterialPageRoute(
+            builder: (context) => LoginPage(
+                  title: MyApp.APP_TITLE,
+                )),
       );
       setState(() {
         isLoading = false;
@@ -164,25 +167,26 @@ class _MapPageState extends State<MapPage> {
   }
 
   populateTargets(OperationFullResponse operation) async {
-    for (var target in operation.markers) {
-      final MarkerId targetId = MarkerId(target.iD);
-      final Portal portal = operation.getPortalFromID(target.portalId);
-      final Marker marker = Marker(
-          markerId: targetId,
-          icon: await target.getIcon(), 
-          position: LatLng(
-            double.parse(portal.lat),
-            double.parse(portal.lng),
-          ),
-          infoWindow: InfoWindow(
-            title: portal.name,
-            snippet: target.getMarkerTitle(portal.name),
-            onTap: () {
-              _onTargetTapped(targetId);
-            },
-          ));
-      markers[targetId] = marker;
-    }
+    if (operation.markers != null)
+      for (var target in operation.markers) {
+        final MarkerId targetId = MarkerId(target.iD);
+        final Portal portal = operation.getPortalFromID(target.portalId);
+        final Marker marker = Marker(
+            markerId: targetId,
+            icon: await target.getIcon(),
+            position: LatLng(
+              double.parse(portal.lat),
+              double.parse(portal.lng),
+            ),
+            infoWindow: InfoWindow(
+              title: portal.name,
+              snippet: target.getMarkerTitle(portal.name),
+              onTap: () {
+                _onTargetTapped(targetId);
+              },
+            ));
+        markers[targetId] = marker;
+      }
   }
 
   _onTargetTapped(MarkerId targetId) {
@@ -195,7 +199,7 @@ class _MapPageState extends State<MapPage> {
       final Portal portal = operation.getPortalFromID(anchor);
       final Marker marker = Marker(
         markerId: markerId,
-        icon: await this.selectedOperation.getIconFromColor(),
+        icon: await this.selectedOperation.getIconFromColor(context),
         position: LatLng(
           double.parse(portal.lat),
           double.parse(portal.lng),
@@ -236,7 +240,6 @@ class _MapPageState extends State<MapPage> {
         },
       );
       polylines[polylineId] = polyline;
-      print('markers = $markers');
     }
   }
 

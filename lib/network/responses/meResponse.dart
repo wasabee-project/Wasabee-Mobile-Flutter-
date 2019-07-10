@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:wasabee/map/utilities.dart';
 
@@ -230,7 +231,7 @@ class Ops {
     return HexColor(hexString);
   }
 
-  Future<BitmapDescriptor> getIconFromColor() async {
+  Future<BitmapDescriptor> getIconFromColor(BuildContext context) async {
     String path = 'assets/icons/groupa_2.bmp';
     switch (this.color) {
       case "groupa":
@@ -252,7 +253,9 @@ class Ops {
         path = 'assets/icons/groupf.bmp';
         break;
     }
-    return BitmapDescriptor.fromAsset(path);
+    final ImageConfiguration imageConfiguration =
+          createLocalImageConfiguration(context);
+    return BitmapDescriptor.fromAssetImage(imageConfiguration, path);
   }
 }
 

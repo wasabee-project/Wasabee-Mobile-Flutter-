@@ -45,15 +45,14 @@ class _LoginPageState extends State<LoginPage> {
       var opList = MeResponse.fromJson(json.decode(response)).ops;
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(
-            builder: (context) =>
-                MapPage(ops: opList)),
+        MaterialPageRoute(builder: (context) => MapPage(ops: opList)),
       );
     } catch (e) {
       await CookieUtils.clearAllCookies();
       setState(() {
         isLoading = false;
       });
+      print("Exception In CallMe -> $e");
     }
   }
 
@@ -74,14 +73,17 @@ class _LoginPageState extends State<LoginPage> {
     print("listOfPermStatuses -> $listOfPermStatuses");
     if (listOfPermStatuses != null)
       for (var status in listOfPermStatuses) {
-        if (status != PermissionStatus.granted) foundNonEnabled = true;
+        if (status != PermissionStatus.granted) {
+          if (!(Platform.isIOS && status == PermissionStatus.unknown))
+            foundNonEnabled = true;
+        }
       }
     return foundNonEnabled;
   }
 
-  showNonEnabledDialog() {
+  showNonEnabledDialog(BuildContext _context) {
     showDialog<void>(
-      context: context,
+      context: _context,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -104,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Text('Ok'),
               onPressed: () {
                 Navigator.of(context).pop();
-                requestPermissions();
+                requestPermissions(_context);
               },
             ),
           ],
@@ -113,15 +115,15 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  requestPermissions() async {
+  requestPermissions(BuildContext _context) async {
     Map<PermissionGroup, PermissionStatus> permissions =
         await PermissionHandler().requestPermissions(
             [PermissionGroup.location, PermissionGroup.storage]);
     print('PERMISSION RESULTS: $permissions');
     if (findNonEnabled(permissions.values.toList())) {
-      showNonEnabledDialog();
+      showNonEnabledDialog(_context);
     } else {
-      initiateSignIn();
+      initiateSignIn(_context);
     }
   }
 
@@ -157,31 +159,36 @@ class _LoginPageState extends State<LoginPage> {
         appBar: AppBar(
           title: Text(widget.title + titleString),
         ),
-        body: Center(
-          child: isLoading
-              ? Center(
-                  child: CircularProgressIndicator(),
-                )
-              : GoogleSignInButton(
-                  onPressed: () {
-                    checkPermissions().then((foundBad) {
-                      if (foundBad) {
-                        showNonEnabledDialog();
-                      } else {
-                        initiateSignIn();
-                      }
-                    });
-                  },
-                  darkMode: true),
-        ));
+        body: Builder(
+            // Create an inner BuildContext so that the onPressed methods
+            // can refer to the Scaffold with Scaffold.of().
+            builder: (BuildContext context) {
+          return Center(
+            child: isLoading
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : GoogleSignInButton(
+                    onPressed: () {
+                      checkPermissions().then((foundBad) {
+                        if (foundBad) {
+                          showNonEnabledDialog(context);
+                        } else {
+                          initiateSignIn(context);
+                        }
+                      });
+                    },
+                    darkMode: true),
+          );
+        }));
   }
 
-  initiateSignIn() {
+  initiateSignIn(BuildContext _context) {
     setState(() {
       isLoading = true;
     });
     Auth(googleSignIn: GoogleSignIn())
-        .signInWithGoogle()
+        .signInWithGoogle(_context)
         .then((GoogleSignInAuthentication googleAuth) {
       if (googleAuth == null) {
         setState(() {
