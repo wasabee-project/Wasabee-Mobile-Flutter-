@@ -241,7 +241,7 @@ class _MapPageState extends State<MapPage> {
           _onPolylineTapped(polylineId);
         },
       );
-      polylines[polylineId] = polyline.copyWith(geodesicParam: true);
+      polylines[polylineId] = polyline;
     }
   }
 
