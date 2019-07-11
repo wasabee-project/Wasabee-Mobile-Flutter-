@@ -31,34 +31,7 @@ class OperationUtils {
     }
     return HexColor(hexString);
   }
-
-  static Future<BitmapDescriptor> getIconFromColor(BuildContext context, Op operation) async {
-    String path = 'assets/icons/groupa_2.bmp';
-    switch (operation.color) {
-      case "groupa":
-        path = 'assets/icons/groupa_2.bmp';
-        break;
-      case "groupb":
-        path = 'assets/icons/groupb.bmp';
-        break;
-      case "groupc":
-        path = 'assets/icons/groupc.bmp';
-        break;
-      case "groupd":
-        path = 'assets/icons/groupd.bmp';
-        break;
-      case "groupe":
-        path = 'assets/icons/groupe.bmp';
-        break;
-      case "groupf":
-        path = 'assets/icons/groupf.bmp';
-        break;
-    }
-    final ImageConfiguration imageConfiguration =
-          createLocalImageConfiguration(context);
-    return BitmapDescriptor.fromAssetImage(imageConfiguration, path);
-  }
-
+  
   static Portal getPortalFromID(String id, Operation operation) {
     for (var portal in operation.opportals) {
       if (portal.id == id) return portal;

@@ -2,6 +2,8 @@ import 'dart:math';
 import 'dart:ui';
 import 'package:vector_math/vector_math.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter/material.dart';
+import '../classutils/target.dart';
 
 class MapUtilities {
   static double getViewCircleZoomLevel(LatLng center, List<Marker> markers) {
@@ -104,4 +106,59 @@ class HexColor extends Color {
   }
 
   HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
+}
+
+class MapMarkerBitmapBank {
+  Map<String, BitmapDescriptor> bank = Map();
+
+  Future<BitmapDescriptor> getIconFromBank(
+      String key, BuildContext context) async {
+    BitmapDescriptor bmd = bank[key];
+    if (bmd != null) {
+      print("Size of Bank -> ${bank.length}");
+      return bmd;
+    } else {
+      ImageConfiguration imageConfiguration =
+          createLocalImageConfiguration(context);
+      bmd = await BitmapDescriptor.fromAssetImage(
+          imageConfiguration, getPathFromKey(key));
+      bank[key] = bmd;
+      print("Size of Bank -> ${bank.length}");
+      return bmd;
+    }
+  }
+
+  String getPathFromKey(String key) {
+    String path = 'assets/icons/unknown.bmp';
+    switch (key) {
+      case TargetUtils.LetDecayPortalAlert:
+        path = 'assets/icons/decay.bmp';
+        break;
+      case TargetUtils.DestroyPortalAlert:
+        path = 'assets/icons/destroy.bmp';
+        break;
+      case TargetUtils.UseVirusPortalAlert:
+        path = 'assets/icons/virus.bmp';
+        break;
+      case "groupa":
+        path = 'assets/icons/groupa_2.bmp';
+        break;
+      case "groupb":
+        path = 'assets/icons/groupb.bmp';
+        break;
+      case "groupc":
+        path = 'assets/icons/groupc.bmp';
+        break;
+      case "groupd":
+        path = 'assets/icons/groupd.bmp';
+        break;
+      case "groupe":
+        path = 'assets/icons/groupe.bmp';
+        break;
+      case "groupf":
+        path = 'assets/icons/groupf.bmp';
+        break;
+    }
+    return path;
+  }
 }

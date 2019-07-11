@@ -35,6 +35,7 @@ class _MapPageState extends State<MapPage> {
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   Map<PolylineId, Polyline> polylines = <PolylineId, Polyline>{};
   Map<MarkerId, Marker> targets = <MarkerId, Marker>{};
+  MapMarkerBitmapBank bitmapBank = MapMarkerBitmapBank();
 
   _MapPageState(List<Op> ops) {
     this.operationList = ops;
@@ -149,6 +150,8 @@ class _MapPageState extends State<MapPage> {
       var operation = Operation.fromJson(json.decode(response));
       markers.clear();
       polylines.clear();
+      populateBank();
+      bitmapBank.bank.clear();
       populateAnchors(operation);
       populateLinks(operation);
       populateTargets(operation);
@@ -172,12 +175,13 @@ class _MapPageState extends State<MapPage> {
 
   populateTargets(Operation operation) async {
     if (operation.markers != null)
+      populateBank();
       for (var target in operation.markers) {
         final MarkerId targetId = MarkerId(target.iD);
         final Portal portal = OperationUtils.getPortalFromID(target.portalId, operation);
         final Marker marker = Marker(
             markerId: targetId,
-            icon: await TargetUtils.getIcon(context, target),
+            icon: await bitmapBank.getIconFromBank(target.type, context),
             position: LatLng(
               double.parse(portal.lat),
               double.parse(portal.lng),
@@ -211,7 +215,7 @@ class _MapPageState extends State<MapPage> {
       final Portal portal = OperationUtils.getPortalFromID(anchor, operation);
       final Marker marker = Marker(
         markerId: markerId,
-        icon: await OperationUtils.getIconFromColor(context, this.selectedOperation),
+        icon: await bitmapBank.getIconFromBank(operation.color, context),
         position: LatLng(
           double.parse(portal.lat),
           double.parse(portal.lng),
@@ -266,6 +270,11 @@ class _MapPageState extends State<MapPage> {
 
   void _onPolylineTapped(PolylineId polylineId) {
     print('Tapped Polyline: ${polylineId.value}');
+  }
+
+  populateBank() {
+    if (bitmapBank == null)
+      bitmapBank = MapMarkerBitmapBank();
   }
 
   List<Widget> getDrawerElements() {

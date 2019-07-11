@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
 
 class TargetUtils {
@@ -22,23 +20,5 @@ class TargetUtils {
     }
     title = "$title$portalName";
     return title;
-  }
-
-  static Future<BitmapDescriptor> getIcon(BuildContext context, Target target) async {
-    String path = 'assets/icons/unknown.bmp';
-    switch (target.type) {
-      case LetDecayPortalAlert:
-        path = 'assets/icons/decay.bmp';
-        break;
-      case DestroyPortalAlert:
-        path = 'assets/icons/destroy.bmp';
-        break;
-      case UseVirusPortalAlert:
-        path = 'assets/icons/virus.bmp';
-        break;
-    }
-     final ImageConfiguration imageConfiguration =
-          createLocalImageConfiguration(context);
-    return BitmapDescriptor.fromAssetImage(imageConfiguration, path);
   }
 }
