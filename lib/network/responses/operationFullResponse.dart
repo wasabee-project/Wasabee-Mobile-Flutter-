@@ -1,22 +1,19 @@
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:flutter/material.dart';
-
-class OperationFullResponse {
+class Operation {
   String iD;
   String name;
   String creator;
   String color;
   List<Portal> opportals;
   List<String> anchors;
-  List<Links> links;
-  List<Markers> markers;
+  List<Link> links;
+  List<Target> markers;
   String teamid;
   String modified;
   String comment;
   Null keysonhand;
   String fetched;
 
-  OperationFullResponse(
+  Operation(
       {this.iD,
       this.name,
       this.creator,
@@ -31,7 +28,7 @@ class OperationFullResponse {
       this.keysonhand,
       this.fetched});
 
-  OperationFullResponse.fromJson(Map<String, dynamic> json) {
+  Operation.fromJson(Map<String, dynamic> json) {
     iD = json['ID'];
     name = json['name'];
     creator = json['creator'];
@@ -44,15 +41,15 @@ class OperationFullResponse {
     }
     anchors = json['anchors'].cast<String>();
     if (json['links'] != null) {
-      links = new List<Links>();
+      links = new List<Link>();
       json['links'].forEach((v) {
-        links.add(new Links.fromJson(v));
+        links.add(new Link.fromJson(v));
       });
     }
     if (json['markers'] != null) {
-      markers = new List<Markers>();
+      markers = new List<Target>();
       json['markers'].forEach((v) {
-        markers.add(new Markers.fromJson(v));
+        markers.add(new Target.fromJson(v));
       });
     }
     teamid = json['teamid'];
@@ -84,23 +81,6 @@ class OperationFullResponse {
     data['keysonhand'] = this.keysonhand;
     data['fetched'] = this.fetched;
     return data;
-  }
-
-  Portal getPortalFromID(String id) {
-    for (var portal in this.opportals) {
-      if (portal.id == id) return portal;
-    }
-    return null;
-  }
-
-  List<Links> getLinksForPortalId(String id) {
-    var linkList = List<Links>();
-    for (var link in this.links) {
-      if (link.fromPortalId == id || link.toPortalId == id) {
-        linkList.add(link);
-      }
-    }
-    return linkList;
   }
 }
 
@@ -135,7 +115,7 @@ class Portal {
   }
 }
 
-class Links {
+class Link {
   String iD;
   String fromPortalId;
   String toPortalId;
@@ -143,7 +123,7 @@ class Links {
   String assignedTo;
   int throwOrderPos;
 
-  Links(
+  Link(
       {this.iD,
       this.fromPortalId,
       this.toPortalId,
@@ -151,7 +131,7 @@ class Links {
       this.assignedTo,
       this.throwOrderPos});
 
-  Links.fromJson(Map<String, dynamic> json) {
+  Link.fromJson(Map<String, dynamic> json) {
     iD = json['ID'];
     fromPortalId = json['fromPortalId'];
     toPortalId = json['toPortalId'];
@@ -172,10 +152,7 @@ class Links {
   }
 }
 
-class Markers {
-  static const DestroyPortalAlert = "DestroyPortalAlert";
-  static const UseVirusPortalAlert = "UseVirusPortalAlert";
-  static const LetDecayPortalAlert = "LetDecayPortalAlert";
+class Target {
 
   String iD;
   String portalId;
@@ -184,7 +161,7 @@ class Markers {
   String assignedTo;
   bool complete;
 
-  Markers(
+  Target(
       {this.iD,
       this.portalId,
       this.type,
@@ -192,7 +169,7 @@ class Markers {
       this.assignedTo,
       this.complete});
 
-  Markers.fromJson(Map<String, dynamic> json) {
+  Target.fromJson(Map<String, dynamic> json) {
     iD = json['ID'];
     portalId = json['portalId'];
     type = json['type'];
@@ -210,40 +187,5 @@ class Markers {
     data['assignedTo'] = this.assignedTo;
     data['complete'] = this.complete;
     return data;
-  }
-
-  Future<BitmapDescriptor> getIcon(BuildContext context) async {
-    String path = 'assets/icons/unknown.bmp';
-    switch (this.type) {
-      case LetDecayPortalAlert:
-        path = 'assets/icons/decay.bmp';
-        break;
-      case DestroyPortalAlert:
-        path = 'assets/icons/destroy.bmp';
-        break;
-      case UseVirusPortalAlert:
-        path = 'assets/icons/virus.bmp';
-        break;
-    }
-     final ImageConfiguration imageConfiguration =
-          createLocalImageConfiguration(context);
-    return BitmapDescriptor.fromAssetImage(imageConfiguration, path);
-  }
-
-  getMarkerTitle(String portalName) {
-    var title = "";
-    switch (this.type) {
-      case DestroyPortalAlert:
-        title = "Destroy - ";
-        break;
-      case UseVirusPortalAlert:
-        title = "Virus - ";
-        break;
-      case LetDecayPortalAlert:
-        title = "Let Decay - ";
-        break;
-    }
-    title = "$title$portalName";
-    return title;
   }
 }

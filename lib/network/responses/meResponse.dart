@@ -1,9 +1,3 @@
-import 'dart:ui';
-
-import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:wasabee/map/utilities.dart';
-
 class MeResponse {
   String googleID;
   String ingressName;
@@ -17,12 +11,12 @@ class MeResponse {
   bool rocksVerified;
   bool rAID;
   bool rISC;
-  List<OwnedTeams> ownedTeams;
-  List<Teams> teams;
-  List<Ops> ops;
-  List<OwnedOps> ownedOps;
+  List<Team> ownedTeams;
+  List<Team> teams;
+  List<Op> ops;
+  List<Op> ownedOps;
   Telegram telegram;
-  List<Assignments> assignments;
+  List<Assignment> assignments;
 
   MeResponse(
       {this.googleID,
@@ -58,36 +52,36 @@ class MeResponse {
     rAID = json['RAID'];
     rISC = json['RISC'];
     if (json['OwnedTeams'] != null) {
-      ownedTeams = new List<OwnedTeams>();
+      ownedTeams = new List<Team>();
       json['OwnedTeams'].forEach((v) {
-        ownedTeams.add(new OwnedTeams.fromJson(v));
+        ownedTeams.add(new Team.fromJson(v));
       });
     }
     if (json['Teams'] != null) {
-      teams = new List<Teams>();
+      teams = new List<Team>();
       json['Teams'].forEach((v) {
-        teams.add(new Teams.fromJson(v));
+        teams.add(new Team.fromJson(v));
       });
     }
     if (json['Ops'] != null) {
-      ops = new List<Ops>();
+      ops = new List<Op>();
       json['Ops'].forEach((v) {
-        ops.add(new Ops.fromJson(v));
+        ops.add(new Op.fromJson(v));
       });
     }
     if (json['OwnedOps'] != null) {
-      ownedOps = new List<OwnedOps>();
+      ownedOps = new List<Op>();
       json['OwnedOps'].forEach((v) {
-        ownedOps.add(new OwnedOps.fromJson(v));
+        ownedOps.add(new Op.fromJson(v));
       });
     }
     telegram = json['Telegram'] != null
         ? new Telegram.fromJson(json['Telegram'])
         : null;
     if (json['Assignments'] != null) {
-      assignments = new List<Assignments>();
+      assignments = new List<Assignment>();
       json['Assignments'].forEach((v) {
-        assignments.add(new Assignments.fromJson(v));
+        assignments.add(new Assignment.fromJson(v));
       });
     }
   }
@@ -128,40 +122,16 @@ class MeResponse {
   }
 }
 
-class OwnedTeams {
-  String iD;
-  String name;
-  String rocksComm;
-  String rocksKey;
 
-  OwnedTeams({this.iD, this.name, this.rocksComm, this.rocksKey});
-
-  OwnedTeams.fromJson(Map<String, dynamic> json) {
-    iD = json['ID'];
-    name = json['Name'];
-    rocksComm = json['RocksComm'];
-    rocksKey = json['RocksKey'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['ID'] = this.iD;
-    data['Name'] = this.name;
-    data['RocksComm'] = this.rocksComm;
-    data['RocksKey'] = this.rocksKey;
-    return data;
-  }
-}
-
-class Teams {
+class Team {
   String iD;
   String name;
   String state;
   String rocksComm;
 
-  Teams({this.iD, this.name, this.state, this.rocksComm});
+  Team({this.iD, this.name, this.state, this.rocksComm});
 
-  Teams.fromJson(Map<String, dynamic> json) {
+  Team.fromJson(Map<String, dynamic> json) {
     iD = json['ID'];
     name = json['Name'];
     state = json['State'];
@@ -178,7 +148,7 @@ class Teams {
   }
 }
 
-class Ops {
+class Op {
   String iD;
   String name;
   String color;
@@ -186,89 +156,9 @@ class Ops {
   String teamID;
   bool isSelected = false;
 
-  Ops({this.iD, this.name, this.color, this.teamName, this.teamID});
+  Op({this.iD, this.name, this.color, this.teamName, this.teamID});
 
-  Ops.fromJson(Map<String, dynamic> json) {
-    iD = json['ID'];
-    name = json['Name'];
-    color = json['Color'];
-    teamName = json['TeamName'];
-    teamID = json['TeamID'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['ID'] = this.iD;
-    data['Name'] = this.name;
-    data['Color'] = this.color;
-    data['TeamName'] = this.teamName;
-    data['TeamID'] = this.teamID;
-    return data;
-  }
-
-  Color getLinkColor() {
-    String hexString = "";
-    switch (this.color) {
-      case "groupa":
-        hexString = 'ff6600';
-        break;
-      case "groupb":
-        hexString = 'ff9900';
-        break;
-      case "groupc":
-        hexString = 'BB9900';
-        break;
-      case "groupd":
-        hexString = 'bb22cc';
-        break;
-      case "groupe":
-        hexString = '33cccc';
-        break;
-      case "groupf":
-        hexString = 'ff55ff';
-        break;
-    }
-    return HexColor(hexString);
-  }
-
-  Future<BitmapDescriptor> getIconFromColor(BuildContext context) async {
-    String path = 'assets/icons/groupa_2.bmp';
-    switch (this.color) {
-      case "groupa":
-        path = 'assets/icons/groupa_2.bmp';
-        break;
-      case "groupb":
-        path = 'assets/icons/groupb.bmp';
-        break;
-      case "groupc":
-        path = 'assets/icons/groupc.bmp';
-        break;
-      case "groupd":
-        path = 'assets/icons/groupd.bmp';
-        break;
-      case "groupe":
-        path = 'assets/icons/groupe.bmp';
-        break;
-      case "groupf":
-        path = 'assets/icons/groupf.bmp';
-        break;
-    }
-    final ImageConfiguration imageConfiguration =
-          createLocalImageConfiguration(context);
-    return BitmapDescriptor.fromAssetImage(imageConfiguration, path);
-  }
-}
-
-class OwnedOps {
-  String iD;
-  String name;
-  String color;
-  String teamName;
-  String teamID;
-
-  OwnedOps({this.iD, this.name, this.color, this.teamName, this.teamID});
-
-  OwnedOps.fromJson(Map<String, dynamic> json) {
+  Op.fromJson(Map<String, dynamic> json) {
     iD = json['ID'];
     name = json['Name'];
     color = json['Color'];
@@ -312,14 +202,14 @@ class Telegram {
   }
 }
 
-class Assignments {
+class Assignment {
   String opID;
   String operationName;
   String type;
 
-  Assignments({this.opID, this.operationName, this.type});
+  Assignment({this.opID, this.operationName, this.type});
 
-  Assignments.fromJson(Map<String, dynamic> json) {
+  Assignment.fromJson(Map<String, dynamic> json) {
     opID = json['OpID'];
     operationName = json['OperationName'];
     type = json['Type'];

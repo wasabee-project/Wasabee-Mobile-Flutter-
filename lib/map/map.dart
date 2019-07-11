@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:wasabee/classutils/operation.dart';
+import 'package:wasabee/classutils/target.dart';
 import 'package:wasabee/login/login.dart';
 import 'package:wasabee/network/responses/meResponse.dart';
 import 'package:flutter/foundation.dart';
@@ -14,7 +16,7 @@ import '../main.dart';
 import 'dart:convert';
 
 class MapPage extends StatefulWidget {
-  final List<Ops> ops;
+  final List<Op> ops;
 
   MapPage({Key key, @required this.ops}) : super(key: key);
 
@@ -26,15 +28,15 @@ class _MapPageState extends State<MapPage> {
   var firstLoad = true;
   var isLoading = false;
   var pendingGrab;
-  Ops selectedOperation;
+  Op selectedOperation;
   GoogleMapController _controller;
   final LatLng _center = const LatLng(32.7766642, -96.7969879);
-  List<Ops> operationList = List();
+  List<Op> operationList = List();
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   Map<PolylineId, Polyline> polylines = <PolylineId, Polyline>{};
   Map<MarkerId, Marker> targets = <MarkerId, Marker>{};
 
-  _MapPageState(List<Ops> ops) {
+  _MapPageState(List<Op> ops) {
     this.operationList = ops;
   }
 
@@ -91,7 +93,7 @@ class _MapPageState extends State<MapPage> {
     );
   }
 
-  doSelectOperationThing(Ops operation) {
+  doSelectOperationThing(Op operation) {
     print('setting pending grab');
     operation.isSelected = true;
     this.pendingGrab = operation;
@@ -113,10 +115,10 @@ class _MapPageState extends State<MapPage> {
     });
   }
 
-  Future<Ops> checkForSelectedOp(List<Ops> operationList) async {
+  Future<Op> checkForSelectedOp(List<Op> operationList) async {
     var selectedOpId = await LocalStorageUtils.getSelectedOpId();
     if (selectedOpId != null) {
-      Ops foundOperation;
+      Op foundOperation;
       for (var listOp in operationList) {
         if (listOp.iD == selectedOpId) foundOperation = listOp;
       }
@@ -127,7 +129,7 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  getFullOperation(Ops op) async {
+  getFullOperation(Op op) async {
     isLoading = true;
     pendingGrab = null;
     try {
@@ -144,7 +146,7 @@ class _MapPageState extends State<MapPage> {
 
   gotOperation(response) async {
     try {
-      var operation = OperationFullResponse.fromJson(json.decode(response));
+      var operation = Operation.fromJson(json.decode(response));
       markers.clear();
       polylines.clear();
       populateAnchors(operation);
@@ -168,73 +170,90 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  populateTargets(OperationFullResponse operation) async {
+  populateTargets(Operation operation) async {
     if (operation.markers != null)
       for (var target in operation.markers) {
         final MarkerId targetId = MarkerId(target.iD);
-        final Portal portal = operation.getPortalFromID(target.portalId);
+        final Portal portal = OperationUtils.getPortalFromID(target.portalId, operation);
         final Marker marker = Marker(
             markerId: targetId,
-            icon: await target.getIcon(context),
+            icon: await TargetUtils.getIcon(context, target),
             position: LatLng(
               double.parse(portal.lat),
               double.parse(portal.lng),
             ),
             infoWindow: InfoWindow(
               title: portal.name,
-              snippet: target.getMarkerTitle(portal.name),
+              snippet: TargetUtils.getMarkerTitle(portal.name, target),
               onTap: () {
-                _onTargetTapped(targetId);
+                _onTargetInfoWindowTapped(target, portal, targetId);
               },
-            ));
+            ),
+            onTap: () {
+              _onAnchorTapped(targetId);
+            });
         markers[targetId] = marker;
       }
+  }
+
+  _onTargetInfoWindowTapped(Target target, Portal portal, MarkerId markerId) {
+    //TODO show dialog to do actions on that marker.
+    print('Tapped MarkerInfoWindow: ${markerId.value}');
   }
 
   _onTargetTapped(MarkerId targetId) {
     print('Tapped Target: ${targetId.value}');
   }
 
-  populateAnchors(OperationFullResponse operation) async {
+  populateAnchors(Operation operation) async {
     for (var anchor in operation.anchors) {
       final MarkerId markerId = MarkerId(anchor);
-      final Portal portal = operation.getPortalFromID(anchor);
+      final Portal portal = OperationUtils.getPortalFromID(anchor, operation);
       final Marker marker = Marker(
         markerId: markerId,
-        icon: await this.selectedOperation.getIconFromColor(context),
+        icon: await OperationUtils.getIconFromColor(context, this.selectedOperation),
         position: LatLng(
           double.parse(portal.lat),
           double.parse(portal.lng),
         ),
         infoWindow: InfoWindow(
-            title: portal.name, snippet: 'Links: ${operation.getLinksForPortalId(portal.id).length}'),
+            title: portal.name,
+            snippet:
+                'Links: ${OperationUtils.getLinksForPortalId(portal.id, operation).length}',
+            onTap: _onAnchorInfoWindowTapped(markerId)),
         onTap: () {
-          _onMarkerTapped(markerId);
+          _onAnchorTapped(markerId);
         },
       );
       markers[markerId] = marker;
     }
   }
 
-  _onMarkerTapped(MarkerId markerId) {
+  _onAnchorInfoWindowTapped(MarkerId markerId) {
+    print('Tapped MarkerInfoWindow: ${markerId.value}');
+  }
+
+  _onAnchorTapped(MarkerId markerId) {
     print('Tapped Marker: ${markerId.value}');
   }
 
-  populateLinks(OperationFullResponse operation) {
+  populateLinks(Operation operation) {
     var lineWidth = 5;
     if (Platform.isIOS) lineWidth = 2;
     for (var link in operation.links) {
       final PolylineId polylineId = PolylineId(link.iD);
-      final Portal fromPortal = operation.getPortalFromID(link.fromPortalId);
-      final Portal toPortal = operation.getPortalFromID(link.toPortalId);
+      final Portal fromPortal = OperationUtils.getPortalFromID(link.fromPortalId, operation);
+      final Portal toPortal = OperationUtils.getPortalFromID(link.toPortalId, operation);
       final List<LatLng> points = <LatLng>[];
-      points.add(LatLng(double.parse(fromPortal.lat), double.parse(fromPortal.lng)));
-      points.add(LatLng(double.parse(toPortal.lat), double.parse(toPortal.lng)));
+      points.add(
+          LatLng(double.parse(fromPortal.lat), double.parse(fromPortal.lng)));
+      points
+          .add(LatLng(double.parse(toPortal.lat), double.parse(toPortal.lng)));
       final Polyline polyline = Polyline(
         geodesic: true,
         polylineId: polylineId,
         consumeTapEvents: true,
-        color: this.selectedOperation.getLinkColor(),
+        color: OperationUtils.getLinkColor(this.selectedOperation),
         width: lineWidth,
         points: points,
         onTap: () {
@@ -287,7 +306,7 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  tappedOp(Ops op, List<Ops> operationList) async {
+  tappedOp(Op op, List<Op> operationList) async {
     await LocalStorageUtils.storeSelectedOpId(op.iD);
     setState(() {
       doSelectOperationThing(op);
