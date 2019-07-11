@@ -175,7 +175,7 @@ class _MapPageState extends State<MapPage> {
         final Portal portal = operation.getPortalFromID(target.portalId);
         final Marker marker = Marker(
             markerId: targetId,
-            icon: await target.getIcon(),
+            icon: await target.getIcon(context),
             position: LatLng(
               double.parse(portal.lat),
               double.parse(portal.lng),
@@ -207,7 +207,7 @@ class _MapPageState extends State<MapPage> {
           double.parse(portal.lng),
         ),
         infoWindow: InfoWindow(
-            title: portal.name, snippet: 'Links: ${operation.links.length}'),
+            title: portal.name, snippet: 'Links: ${operation.getLinksForPortalId(portal.id).length}'),
         onTap: () {
           _onMarkerTapped(markerId);
         },

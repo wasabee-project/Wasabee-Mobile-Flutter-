@@ -1,4 +1,5 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter/material.dart';
 
 class OperationFullResponse {
   String iD;
@@ -90,6 +91,16 @@ class OperationFullResponse {
       if (portal.id == id) return portal;
     }
     return null;
+  }
+
+  List<Links> getLinksForPortalId(String id) {
+    var linkList = List<Links>();
+    for (var link in this.links) {
+      if (link.fromPortalId == id || link.toPortalId == id) {
+        linkList.add(link);
+      }
+    }
+    return linkList;
   }
 }
 
@@ -201,7 +212,7 @@ class Markers {
     return data;
   }
 
-  Future<BitmapDescriptor> getIcon() async {
+  Future<BitmapDescriptor> getIcon(BuildContext context) async {
     String path = 'assets/icons/unknown.bmp';
     switch (this.type) {
       case LetDecayPortalAlert:
@@ -214,7 +225,9 @@ class Markers {
         path = 'assets/icons/virus.bmp';
         break;
     }
-    return BitmapDescriptor.fromAsset(path);
+     final ImageConfiguration imageConfiguration =
+          createLocalImageConfiguration(context);
+    return BitmapDescriptor.fromAssetImage(imageConfiguration, path);
   }
 
   getMarkerTitle(String portalName) {
