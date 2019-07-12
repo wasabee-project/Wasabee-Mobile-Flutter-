@@ -24,3 +24,4 @@ android/app/src/main/AndroidManifest.xml
 .idea/*
 ios/Pods/*
 ios/Flutter/*
+android/.gradle/*
