@@ -7,7 +7,6 @@ import 'package:wasabee/network/responses/teamsResponse.dart';
 import '../classutils/target.dart';
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
-import 'package:image/image.dart' as Images;
 import 'dart:async';
 
 class MapUtilities {
@@ -126,7 +125,7 @@ class MapMarkerBitmapBank {
       ImageConfiguration imageConfiguration =
           createLocalImageConfiguration(context);
       if (key.startsWith("agent_")) {
-        bmd = await getAgentImage(key, imageConfiguration, context);// await getUrlAvatarMarker(agent.pic, imageConfiguration, key, context);
+        bmd = await getAgentImage(key, imageConfiguration,context);
       } else {
         print('getting existing from key -> $key');
         bmd = await BitmapDescriptor.fromAssetImage(
@@ -139,59 +138,26 @@ class MapMarkerBitmapBank {
 
   Future<BitmapDescriptor> getAgentImage(String key,
       ImageConfiguration imageConfiguration, BuildContext context) async {
-        print('getting backup agent image');
+    print('getting backup agent image');
     return await BitmapDescriptor.fromAssetImage(
-        imageConfiguration, 'assets/icons/avatar.bmp');
+        imageConfiguration, 'assets/icons/avatar_placeholder.bmp');
   }
 
-  Future<BitmapDescriptor> getUrlAvatarMarker(
-      String url, ImageConfiguration configuration, String key, BuildContext context) async {
-    var agentAvatar;
-    // load avatar image
-    ByteData imageData = await rootBundle.load('assets/icons/avatar.png');
-    var markerImage = Images.decodeImage(Uint8List.view(imageData.buffer));
+  Future<BitmapDescriptor> getIconFromUrl(String url, ImageConfiguration configuration) async {
+    final Completer<BitmapDescriptor> bitmapIcon =
+        Completer<BitmapDescriptor>();
 
-    //load marker image
-    Image downloadImage = new Image.network(url);
-    final ImageStream stream = downloadImage.image.resolve(configuration);
-    final Completer<void> completer = Completer<void>();
-    stream.addListener(ImageStreamListener((ImageInfo info, bool syncCall) {
-      print('imageInfo -> $info');
-      print('imageInfo.image -> ${info.image}');
-      info.image.toByteData().then((byteData) {
-        print('byteData.buffer -> ${byteData.buffer.toString()}');
-        var data = Uint8List.view(byteData.buffer);
-        print('data -> $data');
-        agentAvatar = Images.decodeImage(data);
-        print('agent avatar -> $agentAvatar');
-        completer.complete();
-      });
+    Image.network(url).image
+        .resolve(configuration)
+        .addListener(ImageStreamListener((ImageInfo image, bool sync) async {
+      final ByteData bytes =
+          await image.image.toByteData(format: ImageByteFormat.png);
+      final BitmapDescriptor bitmap =
+          BitmapDescriptor.fromBytes(bytes.buffer.asUint8List());
+      bitmapIcon.complete(bitmap);
     }));
-    await completer.future;
 
-    //resize the avatar image to fit inside the marker image
-    if (markerImage.width == null ||
-        markerImage.height == null ||
-        agentAvatar == null) {
-          print('returning null agent thing');
-      return await getAgentImage(key, configuration, context);
-    } else {
-      print('doing thing');
-      agentAvatar = Images.copyResize(agentAvatar,
-          width: markerImage.width ~/ 1.1, height: markerImage.height ~/ 1.4);
-
-      var radius = 30;
-      int originX = agentAvatar.width ~/ 2, originY = agentAvatar.height ~/ 2;
-
-      //draw the avatar image cropped as a circle inside the marker image
-      for (int y = -radius; y <= radius; y++)
-        for (int x = -radius; x <= radius; x++)
-          if (x * x + y * y <= radius * radius)
-            markerImage.setPixelSafe(originX + x + 8, originY + y + 10,
-                agentAvatar.getPixelSafe(originX + x, originY + y));
-
-      return BitmapDescriptor.fromBytes(Images.encodePng(markerImage));
-    }
+    return await bitmapIcon.future;
   }
 
   String getPathFromKey(String key) {
