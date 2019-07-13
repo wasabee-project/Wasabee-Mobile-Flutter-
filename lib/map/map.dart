@@ -15,6 +15,7 @@ import '../network/urlmanager.dart';
 import '../storage/localstorage.dart';
 import '../map/utilities.dart';
 import '../main.dart';
+import '../network/responses/teamsResponse.dart';
 import 'dart:convert';
 
 class MapPage extends StatefulWidget {
@@ -241,8 +242,8 @@ class _MapPageState extends State<MapPage> {
         ));
   }
 
+  //TODO do this whenever the map is updated.
   sendLocationIfSharing() {
-    print('doing send location -> $sharingLocation');
     if (sharingLocation) {
       LocationHelper.locateUser().then((Position userPosition) {
         if (userPosition != null) {
@@ -371,15 +372,24 @@ class _MapPageState extends State<MapPage> {
       populateLinks(operation);
       populateTargets(operation);
 
-      setState(() {
-        isLoading = false;
-      });
+      var url = "${UrlManager.FULL_GET_TEAM_URL}${selectedOperation.teamID}";
+      NetworkCalls.doNetworkCall(
+          url, Map<String, String>(), gotTeam, false, NetWorkCallType.GET);
     } catch (e) {
       parsingOperationFailed();
       setState(() {
         isLoading = false;
       });
     }
+  }
+
+  gotTeam(String response) {
+    print("got team response -> $response");
+    var team = FullTeam.fromJson(json.decode(response));
+    populateTeamMembers(team.agents);
+    setState(() {
+      isLoading = false;
+    });
   }
 
   parsingOperationFailed() async {
@@ -422,29 +432,117 @@ class _MapPageState extends State<MapPage> {
   }
 
   populateTargets(Operation operation) async {
-    if (operation.markers != null) populateBank();
-    for (var target in operation.markers) {
-      final MarkerId targetId = MarkerId(target.iD);
-      final Portal portal =
-          OperationUtils.getPortalFromID(target.portalId, operation);
-      final Marker marker = Marker(
-          markerId: targetId,
-          icon: await bitmapBank.getIconFromBank(target.type, context),
+    if (operation.markers != null) {
+      populateBank();
+      for (var target in operation.markers) {
+        final MarkerId targetId = MarkerId(target.iD);
+        final Portal portal =
+            OperationUtils.getPortalFromID(target.portalId, operation);
+        final Marker marker = Marker(
+            markerId: targetId,
+            icon: await bitmapBank.getIconFromBank(target.type, context, null),
+            position: LatLng(
+              double.parse(portal.lat),
+              double.parse(portal.lng),
+            ),
+            infoWindow: InfoWindow(
+              title: portal.name,
+              snippet: TargetUtils.getMarkerTitle(portal.name, target),
+              onTap: () {
+                _onTargetInfoWindowTapped(target, portal, targetId);
+              },
+            ),
+            onTap: () {
+              _onAnchorTapped(targetId);
+            });
+        markers[targetId] = marker;
+      }
+    }
+  }
+
+  populateAnchors(Operation operation) async {
+    if (operation.anchors != null) {
+      populateBank();
+      for (var anchor in operation.anchors) {
+        final MarkerId markerId = MarkerId(anchor);
+        final Portal portal = OperationUtils.getPortalFromID(anchor, operation);
+        final Marker marker = Marker(
+          markerId: markerId,
+          icon: await bitmapBank.getIconFromBank(operation.color, context, null),
           position: LatLng(
             double.parse(portal.lat),
             double.parse(portal.lng),
           ),
           infoWindow: InfoWindow(
-            title: portal.name,
-            snippet: TargetUtils.getMarkerTitle(portal.name, target),
-            onTap: () {
-              _onTargetInfoWindowTapped(target, portal, targetId);
-            },
-          ),
+              title: portal.name,
+              snippet:
+                  'Links: ${OperationUtils.getLinksForPortalId(portal.id, operation).length}',
+              onTap: _onAnchorInfoWindowTapped(markerId)),
           onTap: () {
-            _onAnchorTapped(targetId);
-          });
-      markers[targetId] = marker;
+            _onAnchorTapped(markerId);
+          },
+        );
+        markers[markerId] = marker;
+      }
+    }
+  }
+
+  populateTeamMembers(List<Agent> agents) async {
+    if (agents != null) {
+      populateBank();
+      for (var agent in agents) {
+        if (agent.lat != null && agent.lng != null) {
+          final MarkerId markerId = MarkerId(agent.name);
+          final Marker marker = Marker(
+            markerId: markerId,
+            icon: await bitmapBank.getIconFromBank("agent_${agent.name}", context, agent),
+            position: LatLng(
+              agent.lat,
+              agent.lng,
+            ),
+            infoWindow: InfoWindow(
+                title: agent.name,
+                snippet: 'Last Updated: ${agent.date}',
+                onTap: _onAgentInfoWindowTapped(markerId)),
+            onTap: () {
+              _onAgentTapped(markerId);
+            },
+          );
+          markers[markerId] = marker;
+        }
+      }
+    }
+  }
+
+  populateLinks(Operation operation) {
+    var lineWidth = 5;
+    if (Platform.isIOS) lineWidth = 2;
+    if (operation.links != null) {
+      populateBank();
+      for (var link in operation.links) {
+        final PolylineId polylineId = PolylineId(link.iD);
+        final Portal fromPortal =
+            OperationUtils.getPortalFromID(link.fromPortalId, operation);
+        final Portal toPortal =
+            OperationUtils.getPortalFromID(link.toPortalId, operation);
+        final List<LatLng> points = <LatLng>[];
+        points.add(
+            LatLng(double.parse(fromPortal.lat), double.parse(fromPortal.lng)));
+        points.add(
+            LatLng(double.parse(toPortal.lat), double.parse(toPortal.lng)));
+        final Polyline polyline = Polyline(
+          geodesic: true,
+          polylineId: polylineId,
+          consumeTapEvents: true,
+          color: OperationUtils.getLinkColor(this.selectedOperation),
+          width: lineWidth,
+          points: points,
+          onTap: () {
+            _onPolylineTapped(polylineId);
+          },
+        );
+        polylines[polylineId] = polyline;
+      }
     }
   }
 
@@ -457,28 +555,8 @@ class _MapPageState extends State<MapPage> {
     print('Tapped Target: ${targetId.value}');
   }
 
-  populateAnchors(Operation operation) async {
-    for (var anchor in operation.anchors) {
-      final MarkerId markerId = MarkerId(anchor);
-      final Portal portal = OperationUtils.getPortalFromID(anchor, operation);
-      final Marker marker = Marker(
-        markerId: markerId,
-        icon: await bitmapBank.getIconFromBank(operation.color, context),
-        position: LatLng(
-          double.parse(portal.lat),
-          double.parse(portal.lng),
-        ),
-        infoWindow: InfoWindow(
-            title: portal.name,
-            snippet:
-                'Links: ${OperationUtils.getLinksForPortalId(portal.id, operation).length}',
-            onTap: _onAnchorInfoWindowTapped(markerId)),
-        onTap: () {
-          _onAnchorTapped(markerId);
-        },
-      );
-      markers[markerId] = marker;
-    }
+  void _onPolylineTapped(PolylineId polylineId) {
+    print('Tapped Polyline: ${polylineId.value}');
   }
 
   _onAnchorInfoWindowTapped(MarkerId markerId) {
@@ -489,37 +567,12 @@ class _MapPageState extends State<MapPage> {
     print('Tapped Marker: ${markerId.value}');
   }
 
-  populateLinks(Operation operation) {
-    var lineWidth = 5;
-    if (Platform.isIOS) lineWidth = 2;
-    for (var link in operation.links) {
-      final PolylineId polylineId = PolylineId(link.iD);
-      final Portal fromPortal =
-          OperationUtils.getPortalFromID(link.fromPortalId, operation);
-      final Portal toPortal =
-          OperationUtils.getPortalFromID(link.toPortalId, operation);
-      final List<LatLng> points = <LatLng>[];
-      points.add(
-          LatLng(double.parse(fromPortal.lat), double.parse(fromPortal.lng)));
-      points
-          .add(LatLng(double.parse(toPortal.lat), double.parse(toPortal.lng)));
-      final Polyline polyline = Polyline(
-        geodesic: true,
-        polylineId: polylineId,
-        consumeTapEvents: true,
-        color: OperationUtils.getLinkColor(this.selectedOperation),
-        width: lineWidth,
-        points: points,
-        onTap: () {
-          _onPolylineTapped(polylineId);
-        },
-      );
-      polylines[polylineId] = polyline;
-    }
+  _onAgentInfoWindowTapped(MarkerId markerId) {
+    print('Tapped AgentInfoWindow: ${markerId.value}');
   }
 
-  void _onPolylineTapped(PolylineId polylineId) {
-    print('Tapped Polyline: ${polylineId.value}');
+  _onAgentTapped(MarkerId markerId) {
+    print('Tapped Agent: ${markerId.value}');
   }
 
   populateBank() {

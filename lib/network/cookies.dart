@@ -5,7 +5,7 @@ import 'dart:io';
 
 
 class CookieUtils {
-  static const KEY_WASABEE_COOKIE = "WASABI";
+  static const KEY_WASABEE_COOKIE = "wasabee";
 
   static Future<bool> hasWasabeeCookie(CookieJar cj) async {
     var cookieList = cj.loadForRequest(Uri.parse(UrlManager.BASE_API_URL));

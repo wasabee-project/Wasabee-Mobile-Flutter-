@@ -26,13 +26,14 @@ dependencies:
   cookie_jar: ^1.0.0
   google_maps_flutter:
     path: google_maps_flutter
-  #google_maps_flutter: ^0.5.19
+  #google_maps_flutter: ^0.5.19  When the geodesic thing gets added to the main repo, go back to it.
   shared_preferences: ^0.5.3+1
   location: ^2.3.5
   permission_handler: '^2.2.0'
   path_provider: ^1.1.0
   vector_math: any
   geolocator: '^5.0.0'
+  image: ^2.1.4
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -58,17 +59,7 @@ flutter_icons:
 flutter:
   assets:
       - assets/me.json
-      - assets/icons/groupa.bmp
-      - assets/icons/groupb.bmp
-      - assets/icons/groupc.bmp
-      - assets/icons/groupd.bmp
-      - assets/icons/groupe.bmp
-      - assets/icons/groupf.bmp
-      - assets/icons/groupa_2.bmp
-      - assets/icons/destroy.bmp
-      - assets/icons/decay.bmp
-      - assets/icons/virus.bmp
-      - assets/icons/unknown.bmp
+      - assets/icons/
       - assets/images/
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
