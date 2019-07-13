@@ -18,7 +18,7 @@ class CookieUtils {
     return false;
   }
 
-  static clearAllCookies() async {
+  static Future<bool> clearAllCookies() async {
     Directory appDocDirectory = await getApplicationDocumentsDirectory();
     var directory = await new Directory(appDocDirectory.path + '/' + 'cookies')
         .create(recursive: true);
@@ -27,5 +27,6 @@ class CookieUtils {
       ignoreExpires: false,
     );
     cj.deleteAll();
+    return true;
   }
 }

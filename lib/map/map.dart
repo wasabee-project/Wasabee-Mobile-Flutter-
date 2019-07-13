@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:wasabee/classutils/operation.dart';
@@ -8,6 +7,9 @@ import 'package:wasabee/login/login.dart';
 import 'package:wasabee/network/responses/meResponse.dart';
 import 'package:flutter/foundation.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
+import 'package:geolocator/geolocator.dart';
+import '../network/cookies.dart';
+import '../location/locationhelper.dart';
 import '../network/networkcalls.dart';
 import '../network/urlmanager.dart';
 import '../storage/localstorage.dart';
@@ -26,11 +28,12 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
   var firstLoad = true;
-  var isLoading = false;
+  var isLoading = true;
+  var sharingLocation = false;
   var pendingGrab;
   Op selectedOperation;
+  Operation loadedOperation;
   GoogleMapController _controller;
-  final LatLng _center = const LatLng(32.7766642, -96.7969879);
   List<Op> operationList = List();
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   Map<PolylineId, Polyline> polylines = <PolylineId, Polyline>{};
@@ -42,17 +45,80 @@ class _MapPageState extends State<MapPage> {
   }
 
   @override
+  void initState() {
+    LocalStorageUtils.getIsLocationSharing().then((bool isLocationSharing) {
+      sharingLocation = isLocationSharing;
+      sendLocationIfSharing();
+    });
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (firstLoad == true) {
       firstLoad = false;
       doInitialLoadThings();
     }
-    return checkPendingGrabAndGetPageContent();
-  }
-
-  Scaffold checkPendingGrabAndGetPageContent() {
-    if (pendingGrab != null) getFullOperation(pendingGrab);
-    return getPageContent();
+    return isLoading
+        ? Center(
+            child: CircularProgressIndicator(),
+          )
+        : DefaultTabController(
+            length: 3,
+            child: Scaffold(
+              appBar: AppBar(
+                bottom: TabBar(
+                  tabs: [
+                    Tab(text: 'Map'),
+                    Tab(text: 'Alerts'),
+                    Tab(text: 'Links'),
+                  ],
+                ),
+                title: Text(selectedOperation == null
+                    ? 'Wasabee - Map'
+                    : '${selectedOperation.name}'),
+                actions: loadedOperation == null
+                    ? null
+                    : <Widget>[
+                        // action button
+                        IconButton(
+                          icon: Icon(Icons.settings),
+                          onPressed: () {
+                            //TODO add settings page nav here
+                            print('settings tapped');
+                          },
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.refresh),
+                          onPressed: () {
+                            doRefresh(selectedOperation);
+                          },
+                        )
+                      ],
+              ),
+              body: TabBarView(
+                physics: NeverScrollableScrollPhysics(),
+                children: [
+                  isLoading
+                      ? Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : getPageContent(),
+                  Icon(Icons.add_alert),
+                  Icon(Icons.link),
+                ],
+              ),
+              drawer: isLoading
+                  ? null
+                  : Drawer(
+                      child: ListView(
+                        padding: EdgeInsets.zero,
+                        children: getDrawerElements(),
+                      ),
+                    ),
+            ),
+          );
   }
 
   Scaffold getPageContent() {
@@ -72,26 +138,176 @@ class _MapPageState extends State<MapPage> {
               center, List<Marker>.of(markers.values))),
     );
     return Scaffold(
-      appBar: AppBar(
-        title: Text(selectedOperation == null
-            ? 'Wasabee - Map'
-            : 'Wasabee - ${selectedOperation.name}'),
-        backgroundColor: Colors.green,
-      ),
-      body: isLoading
-          ? Center(
-              child: CircularProgressIndicator(),
-            )
-          : map,
-      drawer: isLoading
-          ? null
-          : Drawer(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: getDrawerElements(),
-              ),
-            ),
+      body: map,
     );
+  }
+
+  List<Widget> getDrawerElements() {
+    if (operationList == null || operationList.isEmpty) {
+      return <Widget>[
+        DrawerHeader(
+          child: Text(
+            'Wasabee Operations',
+            style: TextStyle(color: Colors.white, fontSize: 25.0),
+          ),
+          decoration: BoxDecoration(
+            color: Colors.green,
+          ),
+        ),
+      ];
+    } else {
+      var listOfElements = List<Widget>();
+      listOfElements.add(DrawerHeader(
+        child: Column(
+          children: <Widget>[
+            Text(
+              'Wasabee Operations',
+              style: TextStyle(color: Colors.white, fontSize: 25.0),
+            ),
+            Center(
+              child: Container(
+                  margin: const EdgeInsets.all(10),
+                  child: CircleAvatar(
+                    radius: 40.0,
+                    backgroundColor: Colors.white,
+                    child: new Image.asset(
+                      'assets/images/wasabee.png',
+                      width: 70.0,
+                      height: 70.0,
+                      fit: BoxFit.cover,
+                    ),
+                  )),
+            )
+          ],
+        ),
+        decoration: BoxDecoration(
+          color: Colors.green,
+        ),
+      ));
+      listOfElements.add(getShareLocationViews());
+      listOfElements.add(getRefreshOpListButton());
+      for (var op in operationList) {
+        listOfElements.add(ListTile(
+          title: Text(op.name),
+          selected: op.isSelected,
+          onTap: () {
+            tappedOp(op, operationList);
+            Navigator.pop(context);
+          },
+        ));
+      }
+      return listOfElements;
+    }
+  }
+
+  Widget getShareLocationViews() {
+    return Center(
+        child: Container(
+            color: Colors.grey[200],
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  "Sharing Location",
+                  style: TextStyle(color: Colors.black),
+                ),
+                Checkbox(
+                  value: sharingLocation,
+                  onChanged: (value) {
+                    setState(() {
+                      sharingLocation = value;
+                    });
+                    LocalStorageUtils.storeIsLocationSharing(value);
+                    //TODO add service to share location, also with current operation ID
+                    print('sharing location -> $value');
+                  },
+                )
+              ],
+            )));
+  }
+
+  Widget getRefreshOpListButton() {
+    return Container(
+        margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+        child: RaisedButton(
+          color: Colors.green,
+          child: Text(
+            'Refresh Op List',
+            style: TextStyle(color: Colors.white),
+          ),
+          onPressed: () {
+            tappedRefreshAllOps();
+          },
+        ));
+  }
+
+  sendLocationIfSharing() {
+    print('doing send location -> $sharingLocation');
+    if (sharingLocation) {
+      LocationHelper.locateUser().then((Position userPosition) {
+        if (userPosition != null) {
+          try {
+            var url =
+                "${UrlManager.FULL_LAT_LNG_URL}lat=${userPosition.latitude}&lon=${userPosition.longitude}";
+            NetworkCalls.doNetworkCall(url, Map<String, String>(), gotLocation,
+                false, NetWorkCallType.GET);
+          } catch (e) {
+            print(e);
+          }
+        }
+      });
+    }
+  }
+
+  gotLocation(String response) {
+    print("gotLocation -> $response");
+  }
+
+  tappedRefreshAllOps() {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Refresh Op List?'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Are you sure you want to refresh your operation list?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => LoginPage(
+                            title: MyApp.APP_TITLE,
+                          )),
+                );
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  doRefresh(Op op) {
+    setState(() {
+      doSelectOperationThing(op);
+      pendingGrab = op;
+    });
   }
 
   doSelectOperationThing(Op operation) {
@@ -99,6 +315,7 @@ class _MapPageState extends State<MapPage> {
     operation.isSelected = true;
     this.pendingGrab = operation;
     this.selectedOperation = operation;
+    if (pendingGrab != null) getFullOperation(pendingGrab);
   }
 
   doInitialLoadThings() async {
@@ -111,9 +328,6 @@ class _MapPageState extends State<MapPage> {
         doSelectOperationThing(foundOperation);
       }
     }
-    setState(() {
-      isLoading = false;
-    });
   }
 
   Future<Op> checkForSelectedOp(List<Op> operationList) async {
@@ -148,6 +362,7 @@ class _MapPageState extends State<MapPage> {
   gotOperation(response) async {
     try {
       var operation = Operation.fromJson(json.decode(response));
+      loadedOperation = operation;
       markers.clear();
       polylines.clear();
       populateBank();
@@ -160,44 +375,77 @@ class _MapPageState extends State<MapPage> {
         isLoading = false;
       });
     } catch (e) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => LoginPage(
-                  title: MyApp.APP_TITLE,
-                )),
-      );
+      parsingOperationFailed();
       setState(() {
         isLoading = false;
       });
     }
   }
 
-  populateTargets(Operation operation) async {
-    if (operation.markers != null)
-      populateBank();
-      for (var target in operation.markers) {
-        final MarkerId targetId = MarkerId(target.iD);
-        final Portal portal = OperationUtils.getPortalFromID(target.portalId, operation);
-        final Marker marker = Marker(
-            markerId: targetId,
-            icon: await bitmapBank.getIconFromBank(target.type, context),
-            position: LatLng(
-              double.parse(portal.lat),
-              double.parse(portal.lng),
+  parsingOperationFailed() async {
+    var operationName =
+        selectedOperation != null ? " '${selectedOperation.name}'" : "";
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Parsing Op Failed!'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                    'Either parsing the operation$operationName failed or your auth token expired.  You must login again to continue.  If you\'ve seen this message within 5 minutes, check the operation you\'re trying to load.'),
+              ],
             ),
-            infoWindow: InfoWindow(
-              title: portal.name,
-              snippet: TargetUtils.getMarkerTitle(portal.name, target),
-              onTap: () {
-                _onTargetInfoWindowTapped(target, portal, targetId);
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                CookieUtils.clearAllCookies().then((completed) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => LoginPage(
+                              title: MyApp.APP_TITLE,
+                            )),
+                  );
+                });
               },
             ),
+          ],
+        );
+      },
+    );
+  }
+
+  populateTargets(Operation operation) async {
+    if (operation.markers != null) populateBank();
+    for (var target in operation.markers) {
+      final MarkerId targetId = MarkerId(target.iD);
+      final Portal portal =
+          OperationUtils.getPortalFromID(target.portalId, operation);
+      final Marker marker = Marker(
+          markerId: targetId,
+          icon: await bitmapBank.getIconFromBank(target.type, context),
+          position: LatLng(
+            double.parse(portal.lat),
+            double.parse(portal.lng),
+          ),
+          infoWindow: InfoWindow(
+            title: portal.name,
+            snippet: TargetUtils.getMarkerTitle(portal.name, target),
             onTap: () {
-              _onAnchorTapped(targetId);
-            });
-        markers[targetId] = marker;
-      }
+              _onTargetInfoWindowTapped(target, portal, targetId);
+            },
+          ),
+          onTap: () {
+            _onAnchorTapped(targetId);
+          });
+      markers[targetId] = marker;
+    }
   }
 
   _onTargetInfoWindowTapped(Target target, Portal portal, MarkerId markerId) {
@@ -246,8 +494,10 @@ class _MapPageState extends State<MapPage> {
     if (Platform.isIOS) lineWidth = 2;
     for (var link in operation.links) {
       final PolylineId polylineId = PolylineId(link.iD);
-      final Portal fromPortal = OperationUtils.getPortalFromID(link.fromPortalId, operation);
-      final Portal toPortal = OperationUtils.getPortalFromID(link.toPortalId, operation);
+      final Portal fromPortal =
+          OperationUtils.getPortalFromID(link.fromPortalId, operation);
+      final Portal toPortal =
+          OperationUtils.getPortalFromID(link.toPortalId, operation);
       final List<LatLng> points = <LatLng>[];
       points.add(
           LatLng(double.parse(fromPortal.lat), double.parse(fromPortal.lng)));
@@ -273,53 +523,13 @@ class _MapPageState extends State<MapPage> {
   }
 
   populateBank() {
-    if (bitmapBank == null)
-      bitmapBank = MapMarkerBitmapBank();
-  }
-
-  List<Widget> getDrawerElements() {
-    if (operationList == null || operationList.isEmpty) {
-      return <Widget>[
-        DrawerHeader(
-          child: Text(
-            'Wasabee Operations',
-            style: TextStyle(color: Colors.white, fontSize: 25.0),
-          ),
-          decoration: BoxDecoration(
-            color: Colors.green,
-          ),
-        ),
-      ];
-    } else {
-      var listOfElements = List<Widget>();
-      listOfElements.add(DrawerHeader(
-        child: Text(
-          'Wasabee Operations',
-          style: TextStyle(color: Colors.white, fontSize: 25.0),
-        ),
-        decoration: BoxDecoration(
-          color: Colors.green,
-        ),
-      ));
-      for (var op in operationList) {
-        listOfElements.add(ListTile(
-          title: Text(op.name),
-          selected: op.isSelected,
-          onTap: () {
-            tappedOp(op, operationList);
-            Navigator.pop(context);
-          },
-        ));
-      }
-      return listOfElements;
-    }
+    if (bitmapBank == null) bitmapBank = MapMarkerBitmapBank();
   }
 
   tappedOp(Op op, List<Op> operationList) async {
     await LocalStorageUtils.storeSelectedOpId(op.iD);
     setState(() {
-      doSelectOperationThing(op);
-      pendingGrab = op;
+      doRefresh(op);
       for (var ops in operationList) {
         if (op.iD == ops.iD)
           ops.isSelected = true;
