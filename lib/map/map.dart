@@ -440,7 +440,7 @@ class _MapPageState extends State<MapPage> {
             OperationUtils.getPortalFromID(target.portalId, operation);
         final Marker marker = Marker(
             markerId: targetId,
-            icon: await bitmapBank.getIconFromBank(target.type, context, null),
+            icon: await bitmapBank.getIconFromBank(target.type, context, target),
             position: LatLng(
               double.parse(portal.lat),
               double.parse(portal.lng),
@@ -453,7 +453,7 @@ class _MapPageState extends State<MapPage> {
               },
             ),
             onTap: () {
-              _onAnchorTapped(targetId);
+              _onTargetTapped(targetId);
             });
         markers[targetId] = marker;
       }
@@ -468,7 +468,8 @@ class _MapPageState extends State<MapPage> {
         final Portal portal = OperationUtils.getPortalFromID(anchor, operation);
         final Marker marker = Marker(
           markerId: markerId,
-          icon: await bitmapBank.getIconFromBank(operation.color, context, null),
+          icon:
+              await bitmapBank.getIconFromBank(operation.color, context, null),
           position: LatLng(
             double.parse(portal.lat),
             double.parse(portal.lng),
@@ -495,7 +496,8 @@ class _MapPageState extends State<MapPage> {
           final MarkerId markerId = MarkerId(agent.name);
           final Marker marker = Marker(
             markerId: markerId,
-            icon: await bitmapBank.getIconFromBank("agent_${agent.name}", context, agent),
+            icon: await bitmapBank.getIconFromBank(
+                "agent_${agent.name}", context, null),
             position: LatLng(
               agent.lat,
               agent.lng,
@@ -547,8 +549,32 @@ class _MapPageState extends State<MapPage> {
   }
 
   _onTargetInfoWindowTapped(Target target, Portal portal, MarkerId markerId) {
-    //TODO show dialog to do actions on that marker.
     print('Tapped MarkerInfoWindow: ${markerId.value}');
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(TargetUtils.getMarkerTitle(portal.name, target)),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Comment:', style: TextStyle(fontWeight: FontWeight.bold),),
+                Text('${target.comment}')
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   _onTargetTapped(MarkerId targetId) {

@@ -3,7 +3,8 @@ import 'dart:ui';
 import 'package:vector_math/vector_math.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:wasabee/network/responses/teamsResponse.dart';
+import 'package:wasabee/map/markerutilities.dart';
+import 'package:wasabee/network/responses/operationFullResponse.dart';
 import '../classutils/target.dart';
 import 'dart:typed_data';
 import 'package:flutter/services.dart';
@@ -116,7 +117,7 @@ class MapMarkerBitmapBank {
   Map<String, BitmapDescriptor> bank = Map();
 
   Future<BitmapDescriptor> getIconFromBank(
-      String key, BuildContext context, Agent agent) async {
+      String key, BuildContext context, Target target) async {
     BitmapDescriptor bmd = bank[key];
     if (bmd != null) {
       print("Size of Bank -> ${bank.length}");
@@ -125,11 +126,12 @@ class MapMarkerBitmapBank {
       ImageConfiguration imageConfiguration =
           createLocalImageConfiguration(context);
       if (key.startsWith("agent_")) {
-        bmd = await getAgentImage(key, imageConfiguration,context);
+        bmd = await getAgentImage(key, imageConfiguration, context);
       } else {
         print('getting existing from key -> $key');
-        bmd = await BitmapDescriptor.fromAssetImage(
-            imageConfiguration, getPathFromKey(key));
+        var path = getPathFromKey(key, target);
+        if (target != null) key = path;
+        bmd = await BitmapDescriptor.fromAssetImage(imageConfiguration, path);
       }
       bank[key] = bmd;
       return bmd;
@@ -143,11 +145,13 @@ class MapMarkerBitmapBank {
         imageConfiguration, 'assets/icons/avatar_placeholder.bmp');
   }
 
-  Future<BitmapDescriptor> getIconFromUrl(String url, ImageConfiguration configuration) async {
+  Future<BitmapDescriptor> getIconFromUrl(
+      String url, ImageConfiguration configuration) async {
     final Completer<BitmapDescriptor> bitmapIcon =
         Completer<BitmapDescriptor>();
 
-    Image.network(url).image
+    Image.network(url)
+        .image
         .resolve(configuration)
         .addListener(ImageStreamListener((ImageInfo image, bool sync) async {
       final ByteData bytes =
@@ -160,17 +164,13 @@ class MapMarkerBitmapBank {
     return await bitmapIcon.future;
   }
 
-  String getPathFromKey(String key) {
+  String getPathFromKey(String key, Target target) {
     String path = 'assets/icons/unknown.bmp';
     switch (key) {
       case TargetUtils.LetDecayPortalAlert:
-        path = 'assets/icons/decay.bmp';
-        break;
       case TargetUtils.DestroyPortalAlert:
-        path = 'assets/icons/destroy.bmp';
-        break;
       case TargetUtils.UseVirusPortalAlert:
-        path = 'assets/icons/virus.bmp';
+        path = "assets/markers/${MarkerUtilities.getIconPath(target)}";
         break;
       case "groupa":
         path = 'assets/icons/groupa_2.bmp';
@@ -191,6 +191,7 @@ class MapMarkerBitmapBank {
         path = 'assets/icons/groupf.bmp';
         break;
     }
+    print("PATH -> $path");
     return path;
   }
 }

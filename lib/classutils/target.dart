@@ -5,7 +5,7 @@ class TargetUtils {
   static const UseVirusPortalAlert = "UseVirusPortalAlert";
   static const LetDecayPortalAlert = "LetDecayPortalAlert";
 
-  static getMarkerTitle(String portalName, Target target) {
+  static String getMarkerTitle(String portalName, Target target) {
     var title = "";
     switch (target.type) {
       case DestroyPortalAlert:
@@ -20,5 +20,9 @@ class TargetUtils {
     }
     title = "$title$portalName";
     return title;
+  }
+
+  static String getMarkerKey(Target target) {
+    
   }
 }
