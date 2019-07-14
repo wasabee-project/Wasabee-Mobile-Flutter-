@@ -218,9 +218,9 @@ class _MapPageState extends State<MapPage> {
                     setState(() {
                       sharingLocation = value;
                     });
-                    LocalStorageUtils.storeIsLocationSharing(value);
-                    //TODO add service to share location, also with current operation ID
-                    print('sharing location -> $value');
+                    LocalStorageUtils.storeIsLocationSharing(value).then(() {
+                      sendLocationIfSharing();
+                    });
                   },
                 )
               ],
@@ -434,13 +434,14 @@ class _MapPageState extends State<MapPage> {
   populateTargets(Operation operation) async {
     if (operation.markers != null) {
       populateBank();
+      var googleId = await LocalStorageUtils.getGoogleId();
       for (var target in operation.markers) {
         final MarkerId targetId = MarkerId(target.iD);
         final Portal portal =
             OperationUtils.getPortalFromID(target.portalId, operation);
         final Marker marker = Marker(
             markerId: targetId,
-            icon: await bitmapBank.getIconFromBank(target.type, context, target),
+            icon: await bitmapBank.getIconFromBank(target.type, context, target, googleId),
             position: LatLng(
               double.parse(portal.lat),
               double.parse(portal.lng),
@@ -469,7 +470,7 @@ class _MapPageState extends State<MapPage> {
         final Marker marker = Marker(
           markerId: markerId,
           icon:
-              await bitmapBank.getIconFromBank(operation.color, context, null),
+              await bitmapBank.getIconFromBank(operation.color, context, null, null),
           position: LatLng(
             double.parse(portal.lat),
             double.parse(portal.lng),
@@ -497,7 +498,7 @@ class _MapPageState extends State<MapPage> {
           final Marker marker = Marker(
             markerId: markerId,
             icon: await bitmapBank.getIconFromBank(
-                "agent_${agent.name}", context, null),
+                "agent_${agent.name}", context, null, null),
             position: LatLng(
               agent.lat,
               agent.lng,

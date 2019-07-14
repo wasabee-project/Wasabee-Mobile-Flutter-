@@ -117,10 +117,9 @@ class MapMarkerBitmapBank {
   Map<String, BitmapDescriptor> bank = Map();
 
   Future<BitmapDescriptor> getIconFromBank(
-      String key, BuildContext context, Target target) async {
+      String key, BuildContext context, Target target, String googleId) async {
     BitmapDescriptor bmd = bank[key];
     if (bmd != null) {
-      print("Size of Bank -> ${bank.length}");
       return bmd;
     } else {
       ImageConfiguration imageConfiguration =
@@ -128,8 +127,7 @@ class MapMarkerBitmapBank {
       if (key.startsWith("agent_")) {
         bmd = await getAgentImage(key, imageConfiguration, context);
       } else {
-        print('getting existing from key -> $key');
-        var path = getPathFromKey(key, target);
+        var path = getPathFromKey(key, target, googleId);
         if (target != null) key = path;
         bmd = await BitmapDescriptor.fromAssetImage(imageConfiguration, path);
       }
@@ -164,13 +162,13 @@ class MapMarkerBitmapBank {
     return await bitmapIcon.future;
   }
 
-  String getPathFromKey(String key, Target target) {
+  String getPathFromKey(String key, Target target, String googleId) {
     String path = 'assets/icons/unknown.bmp';
     switch (key) {
       case TargetUtils.LetDecayPortalAlert:
       case TargetUtils.DestroyPortalAlert:
       case TargetUtils.UseVirusPortalAlert:
-        path = "assets/markers/${MarkerUtilities.getIconPath(target)}";
+        path = "assets/markers/${MarkerUtilities.getIconPath(target, googleId)}";
         break;
       case "groupa":
         path = 'assets/icons/groupa_2.bmp';

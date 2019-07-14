@@ -2,6 +2,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
 import 'package:wasabee/network/responses/meResponse.dart';
+import 'package:wasabee/storage/localstorage.dart';
 import 'auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../network/networkcalls.dart';
@@ -42,7 +43,11 @@ class _LoginPageState extends State<LoginPage> {
 
   void finishedCallMe(String response) async {
     try {
-      var opList = MeResponse.fromJson(json.decode(response)).ops;
+      var meResponse = MeResponse.fromJson(json.decode(response));
+      var googleId = meResponse.googleID;
+      if (googleId != null)
+        LocalStorageUtils.storeGoogleId(googleId);
+      var opList = meResponse.ops;
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => MapPage(ops: opList)),

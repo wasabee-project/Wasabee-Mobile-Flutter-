@@ -5,7 +5,7 @@ class MarkerUtilities {
   static const SEGMENT_MARKER = "wasabee_markers_";
   static const SEGMENT_FILE_EXT = ".bmp";
 
-  static String getIconPath(Target target) {
+  static String getIconPath(Target target, String googleId) {
     var typePathSegment = "other_";
     switch (target.type) {
       case TargetUtils.LetDecayPortalAlert:
@@ -18,15 +18,31 @@ class MarkerUtilities {
         typePathSegment = "virus_";
         break;
     }
-    var statusPathSegment = getTargetStatusSegment(target);
+    var statusPathSegment = getTargetStatusSegment(target, googleId);
     return "$SEGMENT_MARKER$typePathSegment$statusPathSegment$SEGMENT_FILE_EXT";
   }
 
-  static String getTargetStatusSegment(Target target) {
+  static String getTargetStatusSegment(Target target, String googleId) {
     var targetStatus = "pending";
-    //TODO compare assignedTo to the saved googleID to check if assigned to that person
-    //If not, and is not blank is assigned
-    //if got here, check complete
+    print('state -> ${target.state}');
+    print('googleId -> ${googleId}');
+    switch (target.state) {
+      case "pending":
+        break;
+      case "assigned":
+        if (googleId != null && target.assignedTo == googleId) {
+          targetStatus = "${target.state}_yours";
+        } else
+          targetStatus = target.state;
+        break;
+      case "acknowledged":
+        targetStatus = target.state;
+        break;
+      case "completed":
+        targetStatus = "done";
+        break;
+    }
+              print('targetStatus -> $targetStatus');
 
     return targetStatus;
   }
