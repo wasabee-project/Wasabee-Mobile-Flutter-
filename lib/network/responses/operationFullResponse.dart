@@ -10,7 +10,7 @@ class Operation {
   String teamid;
   String modified;
   String comment;
-  Null keysonhand;
+  List<KeyOnHand> keysonhand;
   String fetched;
 
   Operation(
@@ -55,7 +55,12 @@ class Operation {
     teamid = json['teamid'];
     modified = json['modified'];
     comment = json['comment'];
-    keysonhand = json['keysonhand'];
+    if (json['keysonhand'] != null) {
+      keysonhand = new List<KeyOnHand>();
+      json['keysonhand'].forEach((v) {
+        keysonhand.add(new KeyOnHand.fromJson(v));
+      });
+    }
     fetched = json['fetched'];
   }
 
@@ -153,7 +158,6 @@ class Link {
 }
 
 class Target {
-
   String iD;
   String portalId;
   String type;
@@ -186,6 +190,28 @@ class Target {
     data['comment'] = this.comment;
     data['assignedTo'] = this.assignedTo;
     data['state'] = this.state;
+    return data;
+  }
+}
+
+class KeyOnHand {
+  String portalId;
+  String gid;
+  int onhand;
+
+  KeyOnHand({this.portalId, this.gid, this.onhand});
+
+  KeyOnHand.fromJson(Map<String, dynamic> json) {
+    portalId = json['portalId'];
+    gid = json['gid'];
+    onhand = json['onhand'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['portalId'] = this.portalId;
+    data['gid'] = this.gid;
+    data['onhand'] = this.onhand;
     return data;
   }
 }
