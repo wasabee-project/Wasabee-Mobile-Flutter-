@@ -168,7 +168,7 @@ class MapMarkerBitmapBank {
       case TargetUtils.LetDecayPortalAlert:
       case TargetUtils.DestroyPortalAlert:
       case TargetUtils.UseVirusPortalAlert:
-        path = "assets/markers/${MarkerUtilities.getIconPath(target, googleId)}";
+        path = "assets/markers/${MarkerUtilities.getImagePath(target, googleId, MarkerUtilities.SEGMENT_MARKER)}";
         break;
       case "groupa":
         path = 'assets/icons/groupa_2.bmp';

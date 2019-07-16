@@ -3,9 +3,10 @@ import 'package:wasabee/network/responses/operationFullResponse.dart';
 
 class MarkerUtilities {
   static const SEGMENT_MARKER = "wasabee_markers_";
+  static const SEGMENT_ICON = "wasabee_icons_";
   static const SEGMENT_FILE_EXT = ".bmp";
 
-  static String getIconPath(Target target, String googleId) {
+  static String getImagePath(Target target, String googleId, String baseSegment) {
     var typePathSegment = "other_";
     switch (target.type) {
       case TargetUtils.LetDecayPortalAlert:
@@ -19,7 +20,7 @@ class MarkerUtilities {
         break;
     }
     var statusPathSegment = getTargetStatusSegment(target, googleId);
-    return "$SEGMENT_MARKER$typePathSegment$statusPathSegment$SEGMENT_FILE_EXT";
+    return "$baseSegment$typePathSegment$statusPathSegment$SEGMENT_FILE_EXT";
   }
 
   static String getTargetStatusSegment(Target target, String googleId) {
