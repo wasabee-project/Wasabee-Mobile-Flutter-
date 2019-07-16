@@ -143,6 +143,7 @@ class MapMarkerBitmapBank {
         imageConfiguration, 'assets/icons/avatar_placeholder.bmp');
   }
 
+/*
   Future<BitmapDescriptor> getIconFromUrl(
       String url, ImageConfiguration configuration) async {
     final Completer<BitmapDescriptor> bitmapIcon =
@@ -161,6 +162,7 @@ class MapMarkerBitmapBank {
 
     return await bitmapIcon.future;
   }
+  */
 
   String getPathFromKey(String key, Target target, String googleId) {
     String path = 'assets/icons/unknown.bmp';

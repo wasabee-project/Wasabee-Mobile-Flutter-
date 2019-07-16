@@ -10,7 +10,7 @@ class LocalStorageUtils {
     return prefs.getString(KEY_SELECTED_OPERATION) ?? '';
   }
 
-  static storeSelectedOpId(String operationId) async {
+  static Future<dynamic> storeSelectedOpId(String operationId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString(KEY_SELECTED_OPERATION, operationId);
   }
@@ -20,7 +20,7 @@ class LocalStorageUtils {
     return prefs.getBool(KEY_SHARING_LOCATION) ?? false;
   }
 
-  static storeIsLocationSharing(bool isLocationSharing) async {
+  static Future<dynamic> storeIsLocationSharing(bool isLocationSharing) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool(KEY_SHARING_LOCATION, isLocationSharing);
   }
@@ -30,7 +30,7 @@ class LocalStorageUtils {
     return prefs.getString(KEY_GOOGLE_ID) ?? null;
   }
 
-  static storeGoogleId(String googleId) async {
+  static Future<dynamic> storeGoogleId(String googleId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(KEY_GOOGLE_ID, googleId);
   }

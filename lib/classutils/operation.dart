@@ -1,10 +1,13 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:wasabee/login/login.dart';
 import 'package:wasabee/map/utilities.dart';
+import 'package:wasabee/network/cookies.dart';
 import 'package:wasabee/network/responses/meResponse.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
+
+import '../main.dart';
 
 class OperationUtils {
   static Color getLinkColor(Op operation) {
@@ -31,7 +34,7 @@ class OperationUtils {
     }
     return HexColor(hexString);
   }
-  
+
   static Portal getPortalFromID(String id, Operation operation) {
     for (var portal in operation.opportals) {
       if (portal.id == id) return portal;
@@ -47,5 +50,71 @@ class OperationUtils {
       }
     }
     return linkList;
+  }
+
+  static AlertDialog getParsingOperationFailedDialog(
+      BuildContext context, String operationName) {
+    return AlertDialog(
+      title: Text('Parsing Op Failed!'),
+      content: SingleChildScrollView(
+        child: ListBody(
+          children: <Widget>[
+            Text(
+                'Either parsing the operation$operationName failed or your auth token expired.  You must login again to continue.  If you\'ve seen this message within 5 minutes, check the operation you\'re trying to load.'),
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        FlatButton(
+          child: Text('Ok'),
+          onPressed: () {
+            Navigator.of(context).pop();
+            CookieUtils.clearAllCookies().then((completed) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => LoginPage(
+                          title: MyApp.APP_TITLE,
+                        )),
+              );
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  static AlertDialog getRefreshOpListDialog(BuildContext context) {
+    return AlertDialog(
+      title: Text('Refresh Op List?'),
+      content: SingleChildScrollView(
+        child: ListBody(
+          children: <Widget>[
+            Text('Are you sure you want to refresh your operation list?'),
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        FlatButton(
+          child: Text('Cancel'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        FlatButton(
+          child: Text('Ok'),
+          onPressed: () {
+            Navigator.of(context).pop();
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => LoginPage(
+                        title: MyApp.APP_TITLE,
+                      )),
+            );
+          },
+        ),
+      ],
+    );
   }
 }

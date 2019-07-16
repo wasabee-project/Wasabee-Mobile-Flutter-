@@ -8,7 +8,6 @@ import 'package:wasabee/network/responses/meResponse.dart';
 import 'package:flutter/foundation.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
 import 'package:geolocator/geolocator.dart';
-import '../network/cookies.dart';
 import '../location/locationhelper.dart';
 import '../network/networkcalls.dart';
 import '../network/urlmanager.dart';
@@ -83,13 +82,13 @@ class _MapPageState extends State<MapPage> {
                     ? null
                     : <Widget>[
                         // action button
-                        IconButton(
-                          icon: Icon(Icons.settings),
-                          onPressed: () {
-                            //TODO add settings page nav here
-                            print('settings tapped');
-                          },
-                        ),
+                        // IconButton(
+                        //   icon: Icon(Icons.settings),
+                        //   onPressed: () {
+                        //     //TODO add settings page nav here
+                        //     print('settings tapped');
+                        //   },
+                        // ),
                         IconButton(
                           icon: Icon(Icons.refresh),
                           onPressed: () {
@@ -158,33 +157,7 @@ class _MapPageState extends State<MapPage> {
       ];
     } else {
       var listOfElements = List<Widget>();
-      listOfElements.add(DrawerHeader(
-        child: Column(
-          children: <Widget>[
-            Text(
-              'Wasabee Operations',
-              style: TextStyle(color: Colors.white, fontSize: 25.0),
-            ),
-            Center(
-              child: Container(
-                  margin: const EdgeInsets.all(10),
-                  child: CircleAvatar(
-                    radius: 40.0,
-                    backgroundColor: Colors.white,
-                    child: new Image.asset(
-                      'assets/images/wasabee.png',
-                      width: 70.0,
-                      height: 70.0,
-                      fit: BoxFit.cover,
-                    ),
-                  )),
-            )
-          ],
-        ),
-        decoration: BoxDecoration(
-          color: Colors.green,
-        ),
-      ));
+      listOfElements.add(getDrawerHeader());
       listOfElements.add(getShareLocationViews());
       listOfElements.add(getRefreshOpListButton());
       for (var op in operationList) {
@@ -199,6 +172,36 @@ class _MapPageState extends State<MapPage> {
       }
       return listOfElements;
     }
+  }
+
+  Widget getDrawerHeader() {
+    return DrawerHeader(
+      child: Column(
+        children: <Widget>[
+          Text(
+            'Wasabee Operations',
+            style: TextStyle(color: Colors.white, fontSize: 25.0),
+          ),
+          Center(
+            child: Container(
+                margin: const EdgeInsets.all(10),
+                child: CircleAvatar(
+                  radius: 40.0,
+                  backgroundColor: Colors.white,
+                  child: new Image.asset(
+                    'assets/images/wasabee.png',
+                    width: 70.0,
+                    height: 70.0,
+                    fit: BoxFit.cover,
+                  ),
+                )),
+          )
+        ],
+      ),
+      decoration: BoxDecoration(
+        color: Colors.green,
+      ),
+    );
   }
 
   Widget getShareLocationViews() {
@@ -216,10 +219,12 @@ class _MapPageState extends State<MapPage> {
                   value: sharingLocation,
                   onChanged: (value) {
                     setState(() {
+                      print('VALUE -> $value');
+                      LocalStorageUtils.storeIsLocationSharing(value)
+                          .then((any) {
+                        sendLocationIfSharing();
+                      });
                       sharingLocation = value;
-                    });
-                    LocalStorageUtils.storeIsLocationSharing(value).then(() {
-                      sendLocationIfSharing();
                     });
                   },
                 )
@@ -269,37 +274,7 @@ class _MapPageState extends State<MapPage> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Refresh Op List?'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('Are you sure you want to refresh your operation list?'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            FlatButton(
-              child: Text('Ok'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => LoginPage(
-                            title: MyApp.APP_TITLE,
-                          )),
-                );
-              },
-            ),
-          ],
-        );
+        return OperationUtils.getRefreshOpListDialog(context);
       },
     );
   }
@@ -360,7 +335,7 @@ class _MapPageState extends State<MapPage> {
     }
   }
 
-  gotOperation(response) async {
+  gotOperation(String response) async {
     try {
       var operation = Operation.fromJson(json.decode(response));
       loadedOperation = operation;
@@ -399,34 +374,8 @@ class _MapPageState extends State<MapPage> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Parsing Op Failed!'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text(
-                    'Either parsing the operation$operationName failed or your auth token expired.  You must login again to continue.  If you\'ve seen this message within 5 minutes, check the operation you\'re trying to load.'),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('Ok'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                CookieUtils.clearAllCookies().then((completed) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => LoginPage(
-                              title: MyApp.APP_TITLE,
-                            )),
-                  );
-                });
-              },
-            ),
-          ],
-        );
+        return OperationUtils.getParsingOperationFailedDialog(
+            context, operationName);
       },
     );
   }
@@ -441,7 +390,8 @@ class _MapPageState extends State<MapPage> {
             OperationUtils.getPortalFromID(target.portalId, operation);
         final Marker marker = Marker(
             markerId: targetId,
-            icon: await bitmapBank.getIconFromBank(target.type, context, target, googleId),
+            icon: await bitmapBank.getIconFromBank(
+                target.type, context, target, googleId),
             position: LatLng(
               double.parse(portal.lat),
               double.parse(portal.lng),
@@ -469,8 +419,8 @@ class _MapPageState extends State<MapPage> {
         final Portal portal = OperationUtils.getPortalFromID(anchor, operation);
         final Marker marker = Marker(
           markerId: markerId,
-          icon:
-              await bitmapBank.getIconFromBank(operation.color, context, null, null),
+          icon: await bitmapBank.getIconFromBank(
+              operation.color, context, null, null),
           position: LatLng(
             double.parse(portal.lat),
             double.parse(portal.lng),
@@ -551,31 +501,16 @@ class _MapPageState extends State<MapPage> {
 
   _onTargetInfoWindowTapped(Target target, Portal portal, MarkerId markerId) {
     print('Tapped MarkerInfoWindow: ${markerId.value}');
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(TargetUtils.getMarkerTitle(portal.name, target)),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('Comment:', style: TextStyle(fontWeight: FontWeight.bold),),
-                Text('${target.comment}')
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('Ok'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
+    LocalStorageUtils.getGoogleId().then((googleId) {
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return TargetUtils.getTargetInfoAlert(
+              context, portal, target, googleId);
+        },
+      );
+    });
   }
 
   _onTargetTapped(MarkerId targetId) {
