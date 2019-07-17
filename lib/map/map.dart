@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:wasabee/classutils/operation.dart';
 import 'package:wasabee/classutils/target.dart';
-import 'package:wasabee/login/login.dart';
 import 'package:wasabee/network/responses/meResponse.dart';
 import 'package:flutter/foundation.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
@@ -33,11 +32,13 @@ class MapPageState extends State<MapPage> {
   Op selectedOperation;
   Operation loadedOperation;
   GoogleMapController _controller;
+  GoogleMap mapView;
   List<Op> operationList = List();
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   Map<PolylineId, Polyline> polylines = <PolylineId, Polyline>{};
   Map<MarkerId, Marker> targets = <MarkerId, Marker>{};
   MapMarkerBitmapBank bitmapBank = MapMarkerBitmapBank();
+  LatLngBounds _visibleRegion;
 
   MapPageState(List<Op> ops) {
     this.operationList = ops;
@@ -60,9 +61,11 @@ class MapPageState extends State<MapPage> {
       doInitialLoadThings();
     }
     return isLoading
-        ? Center(
-            child: CircularProgressIndicator(),
-          )
+        ? Container(
+            color: Colors.white,
+            child: Center(
+              child: CircularProgressIndicator(),
+            ))
         : DefaultTabController(
             length: 3,
             child: Scaffold(
@@ -91,7 +94,7 @@ class MapPageState extends State<MapPage> {
                         IconButton(
                           icon: Icon(Icons.refresh),
                           onPressed: () {
-                            doRefresh(selectedOperation);
+                            doRefresh(selectedOperation, true);
                           },
                         )
                       ],
@@ -121,11 +124,22 @@ class MapPageState extends State<MapPage> {
   }
 
   Scaffold getPageContent() {
-    var center = MapUtilities.computeCentroid(List<Marker>.of(markers.values));
-    var map = GoogleMap(
-      onMapCreated: (GoogleMapController controller) {
-        _controller = controller;
-      },
+    populateMapView();
+    return Scaffold(
+      body: mapView,
+    );
+  }
+
+  populateMapView() {
+    var center = _visibleRegion == null
+        ? MapUtilities.computeCentroid(List<Marker>.of(markers.values))
+        : MapUtilities.getCenterFromBounds(_visibleRegion);
+    var bounds = _visibleRegion == null
+        ? MapUtilities.getBounds(List<Marker>.of(markers.values))
+        : _visibleRegion;
+    var fromExistingLocation = _visibleRegion != null;
+    mapView = GoogleMap(
+      onMapCreated: onMapCreated,
       mapType: MapType.normal,
       myLocationEnabled: true,
       myLocationButtonEnabled: true,
@@ -134,11 +148,19 @@ class MapPageState extends State<MapPage> {
       initialCameraPosition: CameraPosition(
           target: center,
           zoom: MapUtilities.getViewCircleZoomLevel(
-              center, List<Marker>.of(markers.values))),
+              center, bounds, fromExistingLocation)),
     );
-    return Scaffold(
-      body: map,
-    );
+  }
+
+  void onMapCreated(GoogleMapController controller) {
+    _controller = controller;
+  }
+
+  updateVisibleRegion() async {
+    if (_controller != null) {
+      final LatLngBounds visibleRegion = await _controller.getVisibleRegion();
+      _visibleRegion = visibleRegion;
+    }
   }
 
   List<Widget> getDrawerElements() {
@@ -278,7 +300,9 @@ class MapPageState extends State<MapPage> {
     );
   }
 
-  doRefresh(Op op) {
+  doRefresh(Op op, bool resetVisibleRegion) async {
+    if (resetVisibleRegion)
+      _visibleRegion = null;
     setState(() {
       doSelectOperationThing(op);
       pendingGrab = op;
@@ -357,12 +381,12 @@ class MapPageState extends State<MapPage> {
     populateTargets(loadedOperation);
   }
 
-  finishedCompletionCall(String response) {
-    gotOperation(response);
+  finishedTargetActionCall(String response) {
+    doRefresh(selectedOperation, false);
+    //gotOperation(response);
   }
 
   gotTeam(String response) {
-    print("got team response -> $response");
     var team = FullTeam.fromJson(json.decode(response));
     populateTeamMembers(team.agents);
     setIsNotLoading();
@@ -445,7 +469,7 @@ class MapPageState extends State<MapPage> {
       populateBank();
       for (var agent in agents) {
         if (agent.lat != null && agent.lng != null) {
-          final MarkerId markerId = MarkerId(agent.name);
+          final MarkerId markerId = MarkerId("agent_${agent.name}");
           final Marker marker = Marker(
             markerId: markerId,
             icon: await bitmapBank.getIconFromBank(
@@ -501,7 +525,7 @@ class MapPageState extends State<MapPage> {
   }
 
   _onTargetInfoWindowTapped(Target target, Portal portal, MarkerId markerId) {
-    print('Tapped MarkerInfoWindow: ${markerId.value}');
+    //print('Tapped MarkerInfoWindow: ${markerId.value}');
     LocalStorageUtils.getGoogleId().then((googleId) {
       showDialog<void>(
         context: context,
@@ -515,27 +539,27 @@ class MapPageState extends State<MapPage> {
   }
 
   _onTargetTapped(MarkerId targetId) {
-    print('Tapped Target: ${targetId.value}');
+    //print('Tapped Target: ${targetId.value}');
   }
 
   void _onPolylineTapped(PolylineId polylineId) {
-    print('Tapped Polyline: ${polylineId.value}');
+    //print('Tapped Polyline: ${polylineId.value}');
   }
 
   _onAnchorInfoWindowTapped(MarkerId markerId) {
-    print('Tapped MarkerInfoWindow: ${markerId.value}');
+    //print('Tapped AnchorInfoWindow: ${markerId.value}');
   }
 
   _onAnchorTapped(MarkerId markerId) {
-    print('Tapped Marker: ${markerId.value}');
+    //print('Tapped Marker: ${markerId.value}');
   }
 
   _onAgentInfoWindowTapped(MarkerId markerId) {
-    print('Tapped AgentInfoWindow: ${markerId.value}');
+    //print('Tapped AgentInfoWindow: ${markerId.value}');
   }
 
   _onAgentTapped(MarkerId markerId) {
-    print('Tapped Agent: ${markerId.value}');
+    //print('Tapped Agent: ${markerId.value}');
   }
 
   populateBank() {
@@ -545,7 +569,7 @@ class MapPageState extends State<MapPage> {
   tappedOp(Op op, List<Op> operationList) async {
     await LocalStorageUtils.storeSelectedOpId(op.iD);
     setState(() {
-      doRefresh(op);
+      doRefresh(op, true);
       for (var ops in operationList) {
         if (op.iD == ops.iD)
           ops.isSelected = true;

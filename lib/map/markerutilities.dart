@@ -34,8 +34,8 @@ class MarkerUtilities {
         } else
           targetStatus = target.state;
         break;
-      case "acknowledge":
-        targetStatus = target.state;
+      case "acknowledged":
+        targetStatus = "acknowledge";
         break;
       case "completed":
         targetStatus = "done";

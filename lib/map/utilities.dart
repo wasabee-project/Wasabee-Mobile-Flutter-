@@ -6,17 +6,16 @@ import 'package:flutter/material.dart';
 import 'package:wasabee/map/markerutilities.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
 import '../classutils/target.dart';
-import 'dart:typed_data';
-import 'package:flutter/services.dart';
 import 'dart:async';
 
 class MapUtilities {
-  static double getViewCircleZoomLevel(LatLng center, List<Marker> markers) {
+  static const ZOOM_LEVEL_DIFF_CONST = 1.46661;
+
+  static double getViewCircleZoomLevel(
+      LatLng center, LatLngBounds bounds, bool fromExistingLocation) {
     Circle circle = Circle(
-        center: center,
-        radius: calculateDistance(getBounds(markers)),
-        circleId: null);
-    return getZoomLevel(circle);
+        center: center, radius: calculateDistance(bounds), circleId: null);
+    return getZoomLevel(circle, fromExistingLocation);
   }
 
   static double calculateDistance(LatLngBounds bounds) {
@@ -38,13 +37,16 @@ class MapUtilities {
     return distance;
   }
 
-  static double getZoomLevel(Circle circle) {
+  static double getZoomLevel(Circle circle, bool fromExistingLocation) {
     double zoomlevel = 14.0;
     if (circle != null) {
       double radius = circle.radius;
       double scale = radius / 500;
       zoomlevel = (16 - log(scale) / log(2));
     }
+    //_visibleRegion isn't exact, zoom level zooms out a bit each time, not sure why.
+    //But, it's diff by the same amount each time, so this const fixes it for now.
+    if (fromExistingLocation) zoomlevel = zoomlevel + ZOOM_LEVEL_DIFF_CONST;
     return zoomlevel;
   }
 
@@ -54,8 +56,12 @@ class MapUtilities {
     int n = markers.length;
 
     for (Marker point in markers) {
-      latitude += point.position.latitude;
-      longitude += point.position.longitude;
+      if (!point.markerId.value.startsWith("agent_")) {
+        latitude += point.position.latitude;
+        longitude += point.position.longitude;
+      } else {
+        n--;
+      }
     }
 
     return new LatLng(latitude / n, longitude / n);
@@ -98,6 +104,24 @@ class MapUtilities {
         finalLon = marker.position.longitude;
     }
     return LatLng(finalLat, finalLon);
+  }
+
+  static LatLng getCenterFromBounds(LatLngBounds bounds) {
+    var northEastLon = bounds.northeast.longitude;
+    var northEastLat = bounds.northeast.latitude;
+    var southWestLon = bounds.southwest.longitude;
+    var southWestLat = bounds.southwest.latitude;
+
+    if ((southWestLon - northEastLon > 180) ||
+        (northEastLon - southWestLon > 180)) {
+      southWestLon += 360;
+      southWestLon %= 360;
+      northEastLon += 360;
+      northEastLon %= 360;
+    }
+    var centerLat = (southWestLat + northEastLat) / 2;
+    var centerLng = (southWestLon + northEastLon) / 2;
+    return LatLng(centerLat, centerLng);
   }
 }
 
@@ -170,7 +194,14 @@ class MapMarkerBitmapBank {
       case TargetUtils.LetDecayPortalAlert:
       case TargetUtils.DestroyPortalAlert:
       case TargetUtils.UseVirusPortalAlert:
-        path = "assets/markers/${MarkerUtilities.getImagePath(target, googleId, MarkerUtilities.SEGMENT_MARKER)}";
+      case TargetUtils.GetKeyPortalAlert:
+      case TargetUtils.LinkPortalAlert:
+      case TargetUtils.MeetAgentPortalAlert:
+      case TargetUtils.OtherPortalAlert:
+      case TargetUtils.RechargePortalAlert:
+      case TargetUtils.UpgradePortalAlert:
+        path =
+            "assets/markers/${MarkerUtilities.getImagePath(target, googleId, MarkerUtilities.SEGMENT_MARKER)}";
         break;
       case "groupa":
         path = 'assets/icons/groupa_2.bmp';

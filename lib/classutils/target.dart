@@ -73,7 +73,10 @@ class TargetUtils {
           displayState = "Assigned";
         break;
       case STATE_ACKNOWLEDGED:
-        displayState = "Acknowledged";
+        if (googleId != null && target.assignedTo == googleId) {
+          displayState = "Acknowledged Yours";
+        } else
+          displayState = "Acknowledged";
         break;
       case STATE_COMPLETED:
         displayState = "Completed";
@@ -109,13 +112,16 @@ class TargetUtils {
     dialogWidgets.add(getOpenOnIntelButton(portal));
     if (target.assignedTo?.isNotEmpty == true &&
         target.assignedTo == googleId &&
-        target.state != STATE_COMPLETED)
-      dialogWidgets.add(getRejectAssignmentButton(target));
-    if (target.assignedTo?.isNotEmpty == true)
-      dialogWidgets.addAll(
-          getCompleteIncompleteButton(target, opId, context, mapPageState));
+        target.state == STATE_ASSIGNED)
+      dialogWidgets
+          .add(getAssignmentButtons(target, opId, context, mapPageState));
+    dialogWidgets.addAll(
+        getCompleteIncompleteButton(target, opId, context, mapPageState));
     if (target.comment?.isNotEmpty == true)
       dialogWidgets.add(getInfoAlertCommentWidget(target));
+    if (target.assignedNickname?.isNotEmpty == true &&
+        target.assignedTo != googleId)
+      dialogWidgets.add(addAssignedToWidget(target));
     return AlertDialog(
       title: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -159,7 +165,25 @@ class TargetUtils {
         Container(
           child: Text('${target.comment}'),
           margin: EdgeInsets.only(top: MARGIN_SMALL),
-        )
+        ),
+        Divider(color: Colors.green, height: DIVIDER_HEIGHT_DEFAULT),
+      ],
+      crossAxisAlignment: CrossAxisAlignment.start,
+    );
+  }
+
+  static Widget addAssignedToWidget(Target target) {
+    return Column(
+      children: <Widget>[
+        Text(
+          'Agent Assigned:',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        Container(
+          child: Text('${target.assignedNickname}'),
+          margin: EdgeInsets.only(top: MARGIN_SMALL),
+        ),
+        Divider(color: Colors.green, height: DIVIDER_HEIGHT_DEFAULT),
       ],
       crossAxisAlignment: CrossAxisAlignment.start,
     );
@@ -178,28 +202,70 @@ class TargetUtils {
     );
   }
 
-  static Widget getRejectAssignmentButton(Target target) {
-    return RaisedButton(
-        child: Row(
-          children: <Widget>[
-            Container(
-              child: Icon(
-                Icons.cancel,
-                color: Colors.white,
-              ),
-              margin: EdgeInsets.only(right: 10),
-            ),
-            Text(
-              'Reject Assignment',
-              style: TextStyle(color: Colors.white),
-            ),
-          ],
-          mainAxisAlignment: MainAxisAlignment.center,
-        ),
-        onPressed: () {
-          //TODO make this do something
-        },
-        color: Colors.green);
+  static Widget getAssignmentButtons(Target target, String opId,
+      BuildContext context, MapPageState mapPageState) {
+    return Row(
+      children: <Widget>[
+        Expanded(
+            child: Container(
+                margin: EdgeInsets.only(right: 2.5),
+                child: RaisedButton(
+                    child: Row(
+                      children: <Widget>[
+                        Container(
+                          child: Icon(
+                            Icons.cancel,
+                            color: Colors.white,
+                          ),
+                          margin: EdgeInsets.only(right: 10),
+                        ),
+                        Text(
+                          'Reject',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ],
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
+                    ),
+                    onPressed: () {
+                      doTargetDialogAction(
+                          UrlManager.getRejectMarkerUrl(opId, target.iD),
+                          context,
+                          mapPageState);
+                    },
+                    color: Colors.green))),
+        Expanded(
+            child: Container(
+                margin: EdgeInsets.only(left: 2.5),
+                child: RaisedButton(
+                    child: Row(
+                      children: <Widget>[
+                        Container(
+                          child: Icon(
+                            Icons.check_circle,
+                            color: Colors.white,
+                          ),
+                          margin: EdgeInsets.only(right: 10),
+                        ),
+                        Text(
+                          'Accept',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ],
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.max,
+                    ),
+                    onPressed: () {
+                      doTargetDialogAction(
+                          UrlManager.getAcknowledgeMarkerUrl(opId, target.iD),
+                          context,
+                          mapPageState);
+                    },
+                    color: Colors.green)))
+      ],
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.max,
+    );
   }
 
   static List<Widget> getCompleteIncompleteButton(Target target, String opId,
@@ -210,7 +276,9 @@ class TargetUtils {
             children: <Widget>[
               Container(
                 child: Icon(
-                  target.state == STATE_COMPLETED ? Icons.cancel : Icons.done,
+                  target.state == STATE_COMPLETED
+                      ? Icons.cancel
+                      : Icons.sentiment_very_satisfied,
                   color: Colors.white,
                 ),
                 margin: EdgeInsets.only(right: 10),
@@ -228,22 +296,24 @@ class TargetUtils {
             var url = target.state == STATE_COMPLETED
                 ? UrlManager.getInCompleteMarkerUrl(opId, target.iD)
                 : UrlManager.getCompleteMarkerUrl(opId, target.iD);
-            try {
-              Navigator.of(context).pop();
-              NetworkCalls.doNetworkCall(
-                  url,
-                  Map<String, String>(),
-                  mapPageState.finishedCompletionCall,
-                  false,
-                  NetWorkCallType.GET);
-              mapPageState.setIsLoading();
-            } catch (e) {
-              mapPageState.setIsNotLoading();
-              print(e);
-            }
+            doTargetDialogAction(url, context, mapPageState);
           },
           color: Colors.green),
       Divider(color: Colors.green, height: DIVIDER_HEIGHT_DEFAULT),
     ];
+  }
+
+  static doTargetDialogAction(
+      String url, BuildContext context, MapPageState mapPageState) async {
+    try {
+      Navigator.of(context).pop();
+      await mapPageState.updateVisibleRegion();
+      NetworkCalls.doNetworkCall(url, Map<String, String>(),
+          mapPageState.finishedTargetActionCall, false, NetWorkCallType.GET);
+      mapPageState.setIsLoading();
+    } catch (e) {
+      mapPageState.setIsNotLoading();
+      print(e);
+    }
   }
 }

@@ -46,7 +46,7 @@ class _LoginPageState extends State<LoginPage> {
       var meResponse = MeResponse.fromJson(json.decode(response));
       var googleId = meResponse.googleID;
       if (googleId != null)
-        LocalStorageUtils.storeGoogleId(googleId);
+        await LocalStorageUtils.storeGoogleId(googleId);
       var opList = meResponse.ops;
       Navigator.pushReplacement(
         context,

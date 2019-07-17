@@ -10,6 +10,8 @@ class UrlManager {
   static const URL_FRAG_MARKER = "/marker/";
   static const URL_FRAG_COMPLETE = "/complete";
   static const URL_FRAG_INCOMPLETE = "/incomplete";
+  static const URL_FRAG_REJECT = "/reject";
+  static const URL_FRAG_ACKNOWLEDGE = "/acknowledge";
   static const BASE_API_URL = "https://server.wasabee.rocks";
 
   static const FULL_ME_URL = "$BASE_API_URL$URL_FRAG_ME";
@@ -23,6 +25,14 @@ class UrlManager {
 
   static String getInCompleteMarkerUrl(String opId, String markerId) {
     return "$BASE_API_URL$URL_FRAG_API_V1$URL_FRAG_DRAW$opId$URL_FRAG_MARKER$markerId$URL_FRAG_INCOMPLETE";
+  }
+
+  static String getRejectMarkerUrl(String opId, String markerId) {
+    return "$BASE_API_URL$URL_FRAG_API_V1$URL_FRAG_DRAW$opId$URL_FRAG_MARKER$markerId$URL_FRAG_REJECT";
+  }
+
+  static String getAcknowledgeMarkerUrl(String opId, String markerId) {
+    return "$BASE_API_URL$URL_FRAG_API_V1$URL_FRAG_DRAW$opId$URL_FRAG_MARKER$markerId$URL_FRAG_ACKNOWLEDGE";
   }
 
   static launchIntelUrl(String lat, String lng) {
