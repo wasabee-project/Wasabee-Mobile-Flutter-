@@ -25,8 +25,6 @@ class MarkerUtilities {
 
   static String getTargetStatusSegment(Target target, String googleId) {
     var targetStatus = "pending";
-    print('state -> ${target.state}');
-    print('googleId -> $googleId');
     switch (target.state) {
       case "pending":
         break;
@@ -43,8 +41,6 @@ class MarkerUtilities {
         targetStatus = "done";
         break;
     }
-              print('targetStatus -> $targetStatus');
-
     return targetStatus;
   }
 }

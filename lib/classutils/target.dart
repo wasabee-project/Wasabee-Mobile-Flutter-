@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:wasabee/map/map.dart';
 import 'package:wasabee/map/markerutilities.dart';
+import 'package:wasabee/network/networkcalls.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
+import 'package:wasabee/network/urlmanager.dart';
 
 class TargetUtils {
   static const DestroyPortalAlert = "DestroyPortalAlert";
@@ -83,8 +86,8 @@ class TargetUtils {
     return "${getDisplayType(target)} - $portalName";
   }
 
-  static AlertDialog getTargetInfoAlert(
-      BuildContext context, Portal portal, Target target, String googleId) {
+  static AlertDialog getTargetInfoAlert(BuildContext context, Portal portal,
+      Target target, String googleId, String opId, MapPageState mapPageState) {
     List<Widget> dialogWidgets = <Widget>[
       Center(child: Text(portal.name)),
       Divider(color: Colors.green, height: DIVIDER_HEIGHT_DEFAULT),
@@ -103,26 +106,46 @@ class TargetUtils {
       ),
       Divider(color: Colors.green, height: DIVIDER_HEIGHT_DEFAULT),
     ];
-    if (target.assignedTo?.isNotEmpty == true && target.assignedTo == googleId)
-      dialogWidgets.add(getCompleteIncompleteButton(target));
+    dialogWidgets.add(getOpenOnIntelButton(portal));
+    if (target.assignedTo?.isNotEmpty == true &&
+        target.assignedTo == googleId &&
+        target.state != STATE_COMPLETED)
+      dialogWidgets.add(getRejectAssignmentButton(target));
+    if (target.assignedTo?.isNotEmpty == true)
+      dialogWidgets.addAll(
+          getCompleteIncompleteButton(target, opId, context, mapPageState));
     if (target.comment?.isNotEmpty == true)
       dialogWidgets.add(getInfoAlertCommentWidget(target));
     return AlertDialog(
-      title:
-          Center(child: Text("Target - ${TargetUtils.getDisplayType(target)}")),
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Align(
+              alignment: Alignment.bottomCenter,
+              child: Text(
+                "Target - ${TargetUtils.getDisplayType(target)}",
+                textAlign: TextAlign.center,
+              )),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Container(
+              color: Colors.transparent,
+              child: IconButton(
+                icon: Icon(Icons.close),
+                color: Colors.black,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
+          )
+        ],
+      ),
       content: SingleChildScrollView(
         child: ListBody(
           children: dialogWidgets,
         ),
       ),
-      actions: <Widget>[
-        FlatButton(
-          child: Text('Ok'),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ],
     );
   }
 
@@ -142,23 +165,85 @@ class TargetUtils {
     );
   }
 
-  static Widget getCompleteIncompleteButton(Target target) {
-    return Column(
-      children: <Widget>[
-        RaisedButton(
-            child: Text(
-              target.state == STATE_COMPLETED
-                  ? 'Mark Incomplete'
-                  : 'Mark Complete',
+  static Widget getOpenOnIntelButton(Portal portal) {
+    return RaisedButton(
+      onPressed: () {
+        UrlManager.launchIntelUrl(portal.lat, portal.lng);
+      },
+      child: Text(
+        'Open On Intel',
+        style: TextStyle(color: Colors.white),
+      ),
+      color: Colors.green,
+    );
+  }
+
+  static Widget getRejectAssignmentButton(Target target) {
+    return RaisedButton(
+        child: Row(
+          children: <Widget>[
+            Container(
+              child: Icon(
+                Icons.cancel,
+                color: Colors.white,
+              ),
+              margin: EdgeInsets.only(right: 10),
+            ),
+            Text(
+              'Reject Assignment',
               style: TextStyle(color: Colors.white),
             ),
-            onPressed: () {
-              //TODO make this do something
-            },
-            color: Colors.green),
-        Divider(color: Colors.green, height: DIVIDER_HEIGHT_DEFAULT),
-      ],
-      crossAxisAlignment: CrossAxisAlignment.center,
-    );
+          ],
+          mainAxisAlignment: MainAxisAlignment.center,
+        ),
+        onPressed: () {
+          //TODO make this do something
+        },
+        color: Colors.green);
+  }
+
+  static List<Widget> getCompleteIncompleteButton(Target target, String opId,
+      BuildContext context, MapPageState mapPageState) {
+    return <Widget>[
+      RaisedButton(
+          child: Row(
+            children: <Widget>[
+              Container(
+                child: Icon(
+                  target.state == STATE_COMPLETED ? Icons.cancel : Icons.done,
+                  color: Colors.white,
+                ),
+                margin: EdgeInsets.only(right: 10),
+              ),
+              Text(
+                target.state == STATE_COMPLETED
+                    ? 'Mark Incomplete'
+                    : 'Mark Complete',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+            mainAxisAlignment: MainAxisAlignment.center,
+          ),
+          onPressed: () {
+            var url = target.state == STATE_COMPLETED
+                ? UrlManager.getInCompleteMarkerUrl(opId, target.iD)
+                : UrlManager.getCompleteMarkerUrl(opId, target.iD);
+            try {
+              Navigator.of(context).pop();
+              NetworkCalls.doNetworkCall(
+                  url,
+                  Map<String, String>(),
+                  mapPageState.finishedCompletionCall,
+                  false,
+                  NetWorkCallType.GET);
+              mapPageState.setIsLoading();
+            } catch (e) {
+              mapPageState.setIsNotLoading();
+              print(e);
+            }
+          },
+          color: Colors.green),
+      Divider(color: Colors.green, height: DIVIDER_HEIGHT_DEFAULT),
+    ];
   }
 }

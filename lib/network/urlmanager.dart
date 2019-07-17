@@ -1,3 +1,5 @@
+import 'package:url_launcher/url_launcher.dart';
+
 class UrlManager {
   static const URL_FRAG_ME = "/me";
   static const URL_FRAG_APTOK = "/aptok";
@@ -15,10 +17,18 @@ class UrlManager {
   static const FULL_OPERATION_URL = "$BASE_API_URL$URL_FRAG_OPERATION";
   static const FULL_LAT_LNG_URL = "$BASE_API_URL$URL_FRAG_API_V1$URL_FRAG_ME?";
   static const FULL_GET_TEAM_URL = "$BASE_API_URL$URL_FRAG_GET_TEAM";
-  static String getCompleteMarkerUrl (String opId, String markerId) {
-    return "$BASE_API_URL$URL_FRAG_API_V1$URL_FRAG_DRAW$opId$URL_FRAG_MARKER$markerId$URL_FRAG_COMPLETE"; 
+  static String getCompleteMarkerUrl(String opId, String markerId) {
+    return "$BASE_API_URL$URL_FRAG_API_V1$URL_FRAG_DRAW$opId$URL_FRAG_MARKER$markerId$URL_FRAG_COMPLETE";
   }
-  static String getInCompleteMarkerUrl (String opId, String markerId) {
-    return "$BASE_API_URL$URL_FRAG_API_V1$URL_FRAG_DRAW$opId$URL_FRAG_MARKER$markerId$URL_FRAG_INCOMPLETE"; 
+
+  static String getInCompleteMarkerUrl(String opId, String markerId) {
+    return "$BASE_API_URL$URL_FRAG_API_V1$URL_FRAG_DRAW$opId$URL_FRAG_MARKER$markerId$URL_FRAG_INCOMPLETE";
+  }
+
+  static launchIntelUrl(String lat, String lng) {
+    String url = 'https://intel.ingress/intel?ll=$lat,$lng&pll=$lat,$lng';
+    canLaunch(url).then((canLaunch) {
+      launch(url);
+    });
   }
 }

@@ -191,7 +191,6 @@ class MapMarkerBitmapBank {
         path = 'assets/icons/groupf.bmp';
         break;
     }
-    print("PATH -> $path");
     return path;
   }
 }

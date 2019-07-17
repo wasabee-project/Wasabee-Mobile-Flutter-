@@ -13,7 +13,6 @@ import '../network/networkcalls.dart';
 import '../network/urlmanager.dart';
 import '../storage/localstorage.dart';
 import '../map/utilities.dart';
-import '../main.dart';
 import '../network/responses/teamsResponse.dart';
 import 'dart:convert';
 
@@ -23,10 +22,10 @@ class MapPage extends StatefulWidget {
   MapPage({Key key, @required this.ops}) : super(key: key);
 
   @override
-  _MapPageState createState() => _MapPageState(ops);
+  MapPageState createState() => MapPageState(ops);
 }
 
-class _MapPageState extends State<MapPage> {
+class MapPageState extends State<MapPage> {
   var firstLoad = true;
   var isLoading = true;
   var sharingLocation = false;
@@ -40,7 +39,7 @@ class _MapPageState extends State<MapPage> {
   Map<MarkerId, Marker> targets = <MarkerId, Marker>{};
   MapMarkerBitmapBank bitmapBank = MapMarkerBitmapBank();
 
-  _MapPageState(List<Op> ops) {
+  MapPageState(List<Op> ops) {
     this.operationList = ops;
   }
 
@@ -328,9 +327,7 @@ class _MapPageState extends State<MapPage> {
       NetworkCalls.doNetworkCall(
           url, Map<String, String>(), gotOperation, false, NetWorkCallType.GET);
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+      setIsNotLoading();
       print(e);
     }
   }
@@ -339,32 +336,36 @@ class _MapPageState extends State<MapPage> {
     try {
       var operation = Operation.fromJson(json.decode(response));
       loadedOperation = operation;
-      markers.clear();
-      polylines.clear();
-      populateBank();
-      bitmapBank.bank.clear();
-      populateAnchors(operation);
-      populateLinks(operation);
-      populateTargets(operation);
+      await populateEverything();
 
       var url = "${UrlManager.FULL_GET_TEAM_URL}${selectedOperation.teamID}";
       NetworkCalls.doNetworkCall(
           url, Map<String, String>(), gotTeam, false, NetWorkCallType.GET);
     } catch (e) {
       parsingOperationFailed();
-      setState(() {
-        isLoading = false;
-      });
+      setIsNotLoading();
     }
+  }
+
+  populateEverything() async {
+    markers.clear();
+    polylines.clear();
+    populateBank();
+    bitmapBank.bank.clear();
+    populateAnchors(loadedOperation);
+    populateLinks(loadedOperation);
+    populateTargets(loadedOperation);
+  }
+
+  finishedCompletionCall(String response) {
+    gotOperation(response);
   }
 
   gotTeam(String response) {
     print("got team response -> $response");
     var team = FullTeam.fromJson(json.decode(response));
     populateTeamMembers(team.agents);
-    setState(() {
-      isLoading = false;
-    });
+    setIsNotLoading();
   }
 
   parsingOperationFailed() async {
@@ -507,7 +508,7 @@ class _MapPageState extends State<MapPage> {
         barrierDismissible: false,
         builder: (BuildContext context) {
           return TargetUtils.getTargetInfoAlert(
-              context, portal, target, googleId);
+              context, portal, target, googleId, selectedOperation.iD, this);
         },
       );
     });
@@ -551,6 +552,20 @@ class _MapPageState extends State<MapPage> {
         else
           ops.isSelected = false;
       }
+    });
+  }
+
+  setIsLoading() {
+    print('setting loading');
+    setState(() {
+      isLoading = true;
+    });
+  }
+
+  setIsNotLoading() {
+    print('setting not loading');
+    setState(() {
+      isLoading = false;
     });
   }
 }

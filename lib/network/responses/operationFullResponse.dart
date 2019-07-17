@@ -163,6 +163,8 @@ class Target {
   String type;
   String comment;
   String assignedTo;
+  String assignedNickname;
+  String completedBy;
   String state;
 
   Target(
@@ -171,6 +173,8 @@ class Target {
       this.type,
       this.comment,
       this.assignedTo,
+      this.assignedNickname,
+      this.completedBy,
       this.state});
 
   Target.fromJson(Map<String, dynamic> json) {
@@ -179,6 +183,8 @@ class Target {
     type = json['type'];
     comment = json['comment'];
     assignedTo = json['assignedTo'];
+    assignedNickname = json['assignedNickname'];
+    completedBy = json['completedBy'];
     state = json['state'];
   }
 
@@ -189,6 +195,8 @@ class Target {
     data['type'] = this.type;
     data['comment'] = this.comment;
     data['assignedTo'] = this.assignedTo;
+    data['assignedNickname'] = this.assignedNickname;
+    data['completedBy'] = this.completedBy;
     data['state'] = this.state;
     return data;
   }
