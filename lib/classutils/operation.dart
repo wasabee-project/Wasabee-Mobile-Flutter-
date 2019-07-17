@@ -1,8 +1,8 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:wasabee/login/login.dart';
-import 'package:wasabee/map/utilities.dart';
+import 'package:wasabee/pages/loginpage/login.dart';
+import 'package:wasabee/pages/mappage/utilities.dart';
 import 'package:wasabee/network/cookies.dart';
 import 'package:wasabee/network/responses/meResponse.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
@@ -10,6 +10,12 @@ import 'package:wasabee/network/responses/operationFullResponse.dart';
 import '../main.dart';
 
 class OperationUtils {
+  static Map<String, Portal> getPortalMap(List<Portal> portalList) {
+    Map<String, Portal> portalMap = Map<String, Portal>();
+    for (var portal in portalList) portalMap[portal.id] = portal;
+    return portalMap;
+  }
+
   static Color getLinkColor(Op operation) {
     String hexString = "";
     switch (operation.color) {

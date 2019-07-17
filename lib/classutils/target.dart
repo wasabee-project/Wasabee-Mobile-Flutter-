@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:wasabee/map/map.dart';
-import 'package:wasabee/map/markerutilities.dart';
+import 'package:wasabee/pages/mappage/map.dart';
+import 'package:wasabee/pages/mappage/markerutilities.dart';
 import 'package:wasabee/network/networkcalls.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
 import 'package:wasabee/network/urlmanager.dart';
