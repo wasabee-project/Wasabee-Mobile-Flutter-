@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wasabee/pages/alertspage/alertfiltermanager.dart';
 import 'package:wasabee/pages/mappage/map.dart';
 import 'package:wasabee/pages/mappage/markerutilities.dart';
 import 'package:wasabee/network/networkcalls.dart';
@@ -315,5 +316,37 @@ class TargetUtils {
       mapPageState.setIsNotLoading();
       print(e);
     }
+  }
+
+  static int getCountOfUnassigned(List<Target> targetList) {
+    return getUnassignedList(targetList).length;
+  }
+
+  static List<Target> getUnassignedList(List<Target> targetList) {
+    return targetList.where((i) => i.state == STATE_PENDING || i.state.isEmpty).toList();
+  }
+
+  static int getCountOfMine(List<Target> targetList, String googleId) {
+    return getMyList(targetList, googleId).length;
+  } 
+
+  static List<Target> getMyList(List<Target> targetList, String googleId) {
+    return targetList.where((i) => i.assignedTo?.isNotEmpty == true && i.assignedTo == googleId).toList();
+  }
+
+  static List<Target> getFilteredMarkers(List<Target> targetList, AlertFilterType type, String googleId) {
+    var returningList = List<Target>();
+    switch (type) {
+      case AlertFilterType.All:
+        returningList = targetList;
+        break;
+      case AlertFilterType.Unassigned:
+        returningList = getUnassignedList(targetList);
+        break;
+      case AlertFilterType.Mine:
+        returningList = getMyList(targetList, googleId);
+        break;
+    }
+    return returningList;
   }
 }

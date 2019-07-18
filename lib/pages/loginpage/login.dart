@@ -47,10 +47,11 @@ class _LoginPageState extends State<LoginPage> {
       var googleId = meResponse.googleID;
       if (googleId != null)
         await LocalStorageUtils.storeGoogleId(googleId);
+      var alertFilterType = await LocalStorageUtils.getAlertFilter();
       var opList = meResponse.ops;
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => MapPage(ops: opList, googleId: googleId)),
+        MaterialPageRoute(builder: (context) => MapPage(ops: opList, googleId: googleId, alertsSortDropdownValue: alertFilterType)),
       );
     } catch (e) {
       await CookieUtils.clearAllCookies();

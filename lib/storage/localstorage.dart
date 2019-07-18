@@ -1,9 +1,11 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wasabee/pages/alertspage/alertfiltermanager.dart';
 
 class LocalStorageUtils {
   static const KEY_SELECTED_OPERATION = "KEY_SELECTED_OPERATION";
   static const KEY_SHARING_LOCATION = "KEY_SHARING_LOCATION";
   static const KEY_GOOGLE_ID = "KEY_GOOGLE_ID";
+  static const KEY_ALERT_FILTER = "KEY_ALERT_FILTER";
 
   static Future<String> getSelectedOpId() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -33,5 +35,15 @@ class LocalStorageUtils {
   static Future<dynamic> storeGoogleId(String googleId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(KEY_GOOGLE_ID, googleId);
+  }
+
+  static Future<AlertFilterType> getAlertFilter() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return AlertFilterManager.getTypeAsString(prefs.getString(KEY_ALERT_FILTER)) ?? AlertFilterType.All;
+  }
+
+  static Future<dynamic> setAlertfilter(AlertFilterType filter) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(KEY_ALERT_FILTER, filter.toString());
   }
 }

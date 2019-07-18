@@ -1,12 +1,15 @@
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:wasabee/classutils/target.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
+import 'package:latlong/latlong.dart' as latLong;
 
 class MarkerUtilities {
   static const SEGMENT_MARKER = "wasabee_markers_";
   static const SEGMENT_ICON = "wasabee_icons_";
   static const SEGMENT_FILE_EXT = ".bmp";
 
-  static String getImagePath(Target target, String googleId, String baseSegment) {
+  static String getImagePath(
+      Target target, String googleId, String baseSegment) {
     var typePathSegment = "other_";
     switch (target.type) {
       case TargetUtils.LetDecayPortalAlert:
@@ -42,5 +45,17 @@ class MarkerUtilities {
         break;
     }
     return targetStatus;
+  }
+
+  static double getDistanceString(LatLng firstPoint, LatLng secondPoint) {
+    final latLong.Distance distance = new latLong.Distance();
+
+    //TODO when units settings are added, refer to that here.
+    var units = latLong.LengthUnit.Kilometer;
+    final double distanceDouble = distance.as(
+        units,
+        latLong.LatLng(firstPoint.latitude, firstPoint.longitude),
+        latLong.LatLng(secondPoint.latitude, firstPoint.longitude));
+    return distanceDouble;
   }
 }

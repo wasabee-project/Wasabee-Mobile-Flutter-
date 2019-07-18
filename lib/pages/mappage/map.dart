@@ -7,7 +7,9 @@ import 'package:wasabee/network/responses/meResponse.dart';
 import 'package:flutter/foundation.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:wasabee/pages/alertspage/alertfiltermanager.dart';
 import 'package:wasabee/pages/alertspage/alerts.dart';
+import 'package:wasabee/pages/alertspage/targetlistvm.dart';
 import '../../location/locationhelper.dart';
 import '../../network/networkcalls.dart';
 import '../../network/urlmanager.dart';
@@ -19,10 +21,11 @@ import 'dart:convert';
 class MapPage extends StatefulWidget {
   final List<Op> ops;
   final String googleId;
-  MapPage({Key key, @required this.ops, this.googleId}) : super(key: key);
+  final AlertFilterType alertsSortDropdownValue;
+  MapPage({Key key, @required this.ops, this.googleId, this.alertsSortDropdownValue}) : super(key: key);
 
   @override
-  MapPageState createState() => MapPageState(ops, googleId);
+  MapPageState createState() => MapPageState(ops, googleId, alertsSortDropdownValue);
 }
 
 class MapPageState extends State<MapPage> {
@@ -32,6 +35,8 @@ class MapPageState extends State<MapPage> {
   var pendingGrab;
   Op selectedOperation;
   String googleId;
+  LatLng mostRecentLoc;
+  AlertFilterType alertsSortDropdownValue;
   Operation loadedOperation;
   GoogleMapController _controller;
   GoogleMap mapView;
@@ -42,9 +47,10 @@ class MapPageState extends State<MapPage> {
   MapMarkerBitmapBank bitmapBank = MapMarkerBitmapBank();
   LatLngBounds _visibleRegion;
 
-  MapPageState(List<Op> ops, googleId) {
+  MapPageState(List<Op> ops, googleId, alertsSortDropdownValue) {
     this.operationList = ops;
     this.googleId = googleId;
+    this.alertsSortDropdownValue = alertsSortDropdownValue;
   }
 
   @override
@@ -91,6 +97,7 @@ class MapPageState extends State<MapPage> {
                         //   icon: Icon(Icons.settings),
                         //   onPressed: () {
                         //     //TODO add settings page nav here
+                        //     //TODO settings -> distance units, miles or km.  Frequency of gps sharing
                         //     print('settings tapped');
                         //   },
                         // ),
@@ -110,10 +117,24 @@ class MapPageState extends State<MapPage> {
                           child: CircularProgressIndicator(),
                         )
                       : getPageContent(),
-                  isLoading ? Center(
+                  isLoading
+                      ? Center(
                           child: CircularProgressIndicator(),
                         )
-                      : AlertsPage.getPageContent(loadedOperation.markers, OperationUtils.getPortalMap(loadedOperation.opportals), googleId),
+                      : AlertsPage.getPageContent(
+                          TargetListViewModel.fromOperationData(
+                              alertsSortDropdownValue != null
+                                  ? TargetUtils.getFilteredMarkers(
+                                      loadedOperation.markers,
+                                      alertsSortDropdownValue,
+                                      googleId)
+                                  : loadedOperation.markers,
+                              OperationUtils.getPortalMap(
+                                  loadedOperation.opportals),
+                              googleId,
+                              mostRecentLoc),
+                          loadedOperation.markers,
+                          this),
                   Icon(Icons.link),
                 ],
               ),
@@ -307,8 +328,7 @@ class MapPageState extends State<MapPage> {
   }
 
   doRefresh(Op op, bool resetVisibleRegion) async {
-    if (resetVisibleRegion)
-      _visibleRegion = null;
+    if (resetVisibleRegion) _visibleRegion = null;
     setState(() {
       doSelectOperationThing(op);
       pendingGrab = op;
@@ -366,8 +386,9 @@ class MapPageState extends State<MapPage> {
     try {
       var operation = Operation.fromJson(json.decode(response));
       loadedOperation = operation;
+      var recentPosition = await LocationHelper.locateUser();
+      mostRecentLoc = LatLng(recentPosition.latitude, recentPosition.longitude);
       await populateEverything();
-
       var url = "${UrlManager.FULL_GET_TEAM_URL}${selectedOperation.teamID}";
       NetworkCalls.doNetworkCall(
           url, Map<String, String>(), gotTeam, false, NetWorkCallType.GET);
@@ -581,6 +602,12 @@ class MapPageState extends State<MapPage> {
         else
           ops.isSelected = false;
       }
+    });
+  }
+
+  setAlertSortDropdownValue(AlertFilterType value) {
+    setState(() {
+      alertsSortDropdownValue = value;
     });
   }
 
