@@ -53,18 +53,16 @@ class MapUtilities {
   static LatLng computeCentroid(List<Marker> markers) {
     double latitude = 0;
     double longitude = 0;
-    int n = markers.length;
 
-    for (Marker point in markers) {
-      if (!point.markerId.value.startsWith("agent_")) {
-        latitude += point.position.latitude;
-        longitude += point.position.longitude;
-      } else {
-        n--;
-      }
+    var listToAverage = List<LatLng>();
+    listToAverage.add(getSouthWest(markers));
+    listToAverage.add(getNorthEast(markers));
+    for (LatLng point in listToAverage) {
+        latitude += point.latitude;
+        longitude += point.longitude;
     }
 
-    return new LatLng(latitude / n, longitude / n);
+    return new LatLng(latitude / listToAverage.length, longitude / listToAverage.length);
   }
 
   static LatLngBounds getBounds(List<Marker> markers) {

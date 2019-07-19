@@ -1,11 +1,13 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wasabee/pages/alertspage/alertfiltermanager.dart';
+import 'package:wasabee/pages/alertspage/alertsortdialog.dart';
 
 class LocalStorageUtils {
   static const KEY_SELECTED_OPERATION = "KEY_SELECTED_OPERATION";
   static const KEY_SHARING_LOCATION = "KEY_SHARING_LOCATION";
   static const KEY_GOOGLE_ID = "KEY_GOOGLE_ID";
   static const KEY_ALERT_FILTER = "KEY_ALERT_FILTER";
+  static const KEY_ALERT_SORT = "KEY_ALERT_SORT";
 
   static Future<String> getSelectedOpId() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -39,11 +41,25 @@ class LocalStorageUtils {
 
   static Future<AlertFilterType> getAlertFilter() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return AlertFilterManager.getTypeAsString(prefs.getString(KEY_ALERT_FILTER)) ?? AlertFilterType.All;
+    return AlertFilterManager.getFilterTypeAsString(
+            prefs.getString(KEY_ALERT_FILTER)) ??
+        AlertFilterType.All;
   }
 
   static Future<dynamic> setAlertfilter(AlertFilterType filter) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(KEY_ALERT_FILTER, filter.toString());
+  }
+
+  static Future<AlertSortType> getAlertSort() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return AlertFilterManager.getSortTypeAsString(
+            prefs.getString(KEY_ALERT_SORT)) ??
+        AlertSortType.Distance;
+  }
+
+  static Future<dynamic> setAlertSort(AlertSortType sort) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(KEY_ALERT_SORT, sort.toString());
   }
 }

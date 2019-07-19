@@ -50,11 +50,12 @@ class OperationUtils {
 
   static List<Link> getLinksForPortalId(String id, Operation operation) {
     var linkList = List<Link>();
-    for (var link in operation.links) {
-      if (link.fromPortalId == id || link.toPortalId == id) {
-        linkList.add(link);
+    if (operation.links != null)
+      for (var link in operation.links) {
+        if (link.fromPortalId == id || link.toPortalId == id) {
+          linkList.add(link);
+        }
       }
-    }
     return linkList;
   }
 

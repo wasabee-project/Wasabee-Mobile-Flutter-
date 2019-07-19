@@ -45,13 +45,18 @@ class _LoginPageState extends State<LoginPage> {
     try {
       var meResponse = MeResponse.fromJson(json.decode(response));
       var googleId = meResponse.googleID;
-      if (googleId != null)
-        await LocalStorageUtils.storeGoogleId(googleId);
+      if (googleId != null) await LocalStorageUtils.storeGoogleId(googleId);
       var alertFilterType = await LocalStorageUtils.getAlertFilter();
+      var alertSortType = await LocalStorageUtils.getAlertSort();
       var opList = meResponse.ops;
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => MapPage(ops: opList, googleId: googleId, alertsSortDropdownValue: alertFilterType)),
+        MaterialPageRoute(
+            builder: (context) => MapPage(
+                ops: opList,
+                googleId: googleId,
+                alertFilterDropdownValue: alertFilterType,
+                alertSortDropdownValue: alertSortType)),
       );
     } catch (e) {
       await CookieUtils.clearAllCookies();

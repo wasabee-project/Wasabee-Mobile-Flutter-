@@ -9,6 +9,7 @@ import 'package:wasabee/network/responses/operationFullResponse.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:wasabee/pages/alertspage/alertfiltermanager.dart';
 import 'package:wasabee/pages/alertspage/alerts.dart';
+import 'package:wasabee/pages/alertspage/alertsortdialog.dart';
 import 'package:wasabee/pages/alertspage/targetlistvm.dart';
 import '../../location/locationhelper.dart';
 import '../../network/networkcalls.dart';
@@ -21,11 +22,19 @@ import 'dart:convert';
 class MapPage extends StatefulWidget {
   final List<Op> ops;
   final String googleId;
-  final AlertFilterType alertsSortDropdownValue;
-  MapPage({Key key, @required this.ops, this.googleId, this.alertsSortDropdownValue}) : super(key: key);
+  final AlertFilterType alertFilterDropdownValue;
+  final AlertSortType alertSortDropdownValue;
+  MapPage(
+      {Key key,
+      @required this.ops,
+      this.googleId,
+      this.alertFilterDropdownValue,
+      this.alertSortDropdownValue})
+      : super(key: key);
 
   @override
-  MapPageState createState() => MapPageState(ops, googleId, alertsSortDropdownValue);
+  MapPageState createState() =>
+      MapPageState(ops, googleId, alertFilterDropdownValue, alertSortDropdownValue);
 }
 
 class MapPageState extends State<MapPage> {
@@ -36,7 +45,8 @@ class MapPageState extends State<MapPage> {
   Op selectedOperation;
   String googleId;
   LatLng mostRecentLoc;
-  AlertFilterType alertsSortDropdownValue;
+  AlertFilterType alertFilterDropdownValue;
+  AlertSortType alertSortDropdownValue;
   Operation loadedOperation;
   GoogleMapController _controller;
   GoogleMap mapView;
@@ -47,10 +57,11 @@ class MapPageState extends State<MapPage> {
   MapMarkerBitmapBank bitmapBank = MapMarkerBitmapBank();
   LatLngBounds _visibleRegion;
 
-  MapPageState(List<Op> ops, googleId, alertsSortDropdownValue) {
+  MapPageState(List<Op> ops, googleId, alertFilterDropdownValue, alertSortDropdownValue) {
     this.operationList = ops;
     this.googleId = googleId;
-    this.alertsSortDropdownValue = alertsSortDropdownValue;
+    this.alertFilterDropdownValue = alertFilterDropdownValue;
+    this.alertSortDropdownValue = alertSortDropdownValue;
   }
 
   @override
@@ -69,6 +80,7 @@ class MapPageState extends State<MapPage> {
       firstLoad = false;
       doInitialLoadThings();
     }
+
     return isLoading
         ? Container(
             color: Colors.white,
@@ -122,17 +134,18 @@ class MapPageState extends State<MapPage> {
                           child: CircularProgressIndicator(),
                         )
                       : AlertsPage.getPageContent(
-                          TargetListViewModel.fromOperationData(
-                              alertsSortDropdownValue != null
-                                  ? TargetUtils.getFilteredMarkers(
-                                      loadedOperation.markers,
-                                      alertsSortDropdownValue,
-                                      googleId)
-                                  : loadedOperation.markers,
-                              OperationUtils.getPortalMap(
-                                  loadedOperation.opportals),
-                              googleId,
-                              mostRecentLoc),
+                              TargetListViewModel.fromOperationData(
+                                  alertFilterDropdownValue != null
+                                      ? TargetUtils.getFilteredMarkers(
+                                          loadedOperation.markers,
+                                          alertFilterDropdownValue,
+                                          googleId)
+                                      : loadedOperation.markers,
+                                  OperationUtils.getPortalMap(
+                                      loadedOperation.opportals),
+                                  googleId,
+                                  mostRecentLoc,
+                                  alertSortDropdownValue),
                           loadedOperation.markers,
                           this),
                   Icon(Icons.link),
@@ -388,6 +401,7 @@ class MapPageState extends State<MapPage> {
       loadedOperation = operation;
       var recentPosition = await LocationHelper.locateUser();
       mostRecentLoc = LatLng(recentPosition.latitude, recentPosition.longitude);
+
       await populateEverything();
       var url = "${UrlManager.FULL_GET_TEAM_URL}${selectedOperation.teamID}";
       NetworkCalls.doNetworkCall(
@@ -605,9 +619,15 @@ class MapPageState extends State<MapPage> {
     });
   }
 
-  setAlertSortDropdownValue(AlertFilterType value) {
+  setAlerFilterDropdownValue(AlertFilterType value) {
     setState(() {
-      alertsSortDropdownValue = value;
+      alertFilterDropdownValue = value;
+    });
+  }
+
+  setAlertSortDropdownValue(AlertSortType value) {
+    setState(() {
+     alertSortDropdownValue = value; 
     });
   }
 

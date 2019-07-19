@@ -47,15 +47,14 @@ class MarkerUtilities {
     return targetStatus;
   }
 
-  static double getDistanceString(LatLng firstPoint, LatLng secondPoint) {
+  static double getDistanceDouble(LatLng firstPoint, LatLng secondPoint) {
     final latLong.Distance distance = new latLong.Distance();
 
     //TODO when units settings are added, refer to that here.
-    var units = latLong.LengthUnit.Kilometer;
-    final double distanceDouble = distance.as(
-        units,
+    final double distanceDouble = distance(
         latLong.LatLng(firstPoint.latitude, firstPoint.longitude),
         latLong.LatLng(secondPoint.latitude, firstPoint.longitude));
-    return distanceDouble;
+        // ^^ THIS GIVES METERS, THE / 1000 BELOW NEEDS TO CHANGE WHEN MILES
+    return distanceDouble / 1000;
   }
 }
