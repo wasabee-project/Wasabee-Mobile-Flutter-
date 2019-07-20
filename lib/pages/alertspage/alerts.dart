@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
 import 'package:wasabee/pages/alertspage/alertfiltermanager.dart';
 import 'package:wasabee/pages/alertspage/alertsortdialog.dart';
@@ -73,41 +74,46 @@ class AlertsPage {
               itemCount: listOfVM.length,
               itemBuilder: (BuildContext context, int index) {
                 TargetListViewModel vm = listOfVM[index];
-                return Column(children: <Widget>[
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        Image.asset(
-                          vm.imagePath,
-                          width: 50.0,
-                          height: 50.0,
-                          fit: BoxFit.fitHeight,
-                        ),
-                        VerticalDivider(),
-                        Flexible(
-                            child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                return InkWell(
+                    onTap: () {
+                      mapPageState.makeZoomedPositionFromLatLng(vm.latLng);
+                      mapPageState.tabController.animateTo(0);
+                    },
+                    child: Column(children: <Widget>[
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: <Widget>[
-                            Text(
-                              vm.titleString,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            Image.asset(
+                              vm.imagePath,
+                              width: 50.0,
+                              height: 50.0,
+                              fit: BoxFit.fitHeight,
                             ),
-                            Divider(
-                              height: 8.0,
-                              color: Colors.green,
-                              endIndent: 15.0,
-                            ),
-                            Text(vm.stateString),
-                            Text(vm.distanceString),
-                          ],
-                        ))
-                      ]),
-                  Divider(
-                    height: 10.0,
-                    color: Colors.grey,
-                  )
-                ]);
+                            VerticalDivider(),
+                            Flexible(
+                                child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  vm.titleString,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                Divider(
+                                  height: 8.0,
+                                  color: Colors.green,
+                                  endIndent: 15.0,
+                                ),
+                                Text(vm.stateString),
+                                Text(vm.distanceString),
+                              ],
+                            ))
+                          ]),
+                      Divider(
+                        height: 10.0,
+                        color: Colors.grey,
+                      )
+                    ]));
               }))
     ]));
   }

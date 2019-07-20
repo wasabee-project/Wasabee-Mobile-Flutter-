@@ -33,11 +33,12 @@ class MapPage extends StatefulWidget {
       : super(key: key);
 
   @override
-  MapPageState createState() =>
-      MapPageState(ops, googleId, alertFilterDropdownValue, alertSortDropdownValue);
+  MapPageState createState() => MapPageState(
+      ops, googleId, alertFilterDropdownValue, alertSortDropdownValue);
 }
 
-class MapPageState extends State<MapPage> {
+class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
+  static const ZOOMED_ZOOM_LEVEL = 18.0;
   var firstLoad = true;
   var isLoading = true;
   var sharingLocation = false;
@@ -48,16 +49,24 @@ class MapPageState extends State<MapPage> {
   AlertFilterType alertFilterDropdownValue;
   AlertSortType alertSortDropdownValue;
   Operation loadedOperation;
-  GoogleMapController _controller;
+  GoogleMapController mapController;
   GoogleMap mapView;
+  CameraPosition passedPosition;
   List<Op> operationList = List();
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   Map<PolylineId, Polyline> polylines = <PolylineId, Polyline>{};
   Map<MarkerId, Marker> targets = <MarkerId, Marker>{};
   MapMarkerBitmapBank bitmapBank = MapMarkerBitmapBank();
   LatLngBounds _visibleRegion;
+  TabController tabController;
+  final List<Tab> myTabs = <Tab>[
+    Tab(text: 'Map'),
+    Tab(text: 'Alerts'),
+    Tab(text: 'Links'),
+  ];
 
-  MapPageState(List<Op> ops, googleId, alertFilterDropdownValue, alertSortDropdownValue) {
+  MapPageState(List<Op> ops, googleId, alertFilterDropdownValue,
+      alertSortDropdownValue) {
     this.operationList = ops;
     this.googleId = googleId;
     this.alertFilterDropdownValue = alertFilterDropdownValue;
@@ -70,8 +79,14 @@ class MapPageState extends State<MapPage> {
       sharingLocation = isLocationSharing;
       sendLocationIfSharing();
     });
-
+    tabController = new TabController(vsync: this, length: myTabs.length);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -87,79 +102,74 @@ class MapPageState extends State<MapPage> {
             child: Center(
               child: CircularProgressIndicator(),
             ))
-        : DefaultTabController(
-            length: 3,
-            child: Scaffold(
-              appBar: AppBar(
-                bottom: TabBar(
-                  tabs: [
-                    Tab(text: 'Map'),
-                    Tab(text: 'Alerts'),
-                    Tab(text: 'Links'),
-                  ],
-                ),
-                title: Text(selectedOperation == null
-                    ? 'Wasabee - Map'
-                    : '${selectedOperation.name}'),
-                actions: loadedOperation == null
-                    ? null
-                    : <Widget>[
-                        // action button
-                        // IconButton(
-                        //   icon: Icon(Icons.settings),
-                        //   onPressed: () {
-                        //     //TODO add settings page nav here
-                        //     //TODO settings -> distance units, miles or km.  Frequency of gps sharing
-                        //     print('settings tapped');
-                        //   },
-                        // ),
-                        IconButton(
-                          icon: Icon(Icons.refresh),
-                          onPressed: () {
-                            doRefresh(selectedOperation, true);
-                          },
-                        )
-                      ],
+        : Scaffold(
+            appBar: AppBar(
+              bottom: TabBar(
+                controller: tabController,
+                tabs: myTabs,
               ),
-              body: TabBarView(
-                physics: NeverScrollableScrollPhysics(),
-                children: [
-                  isLoading
-                      ? Center(
-                          child: CircularProgressIndicator(),
-                        )
-                      : getPageContent(),
-                  isLoading
-                      ? Center(
-                          child: CircularProgressIndicator(),
-                        )
-                      : AlertsPage.getPageContent(
-                              TargetListViewModel.fromOperationData(
-                                  alertFilterDropdownValue != null
-                                      ? TargetUtils.getFilteredMarkers(
-                                          loadedOperation.markers,
-                                          alertFilterDropdownValue,
-                                          googleId)
-                                      : loadedOperation.markers,
-                                  OperationUtils.getPortalMap(
-                                      loadedOperation.opportals),
-                                  googleId,
-                                  mostRecentLoc,
-                                  alertSortDropdownValue),
-                          loadedOperation.markers,
-                          this),
-                  Icon(Icons.link),
-                ],
-              ),
-              drawer: isLoading
+              title: Text(selectedOperation == null
+                  ? 'Wasabee - Map'
+                  : '${selectedOperation.name}'),
+              actions: loadedOperation == null
                   ? null
-                  : Drawer(
-                      child: ListView(
-                        padding: EdgeInsets.zero,
-                        children: getDrawerElements(),
-                      ),
-                    ),
+                  : <Widget>[
+                      // action button
+                      // IconButton(
+                      //   icon: Icon(Icons.settings),
+                      //   onPressed: () {
+                      //     //TODO add settings page nav here
+                      //     //TODO settings -> distance units, miles or km.  Frequency of gps sharing
+                      //     print('settings tapped');
+                      //   },
+                      // ),
+                      IconButton(
+                        icon: Icon(Icons.refresh),
+                        onPressed: () {
+                          doRefresh(selectedOperation, true);
+                        },
+                      )
+                    ],
             ),
+            body: TabBarView(
+              controller: tabController,
+              physics: NeverScrollableScrollPhysics(),
+              children: [
+                isLoading
+                    ? Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : getPageContent(),
+                isLoading
+                    ? Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : AlertsPage.getPageContent(
+                        TargetListViewModel.fromOperationData(
+                            alertFilterDropdownValue != null
+                                ? TargetUtils.getFilteredMarkers(
+                                    loadedOperation.markers,
+                                    alertFilterDropdownValue,
+                                    googleId)
+                                : loadedOperation.markers,
+                            OperationUtils.getPortalMap(
+                                loadedOperation.opportals),
+                            googleId,
+                            mostRecentLoc,
+                            alertSortDropdownValue),
+                        loadedOperation.markers,
+                        this),
+                Icon(Icons.link),
+              ],
+            ),
+            drawer: isLoading
+                ? null
+                : Drawer(
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      children: getDrawerElements(),
+                    ),
+                  ),
           );
   }
 
@@ -171,6 +181,7 @@ class MapPageState extends State<MapPage> {
   }
 
   populateMapView() {
+    print('populating map view');
     var center = _visibleRegion == null
         ? MapUtilities.computeCentroid(List<Marker>.of(markers.values))
         : MapUtilities.getCenterFromBounds(_visibleRegion);
@@ -185,20 +196,23 @@ class MapPageState extends State<MapPage> {
       myLocationButtonEnabled: true,
       markers: Set<Marker>.of(markers.values),
       polylines: Set<Polyline>.of(polylines.values),
-      initialCameraPosition: CameraPosition(
-          target: center,
-          zoom: MapUtilities.getViewCircleZoomLevel(
-              center, bounds, fromExistingLocation)),
+      initialCameraPosition: passedPosition == null
+          ? CameraPosition(
+              target: center,
+              zoom: MapUtilities.getViewCircleZoomLevel(
+                  center, bounds, fromExistingLocation))
+          : passedPosition,
     );
+    passedPosition = null;
   }
 
   void onMapCreated(GoogleMapController controller) {
-    _controller = controller;
+    mapController = controller;
   }
 
   updateVisibleRegion() async {
-    if (_controller != null) {
-      final LatLngBounds visibleRegion = await _controller.getVisibleRegion();
+    if (mapController != null) {
+      final LatLngBounds visibleRegion = await mapController.getVisibleRegion();
       _visibleRegion = visibleRegion;
     }
   }
@@ -619,6 +633,11 @@ class MapPageState extends State<MapPage> {
     });
   }
 
+  makeZoomedPositionFromLatLng(LatLng latLng) {
+    passedPosition = CameraPosition(target: latLng, zoom: ZOOMED_ZOOM_LEVEL);
+    setState(() {});
+  }
+
   setAlerFilterDropdownValue(AlertFilterType value) {
     setState(() {
       alertFilterDropdownValue = value;
@@ -627,7 +646,7 @@ class MapPageState extends State<MapPage> {
 
   setAlertSortDropdownValue(AlertSortType value) {
     setState(() {
-     alertSortDropdownValue = value; 
+      alertSortDropdownValue = value;
     });
   }
 

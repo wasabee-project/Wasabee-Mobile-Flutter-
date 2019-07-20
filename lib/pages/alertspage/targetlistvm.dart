@@ -81,7 +81,6 @@ class TargetListViewModel {
         list = sortAlertVMsByType(list);
         break;
     }
-    for (var vm in list) print('vm title -> ${vm.titleString}');
     return list;
   }
 
