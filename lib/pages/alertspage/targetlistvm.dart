@@ -33,7 +33,8 @@ class TargetListViewModel {
       Map<String, Portal> portalMap,
       String googleId,
       LatLng mostRecentLoc,
-      AlertSortType sortType) {
+      AlertSortType sortType,
+      bool useImperialUnits) {
     var listOfVM = List<TargetListViewModel>();
     if (targetList != null && targetList.length > 0)
       for (var target in targetList) {
@@ -43,16 +44,15 @@ class TargetListViewModel {
           portalLoc =
               LatLng(double.parse(portal.lat), double.parse(portal.lng));
         }
-        var distanceDouble =
-            MarkerUtilities.getDistanceDouble(portalLoc, mostRecentLoc);
-        var unitsString = "km";
+        var distanceDouble = MarkerUtilities.getDistanceDouble(
+            portalLoc, mostRecentLoc, useImperialUnits);
         listOfVM.add(TargetListViewModel(
             targetId: target.iD,
             titleString: TargetUtils.getMarkerTitle(portal.name, target),
             stateString: TargetUtils.getDisplayState(target, googleId),
             distanceDouble: distanceDouble,
             distanceString:
-                mostRecentLoc == null ? "" : "$distanceDouble $unitsString",
+                mostRecentLoc == null ? "" : MarkerUtilities.getDistanceString(distanceDouble, useImperialUnits),
             imagePath:
                 "assets/dialog_icons/${MarkerUtilities.getImagePath(target, googleId, MarkerUtilities.SEGMENT_ICON)}",
             latLng: portalLoc,

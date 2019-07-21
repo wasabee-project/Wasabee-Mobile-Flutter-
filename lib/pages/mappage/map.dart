@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:wasabee/classutils/operation.dart';
 import 'package:wasabee/classutils/target.dart';
+import 'package:wasabee/main.dart';
 import 'package:wasabee/network/responses/meResponse.dart';
 import 'package:flutter/foundation.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
@@ -11,6 +12,8 @@ import 'package:wasabee/pages/alertspage/alertfiltermanager.dart';
 import 'package:wasabee/pages/alertspage/alerts.dart';
 import 'package:wasabee/pages/alertspage/alertsortdialog.dart';
 import 'package:wasabee/pages/alertspage/targetlistvm.dart';
+import 'package:wasabee/pages/loginpage/login.dart';
+import 'package:wasabee/pages/settingspage/settings.dart';
 import '../../location/locationhelper.dart';
 import '../../network/networkcalls.dart';
 import '../../network/urlmanager.dart';
@@ -24,17 +27,19 @@ class MapPage extends StatefulWidget {
   final String googleId;
   final AlertFilterType alertFilterDropdownValue;
   final AlertSortType alertSortDropdownValue;
+  final bool useImperialUnitsValue;
   MapPage(
       {Key key,
       @required this.ops,
       this.googleId,
       this.alertFilterDropdownValue,
-      this.alertSortDropdownValue})
+      this.alertSortDropdownValue,
+      this.useImperialUnitsValue})
       : super(key: key);
 
   @override
   MapPageState createState() => MapPageState(
-      ops, googleId, alertFilterDropdownValue, alertSortDropdownValue);
+      ops, googleId, alertFilterDropdownValue, alertSortDropdownValue, useImperialUnitsValue);
 }
 
 class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
@@ -48,6 +53,7 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   LatLng mostRecentLoc;
   AlertFilterType alertFilterDropdownValue;
   AlertSortType alertSortDropdownValue;
+  bool useImperialUnitsValue;
   Operation loadedOperation;
   GoogleMapController mapController;
   GoogleMap mapView;
@@ -66,11 +72,12 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   ];
 
   MapPageState(List<Op> ops, googleId, alertFilterDropdownValue,
-      alertSortDropdownValue) {
+      alertSortDropdownValue, useImperialUnitsValue) {
     this.operationList = ops;
     this.googleId = googleId;
     this.alertFilterDropdownValue = alertFilterDropdownValue;
     this.alertSortDropdownValue = alertSortDropdownValue;
+    this.useImperialUnitsValue = useImperialUnitsValue;
   }
 
   @override
@@ -115,14 +122,12 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
                   ? null
                   : <Widget>[
                       // action button
-                      // IconButton(
-                      //   icon: Icon(Icons.settings),
-                      //   onPressed: () {
-                      //     //TODO add settings page nav here
-                      //     //TODO settings -> distance units, miles or km.  Frequency of gps sharing
-                      //     print('settings tapped');
-                      //   },
-                      // ),
+                      IconButton(
+                        icon: Icon(Icons.settings),
+                        onPressed: () {
+                          pressedSettings();
+                        },
+                      ),
                       IconButton(
                         icon: Icon(Icons.refresh),
                         onPressed: () {
@@ -156,7 +161,8 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
                                 loadedOperation.opportals),
                             googleId,
                             mostRecentLoc,
-                            alertSortDropdownValue),
+                            alertSortDropdownValue,
+                            useImperialUnitsValue),
                         loadedOperation.markers,
                         this),
                 Icon(Icons.link),
@@ -181,7 +187,7 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   }
 
   populateMapView() {
-    print('populating map view');
+    sendLocationIfSharing();
     var center = _visibleRegion == null
         ? MapUtilities.computeCentroid(List<Marker>.of(markers.values))
         : MapUtilities.getCenterFromBounds(_visibleRegion);
@@ -322,7 +328,6 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
         ));
   }
 
-  //TODO do this whenever the map is updated.
   sendLocationIfSharing() {
     if (sharingLocation) {
       LocationHelper.locateUser().then((Position userPosition) {
@@ -651,16 +656,42 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   }
 
   setIsLoading() {
-    print('setting loading');
     setState(() {
       isLoading = true;
     });
   }
 
   setIsNotLoading() {
-    print('setting not loading');
     setState(() {
       isLoading = false;
     });
+  }
+
+  pressedSettings() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => SettingsPage(
+                title: MyApp.APP_TITLE,
+                useImperial: useImperialUnitsValue,
+              )),
+    ).then((onValue) {
+      if (onValue) {
+        doFullRefresh();
+      }
+      print('returned settings with -> $onValue');
+    });
+    //TODO settings -> Frequency of gps sharing
+  }
+
+  doFullRefresh() {
+    Navigator.of(context).pop();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+          builder: (context) => LoginPage(
+                title: MyApp.APP_TITLE,
+              )),
+    );
   }
 }

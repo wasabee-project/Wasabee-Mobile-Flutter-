@@ -48,6 +48,7 @@ class _LoginPageState extends State<LoginPage> {
       if (googleId != null) await LocalStorageUtils.storeGoogleId(googleId);
       var alertFilterType = await LocalStorageUtils.getAlertFilter();
       var alertSortType = await LocalStorageUtils.getAlertSort();
+      var useImperialUnits = await LocalStorageUtils.getUseImperialUnits();
       var opList = meResponse.ops;
       Navigator.pushReplacement(
         context,
@@ -56,7 +57,8 @@ class _LoginPageState extends State<LoginPage> {
                 ops: opList,
                 googleId: googleId,
                 alertFilterDropdownValue: alertFilterType,
-                alertSortDropdownValue: alertSortType)),
+                alertSortDropdownValue: alertSortType,
+                useImperialUnitsValue: useImperialUnits)),
       );
     } catch (e) {
       await CookieUtils.clearAllCookies();

@@ -8,6 +8,7 @@ class LocalStorageUtils {
   static const KEY_GOOGLE_ID = "KEY_GOOGLE_ID";
   static const KEY_ALERT_FILTER = "KEY_ALERT_FILTER";
   static const KEY_ALERT_SORT = "KEY_ALERT_SORT";
+  static const KEY_USE_IMPERIAL = "KEY_USE_IMPERIAL";
 
   static Future<String> getSelectedOpId() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -61,5 +62,15 @@ class LocalStorageUtils {
   static Future<dynamic> setAlertSort(AlertSortType sort) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(KEY_ALERT_SORT, sort.toString());
+  }
+
+  static Future<bool> getUseImperialUnits() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(KEY_USE_IMPERIAL) ?? false;
+  }
+
+  static Future<dynamic> setUseImperialUnits(bool useImperialUnits) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(KEY_USE_IMPERIAL, useImperialUnits);
   }
 }
