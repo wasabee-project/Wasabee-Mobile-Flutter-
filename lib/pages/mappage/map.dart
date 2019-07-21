@@ -482,25 +482,27 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
         final MarkerId targetId = MarkerId(target.iD);
         final Portal portal =
             OperationUtils.getPortalFromID(target.portalId, operation);
-        final Marker marker = Marker(
-            markerId: targetId,
-            icon: await bitmapBank.getIconFromBank(
-                target.type, context, target, googleId),
-            position: LatLng(
-              double.parse(portal.lat),
-              double.parse(portal.lng),
-            ),
-            infoWindow: InfoWindow(
-              title: portal.name,
-              snippet: TargetUtils.getMarkerTitle(portal.name, target),
+        if (portal != null) {
+          final Marker marker = Marker(
+              markerId: targetId,
+              icon: await bitmapBank.getIconFromBank(
+                  target.type, context, target, googleId),
+              position: LatLng(
+                double.parse(portal.lat),
+                double.parse(portal.lng),
+              ),
+              infoWindow: InfoWindow(
+                title: portal.name,
+                snippet: TargetUtils.getMarkerTitle(portal.name, target),
+                onTap: () {
+                  _onTargetInfoWindowTapped(target, portal, targetId);
+                },
+              ),
               onTap: () {
-                _onTargetInfoWindowTapped(target, portal, targetId);
-              },
-            ),
-            onTap: () {
-              _onTargetTapped(targetId);
-            });
-        markers[targetId] = marker;
+                _onTargetTapped(targetId);
+              });
+          markers[targetId] = marker;
+        }
       }
     }
   }

@@ -39,26 +39,31 @@ class TargetListViewModel {
     if (targetList != null && targetList.length > 0)
       for (var target in targetList) {
         var portal = portalMap[target.portalId];
-        LatLng portalLoc;
-        if (portal.lat?.isNotEmpty == true && portal.lng?.isNotEmpty == true) {
-          portalLoc =
-              LatLng(double.parse(portal.lat), double.parse(portal.lng));
+        if (portal != null) {
+          LatLng portalLoc;
+          if (portal.lat?.isNotEmpty == true &&
+              portal.lng?.isNotEmpty == true) {
+            portalLoc =
+                LatLng(double.parse(portal.lat), double.parse(portal.lng));
+          }
+          var distanceDouble = MarkerUtilities.getDistanceDouble(
+              portalLoc, mostRecentLoc, useImperialUnits);
+          listOfVM.add(TargetListViewModel(
+              targetId: target.iD,
+              titleString: TargetUtils.getMarkerTitle(portal.name, target),
+              stateString: TargetUtils.getDisplayState(target, googleId),
+              distanceDouble: distanceDouble,
+              distanceString: mostRecentLoc == null
+                  ? ""
+                  : MarkerUtilities.getDistanceString(
+                      distanceDouble, useImperialUnits),
+              imagePath:
+                  "assets/dialog_icons/${MarkerUtilities.getImagePath(target, googleId, MarkerUtilities.SEGMENT_ICON)}",
+              latLng: portalLoc,
+              targetType: target.type,
+              targetState: target.state,
+              targetPortalName: portal.name));
         }
-        var distanceDouble = MarkerUtilities.getDistanceDouble(
-            portalLoc, mostRecentLoc, useImperialUnits);
-        listOfVM.add(TargetListViewModel(
-            targetId: target.iD,
-            titleString: TargetUtils.getMarkerTitle(portal.name, target),
-            stateString: TargetUtils.getDisplayState(target, googleId),
-            distanceDouble: distanceDouble,
-            distanceString:
-                mostRecentLoc == null ? "" : MarkerUtilities.getDistanceString(distanceDouble, useImperialUnits),
-            imagePath:
-                "assets/dialog_icons/${MarkerUtilities.getImagePath(target, googleId, MarkerUtilities.SEGMENT_ICON)}",
-            latLng: portalLoc,
-            targetType: target.type,
-            targetState: target.state,
-            targetPortalName: portal.name));
       }
     listOfVM = sortAlertVMsByDistance(listOfVM);
     listOfVM = sortFromType(sortType, listOfVM);
