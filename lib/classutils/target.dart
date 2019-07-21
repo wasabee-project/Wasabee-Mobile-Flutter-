@@ -323,7 +323,7 @@ class TargetUtils {
   }
 
   static List<Target> getUnassignedList(List<Target> targetList) {
-    return targetList.where((i) => i.state == STATE_PENDING || i.state.isEmpty).toList();
+    return targetList == null ? List<Target>() : targetList.where((i) => i.state == STATE_PENDING || i.state.isEmpty).toList();
   }
 
   static int getCountOfMine(List<Target> targetList, String googleId) {
@@ -331,7 +331,7 @@ class TargetUtils {
   } 
 
   static List<Target> getMyList(List<Target> targetList, String googleId) {
-    return targetList.where((i) => i.assignedTo?.isNotEmpty == true && i.assignedTo == googleId).toList();
+    return targetList == null ? List<Target>() : targetList.where((i) => i.assignedTo?.isNotEmpty == true && i.assignedTo == googleId).toList();
   }
 
   static List<Target> getFilteredMarkers(List<Target> targetList, AlertFilterType type, String googleId) {

@@ -4,6 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:wasabee/classutils/operation.dart';
 import 'package:wasabee/classutils/target.dart';
 import 'package:wasabee/main.dart';
+import 'package:wasabee/network/cookies.dart';
 import 'package:wasabee/network/responses/meResponse.dart';
 import 'package:flutter/foundation.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
@@ -38,8 +39,8 @@ class MapPage extends StatefulWidget {
       : super(key: key);
 
   @override
-  MapPageState createState() => MapPageState(
-      ops, googleId, alertFilterDropdownValue, alertSortDropdownValue, useImperialUnitsValue);
+  MapPageState createState() => MapPageState(ops, googleId,
+      alertFilterDropdownValue, alertSortDropdownValue, useImperialUnitsValue);
 }
 
 class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
@@ -87,6 +88,7 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
       sendLocationIfSharing();
     });
     tabController = new TabController(vsync: this, length: myTabs.length);
+    WidgetsBinding.instance.addPostFrameCallback((_) => doInitialLoadThings());
     super.initState();
   }
 
@@ -98,11 +100,6 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    if (firstLoad == true) {
-      firstLoad = false;
-      doInitialLoadThings();
-    }
-
     return isLoading
         ? Container(
             color: Colors.white,
@@ -376,7 +373,7 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   }
 
   doInitialLoadThings() async {
-    if (operationList.length > 0) {
+    if (operationList != null && operationList.length > 0) {
       var foundOperation = await checkForSelectedOp(operationList);
       if (foundOperation == null) {
         print('FOUND operation is null!');
@@ -384,6 +381,15 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
       } else {
         doSelectOperationThing(foundOperation);
       }
+    } else {
+      var dialog = OperationUtils.getNoOperationDialog(context);
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return dialog;
+        },
+      );
     }
   }
 
@@ -417,14 +423,18 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   gotOperation(String response) async {
     try {
       var operation = Operation.fromJson(json.decode(response));
-      loadedOperation = operation;
-      var recentPosition = await LocationHelper.locateUser();
-      mostRecentLoc = LatLng(recentPosition.latitude, recentPosition.longitude);
+      if (operation != null) {
+        loadedOperation = operation;
+        var recentPosition = await LocationHelper.locateUser();
+        mostRecentLoc =
+            LatLng(recentPosition.latitude, recentPosition.longitude);
 
-      await populateEverything();
-      var url = "${UrlManager.FULL_GET_TEAM_URL}${selectedOperation.teamID}";
-      NetworkCalls.doNetworkCall(
-          url, Map<String, String>(), gotTeam, false, NetWorkCallType.GET);
+        await populateEverything();
+        var url = "${UrlManager.FULL_GET_TEAM_URL}${selectedOperation.teamID}";
+        NetworkCalls.doNetworkCall(
+            url, Map<String, String>(), gotTeam, false, NetWorkCallType.GET);
+      } else
+        parsingOperationFailed();
     } catch (e) {
       parsingOperationFailed();
       setIsNotLoading();
@@ -466,7 +476,7 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   }
 
   populateTargets(Operation operation) async {
-    if (operation.markers != null) {
+    if (operation?.markers != null) {
       populateBank();
       for (var target in operation.markers) {
         final MarkerId targetId = MarkerId(target.iD);

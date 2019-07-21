@@ -9,6 +9,7 @@ class MarkerUtilities {
   static const SEGMENT_FILE_EXT = ".bmp";
   static const CONVERT_METERS_TO_MILES_CONST = 0.00062137;
   static const CONVERT_METERS_TO_YARDS_CONST = 1.0936;
+  static const CONVERT_MILES_TO_YARDS_CONST = 1760;
 
   static String getImagePath(
       Target target, String googleId, String baseSegment) {
@@ -67,29 +68,30 @@ class MarkerUtilities {
   }
 
   static String getDistanceString(double distanceBig, bool useImperialUnits) {
-    double finalDistance;
     String finalDistanceUnits;
+    String finalDistanceString;
     if (useImperialUnits) {
       //MILES
       finalDistanceUnits = "mi";
-      finalDistance = distanceBig;
+      finalDistanceString = "${distanceBig.toStringAsFixed(2)}";
       if (distanceBig < 1) {
         //YARDS
+        print('distanceBig -> $distanceBig');
         finalDistanceUnits = "yards";
-        finalDistance = distanceBig *
-            CONVERT_METERS_TO_YARDS_CONST; // need to convert miles to yards, not meters
+        finalDistanceString = (distanceBig *
+            CONVERT_MILES_TO_YARDS_CONST).toStringAsFixed(0); // need to convert miles to yards, not meters
       }
     } else {
       //KM
       finalDistanceUnits = "km";
-      finalDistance = distanceBig;
+      finalDistanceString = "${distanceBig.toStringAsFixed(2)}";
       if (distanceBig < 1) {
         //METERS
         finalDistanceUnits = "meters";
-        finalDistance = distanceBig * 1000;
+        finalDistanceString = (distanceBig * 1000).toStringAsFixed(0);
       }
     }
-    return "$finalDistance $finalDistanceUnits";
+    return "$finalDistanceString $finalDistanceUnits";
   }
 
   static String getDistanceUnits(

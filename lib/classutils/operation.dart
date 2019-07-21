@@ -76,15 +76,29 @@ class OperationUtils {
           child: Text('Ok'),
           onPressed: () {
             Navigator.of(context).pop();
-            CookieUtils.clearAllCookies().then((completed) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => LoginPage(
-                          title: MyApp.APP_TITLE,
-                        )),
-              );
-            });
+            CookieUtils.clearAllCookiesAndGotoLogin(context);
+          },
+        ),
+      ],
+    );
+  }
+
+  static AlertDialog getNoOperationDialog(BuildContext context) {
+return AlertDialog(
+      title: Text('No Operations Found'),
+      content: SingleChildScrollView(
+        child: ListBody(
+          children: <Widget>[
+            Text('No operations were found for your user on the server.'),
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        FlatButton(
+          child: Text('Ok'),
+          onPressed: () {
+            Navigator.of(context).pop();
+            CookieUtils.clearAllCookiesAndGotoLogin(context);
           },
         ),
       ],

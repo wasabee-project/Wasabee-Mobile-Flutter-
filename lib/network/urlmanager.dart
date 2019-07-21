@@ -36,7 +36,7 @@ class UrlManager {
   }
 
   static launchIntelUrl(String lat, String lng) {
-    String url = 'https://intel.ingress/intel?ll=$lat,$lng&pll=$lat,$lng';
+    String url = 'https://intel.ingress.com/intel?ll=$lat,$lng&pll=$lat,$lng';
     canLaunch(url).then((canLaunch) {
       launch(url);
     });
