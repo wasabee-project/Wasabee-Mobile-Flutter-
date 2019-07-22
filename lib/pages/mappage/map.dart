@@ -13,6 +13,8 @@ import 'package:wasabee/pages/alertspage/alertfiltermanager.dart';
 import 'package:wasabee/pages/alertspage/alerts.dart';
 import 'package:wasabee/pages/alertspage/alertsortdialog.dart';
 import 'package:wasabee/pages/alertspage/targetlistvm.dart';
+import 'package:wasabee/pages/linkspage/linklistvm.dart';
+import 'package:wasabee/pages/linkspage/links.dart';
 import 'package:wasabee/pages/loginpage/login.dart';
 import 'package:wasabee/pages/settingspage/settings.dart';
 import '../../location/locationhelper.dart';
@@ -118,7 +120,6 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
               actions: loadedOperation == null
                   ? null
                   : <Widget>[
-                      // action button
                       IconButton(
                         icon: Icon(Icons.settings),
                         onPressed: () {
@@ -162,7 +163,20 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
                             useImperialUnitsValue),
                         loadedOperation.markers,
                         this),
-                Icon(Icons.link),
+                isLoading
+                    ? Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : LinksPage.getPageContent(
+                        LinkListViewModel.fromOperationData(
+                            loadedOperation.links,
+                            OperationUtils.getPortalMap(
+                                loadedOperation.opportals),
+                            googleId,
+                            mostRecentLoc,
+                            useImperialUnitsValue),
+                        loadedOperation.links,
+                        this),
               ],
             ),
             drawer: isLoading
