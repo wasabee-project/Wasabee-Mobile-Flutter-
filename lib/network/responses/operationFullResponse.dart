@@ -33,19 +33,25 @@ class Operation {
     name = json['name'];
     creator = json['creator'];
     color = json['color'];
+    opportals = new List<Portal>();
     if (json['opportals'] != null) {
       opportals = new List<Portal>();
       json['opportals'].forEach((v) {
         opportals.add(new Portal.fromJson(v));
       });
     }
-    anchors = json['anchors'].cast<String>();
+    anchors = json['anchors'] == null
+        ? List<String>()
+        : json['anchors'].cast<String>();
+
+    links = new List<Link>();
     if (json['links'] != null) {
       links = new List<Link>();
       json['links'].forEach((v) {
         links.add(new Link.fromJson(v));
       });
     }
+    markers = new List<Target>();
     if (json['markers'] != null) {
       markers = new List<Target>();
       json['markers'].forEach((v) {

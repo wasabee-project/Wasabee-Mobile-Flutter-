@@ -6,6 +6,7 @@ import 'package:wasabee/pages/mappage/utilities.dart';
 import 'package:wasabee/network/cookies.dart';
 import 'package:wasabee/network/responses/meResponse.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
+import 'package:wasabee/storage/localstorage.dart';
 
 import '../main.dart';
 
@@ -76,15 +77,45 @@ class OperationUtils {
           child: Text('Ok'),
           onPressed: () {
             Navigator.of(context).pop();
-            CookieUtils.clearAllCookiesAndGotoLogin(context);
+            LocalStorageUtils.storeSelectedOpId(null).then((any) {
+              CookieUtils.clearAllCookiesAndGotoLogin(context);
+            });
           },
         ),
       ],
     );
   }
 
+  static AlertDialog checkForAlertsMarkersLinks(
+      Operation operation, BuildContext context) {
+    if (operation.markers.length == 0 &&
+        operation.anchors.length == 0 &&
+        operation.links.length == 0) {
+      return AlertDialog(
+        title: Text('No Links/Alerts Found'),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              Text(
+                  'No Links or Alerts were found for this operation.  You should add some!'),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          FlatButton(
+            child: Text('Ok'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    } else
+      return null;
+  }
+
   static AlertDialog getNoOperationDialog(BuildContext context) {
-return AlertDialog(
+    return AlertDialog(
       title: Text('No Operations Found'),
       content: SingleChildScrollView(
         child: ListBody(

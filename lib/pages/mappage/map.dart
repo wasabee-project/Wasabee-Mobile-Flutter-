@@ -435,6 +435,7 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   }
 
   gotOperation(String response) async {
+    print('got operation! -> $response');
     try {
       var operation = Operation.fromJson(json.decode(response));
       if (operation != null) {
@@ -474,6 +475,18 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
     var team = FullTeam.fromJson(json.decode(response));
     populateTeamMembers(team.agents);
     setIsNotLoading();
+    if (loadedOperation != null) {
+      var dialogToShow =
+          OperationUtils.checkForAlertsMarkersLinks(loadedOperation, context);
+      if (dialogToShow != null)
+        showDialog<void>(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return dialogToShow;
+          },
+        );
+    }
   }
 
   parsingOperationFailed() async {
