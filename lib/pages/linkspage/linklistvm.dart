@@ -2,9 +2,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
 
 class LinkListViewModel {
-  String titleString;
+  String fromPortalName;
+  String toPortalName;
+  int linkOrder;
 
-  LinkListViewModel({this.titleString});
+  LinkListViewModel({this.fromPortalName, this.toPortalName, this.linkOrder});
 
   static List<LinkListViewModel> fromOperationData(
       List<Link> linkList,
@@ -15,9 +17,13 @@ class LinkListViewModel {
     var listOfVM = List<LinkListViewModel>();
     if (linkList != null && linkList.length > 0)
       for (var link in linkList) {
-        var portal = portalMap[link.toPortalId];
-
-        listOfVM.add(LinkListViewModel(titleString: "putLinkTitleHere"));
+        var toPortal = portalMap[link.toPortalId];
+        var fromPortal = portalMap[link.fromPortalId];
+        if (fromPortal != null && toPortal != null) {
+          var fromPortalName = "${fromPortal.name}";
+          var toPortalName = "${toPortal.name}";
+          listOfVM.add(LinkListViewModel(fromPortalName: fromPortalName, toPortalName: toPortalName, linkOrder: link.throwOrderPos));
+        }
       }
 
     //TODO add sorting link list -> Longest link? alpha by to, alpha by from
