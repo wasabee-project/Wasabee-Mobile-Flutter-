@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:wasabee/classutils/link.dart';
 import 'package:wasabee/classutils/operation.dart';
 import 'package:wasabee/classutils/target.dart';
 import 'package:wasabee/main.dart';
-import 'package:wasabee/network/cookies.dart';
 import 'package:wasabee/network/responses/meResponse.dart';
 import 'package:flutter/foundation.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
@@ -13,8 +13,10 @@ import 'package:wasabee/pages/alertspage/alertfiltermanager.dart';
 import 'package:wasabee/pages/alertspage/alerts.dart';
 import 'package:wasabee/pages/alertspage/alertsortdialog.dart';
 import 'package:wasabee/pages/alertspage/targetlistvm.dart';
+import 'package:wasabee/pages/linkspage/linkfiltermanager.dart';
 import 'package:wasabee/pages/linkspage/linklistvm.dart';
 import 'package:wasabee/pages/linkspage/links.dart';
+import 'package:wasabee/pages/linkspage/linksortdialog.dart';
 import 'package:wasabee/pages/loginpage/login.dart';
 import 'package:wasabee/pages/settingspage/settings.dart';
 import '../../location/locationhelper.dart';
@@ -30,6 +32,8 @@ class MapPage extends StatefulWidget {
   final String googleId;
   final AlertFilterType alertFilterDropdownValue;
   final AlertSortType alertSortDropdownValue;
+  final LinkFilterType linkFilterDropdownValue;
+  final LinkSortType linkSortDropDownValue;
   final bool useImperialUnitsValue;
   MapPage(
       {Key key,
@@ -37,12 +41,20 @@ class MapPage extends StatefulWidget {
       this.googleId,
       this.alertFilterDropdownValue,
       this.alertSortDropdownValue,
+      this.linkFilterDropdownValue,
+      this.linkSortDropDownValue,
       this.useImperialUnitsValue})
       : super(key: key);
 
   @override
-  MapPageState createState() => MapPageState(ops, googleId,
-      alertFilterDropdownValue, alertSortDropdownValue, useImperialUnitsValue);
+  MapPageState createState() => MapPageState(
+      ops,
+      googleId,
+      alertFilterDropdownValue,
+      alertSortDropdownValue,
+      linkFilterDropdownValue,
+      linkSortDropDownValue,
+      useImperialUnitsValue);
 }
 
 class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
@@ -56,6 +68,8 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   LatLng mostRecentLoc;
   AlertFilterType alertFilterDropdownValue;
   AlertSortType alertSortDropdownValue;
+  LinkFilterType linkFilterDropdownValue;
+  LinkSortType linkSortDropDownValue;
   bool useImperialUnitsValue;
   Operation loadedOperation;
   GoogleMapController mapController;
@@ -75,11 +89,13 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   ];
 
   MapPageState(List<Op> ops, googleId, alertFilterDropdownValue,
-      alertSortDropdownValue, useImperialUnitsValue) {
+      alertSortDropdownValue, linkFilterDropdownValue, linkSortDropDownValue, useImperialUnitsValue) {
     this.operationList = ops;
     this.googleId = googleId;
     this.alertFilterDropdownValue = alertFilterDropdownValue;
     this.alertSortDropdownValue = alertSortDropdownValue;
+    this.linkFilterDropdownValue = linkFilterDropdownValue;
+    this.linkSortDropDownValue = linkSortDropDownValue;
     this.useImperialUnitsValue = useImperialUnitsValue;
   }
 
@@ -169,7 +185,12 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
                       )
                     : LinksPage.getPageContent(
                         LinkListViewModel.fromOperationData(
-                            loadedOperation.links,
+                            linkFilterDropdownValue != null
+                                ? LinkUtils.getFilteredLinks(
+                                    loadedOperation.links,
+                                    linkFilterDropdownValue,
+                                    googleId)
+                                : loadedOperation.markers,
                             OperationUtils.getPortalMap(
                                 loadedOperation.opportals),
                             googleId,
@@ -198,7 +219,6 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   }
 
   populateMapView() {
-    sendLocationIfSharing();
     var center = _visibleRegion == null
         ? MapUtilities.computeCentroid(List<Marker>.of(markers.values))
         : MapUtilities.getCenterFromBounds(_visibleRegion);
@@ -691,6 +711,18 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   setAlertSortDropdownValue(AlertSortType value) {
     setState(() {
       alertSortDropdownValue = value;
+    });
+  }
+
+  setLinkFilterDropdownValue(LinkFilterType value) {
+    setState(() {
+      linkFilterDropdownValue = value;
+    });
+  }
+
+  setLinkSortDropdownValue(LinkSortType value) {
+    setState(() {
+      linkSortDropDownValue = value;
     });
   }
 

@@ -1,6 +1,9 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wasabee/pages/alertspage/alertfiltermanager.dart';
 import 'package:wasabee/pages/alertspage/alertsortdialog.dart';
+import 'package:wasabee/pages/linkspage/linkfiltermanager.dart';
+import 'package:wasabee/pages/linkspage/linksortdialog.dart';
+import 'package:wasabee/pages/linkspage/linksortmanager.dart';
 
 class LocalStorageUtils {
   static const KEY_SELECTED_OPERATION = "KEY_SELECTED_OPERATION";
@@ -52,6 +55,18 @@ class LocalStorageUtils {
     await prefs.setString(KEY_ALERT_FILTER, filter.toString());
   }
 
+  static Future<LinkFilterType> getLinkFilter() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return LinkFilterManager.getFilterTypeAsString(
+            prefs.getString(KEY_ALERT_FILTER)) ??
+        LinkFilterType.All;
+  }
+
+  static Future<dynamic> setLinkFilter(LinkFilterType filter) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(KEY_ALERT_FILTER, filter.toString());
+  }
+
   static Future<AlertSortType> getAlertSort() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return AlertFilterManager.getSortTypeAsString(
@@ -60,6 +75,18 @@ class LocalStorageUtils {
   }
 
   static Future<dynamic> setAlertSort(AlertSortType sort) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(KEY_ALERT_SORT, sort.toString());
+  }
+
+   static Future<LinkSortType> getLinkSort() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return LinkFilterManager.getSortTypeAsString(
+            prefs.getString(KEY_ALERT_SORT)) ??
+        LinkSortType.LinkOrder;
+  }
+
+  static Future<dynamic> setLinkSort(LinkSortType sort) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(KEY_ALERT_SORT, sort.toString());
   }
