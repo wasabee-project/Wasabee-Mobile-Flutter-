@@ -194,7 +194,7 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
                             OperationUtils.getPortalMap(
                                 loadedOperation.opportals),
                             googleId,
-                            mostRecentLoc,
+                            linkSortDropDownValue,
                             useImperialUnitsValue),
                         loadedOperation.links,
                         this),

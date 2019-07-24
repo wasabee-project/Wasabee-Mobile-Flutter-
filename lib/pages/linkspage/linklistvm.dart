@@ -1,4 +1,6 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:wasabee/location/distanceutilities.dart';
+import 'package:wasabee/location/locationhelper.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
 import 'package:wasabee/pages/linkspage/linksortdialog.dart';
 
@@ -7,13 +9,21 @@ class LinkListViewModel {
   String toPortalName;
   int linkOrder;
   double length;
-  LinkListViewModel({this.fromPortalName, this.toPortalName, this.linkOrder, this.length});
+  String lengthString;
+  bool completed;
+  LinkListViewModel(
+      {this.fromPortalName,
+      this.toPortalName,
+      this.linkOrder,
+      this.length,
+      this.lengthString,
+      this.completed});
 
   static List<LinkListViewModel> fromOperationData(
       List<Link> linkList,
       Map<String, Portal> portalMap,
       String googleId,
-      LatLng mostRecentLoc,
+      LinkSortType sortType,
       bool useImperialUnits) {
     var listOfVM = List<LinkListViewModel>();
     if (linkList != null && linkList.length > 0)
@@ -21,15 +31,29 @@ class LinkListViewModel {
         var toPortal = portalMap[link.toPortalId];
         var fromPortal = portalMap[link.fromPortalId];
         if (fromPortal != null && toPortal != null) {
+          LatLng fromPortalLoc = LocationHelper.getPortalLoc(fromPortal);
+          LatLng toPortalLoc = LocationHelper.getPortalLoc(toPortal);
+
           var fromPortalName = "${fromPortal.name}";
           var toPortalName = "${toPortal.name}";
-          listOfVM.add(LinkListViewModel(fromPortalName: fromPortalName, toPortalName: toPortalName, linkOrder: link.throwOrderPos));
+          var distanceDouble = DistanceUtilities.getDistanceDouble(
+              fromPortalLoc, toPortalLoc, useImperialUnits);
+          var distanceString = fromPortalLoc == null || toPortalLoc == null
+                  ? ""
+                  : DistanceUtilities.getDistanceString(
+                      distanceDouble, useImperialUnits);
+          listOfVM.add(LinkListViewModel(
+              fromPortalName: fromPortalName,
+              toPortalName: toPortalName,
+              linkOrder: link.throwOrderPos,
+              length: distanceDouble,
+              lengthString: distanceString,
+              completed: link.completed));
         }
       }
 
     listOfVM = sortLinkVMsByOrder(listOfVM);
-
-    //TODO add sorting link list -> Longest link? alpha by to, alpha by from
+    listOfVM = sortFromType(sortType, listOfVM);
     return listOfVM;
   }
 

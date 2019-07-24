@@ -49,6 +49,7 @@ class _LoginPageState extends State<LoginPage> {
       var alertFilterType = await LocalStorageUtils.getAlertFilter();
       var alertSortType = await LocalStorageUtils.getAlertSort();
       var linkFilterType = await LocalStorageUtils.getLinkFilter();
+      var linkSortType = await LocalStorageUtils.getLinkSort();
       var useImperialUnits = await LocalStorageUtils.getUseImperialUnits();
       var opList = meResponse.ops;
       Navigator.pushReplacement(
@@ -60,6 +61,7 @@ class _LoginPageState extends State<LoginPage> {
                 alertFilterDropdownValue: alertFilterType,
                 alertSortDropdownValue: alertSortType,
                 linkFilterDropdownValue: linkFilterType,
+                linkSortDropDownValue: linkSortType,
                 useImperialUnitsValue: useImperialUnits)),
       );
     } catch (e) {

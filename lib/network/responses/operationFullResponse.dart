@@ -133,6 +133,7 @@ class Link {
   String description;
   String assignedTo;
   int throwOrderPos;
+  bool completed;
 
   Link(
       {this.iD,
@@ -140,7 +141,8 @@ class Link {
       this.toPortalId,
       this.description,
       this.assignedTo,
-      this.throwOrderPos});
+      this.throwOrderPos,
+      this.completed});
 
   Link.fromJson(Map<String, dynamic> json) {
     iD = json['ID'];
@@ -149,6 +151,7 @@ class Link {
     description = json['description'];
     assignedTo = json['assignedTo'];
     throwOrderPos = json['throwOrderPos'];
+    completed = json['completed'];
   }
 
   Map<String, dynamic> toJson() {
@@ -159,6 +162,7 @@ class Link {
     data['description'] = this.description;
     data['assignedTo'] = this.assignedTo;
     data['throwOrderPos'] = this.throwOrderPos;
+    data['completed'] = this.completed;
     return data;
   }
 }

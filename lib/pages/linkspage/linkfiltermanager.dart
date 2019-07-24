@@ -1,6 +1,5 @@
 import 'package:wasabee/classutils/link.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
-import 'package:wasabee/pages/alertspage/alertsortdialog.dart';
 import 'package:wasabee/pages/linkspage/linksortdialog.dart';
 
 class LinkFilterManager {
@@ -9,6 +8,8 @@ class LinkFilterManager {
     filterTypeList.add(LinkFilterType.All);
     filterTypeList.add(LinkFilterType.Unassigned);
     filterTypeList.add(LinkFilterType.Mine);
+    filterTypeList.add(LinkFilterType.Complete);
+    filterTypeList.add(LinkFilterType.Incomplete);
     return filterTypeList;
   }
 
@@ -24,6 +25,12 @@ class LinkFilterManager {
         break;
       case LinkFilterType.Mine:
         displayString = "My Links";
+        break;
+      case LinkFilterType.Complete:
+        displayString = "Complete Links";
+        break;
+      case LinkFilterType.Incomplete:
+        displayString = "Incomplete Links";
         break;
     }
     return linkFilter == null
@@ -43,6 +50,12 @@ class LinkFilterManager {
         break;
       case LinkFilterType.Mine:
         count = LinkUtils.getCountOfMine(linkFilter, googleId);
+        break;
+      case LinkFilterType.Complete:
+        count = LinkUtils.getCountOfComplete(linkFilter);
+        break;
+      case LinkFilterType.Incomplete:
+        count = LinkUtils.getCountOfIncomplete(linkFilter);
         break;
     }
     return count;
@@ -67,4 +80,4 @@ class LinkFilterManager {
   }
 }
 
-enum LinkFilterType { All, Unassigned, Mine }
+enum LinkFilterType { All, Unassigned, Mine, Complete, Incomplete }

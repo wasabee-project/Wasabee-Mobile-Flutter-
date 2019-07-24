@@ -1,5 +1,7 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:wasabee/classutils/target.dart';
+import 'package:wasabee/location/distanceutilities.dart';
+import 'package:wasabee/location/locationhelper.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
 import 'package:wasabee/pages/alertspage/alertsortdialog.dart';
 import '../mappage/markerutilities.dart';
@@ -40,13 +42,8 @@ class TargetListViewModel {
       for (var target in targetList) {
         var portal = portalMap[target.portalId];
         if (portal != null) {
-          LatLng portalLoc;
-          if (portal.lat?.isNotEmpty == true &&
-              portal.lng?.isNotEmpty == true) {
-            portalLoc =
-                LatLng(double.parse(portal.lat), double.parse(portal.lng));
-          }
-          var distanceDouble = MarkerUtilities.getDistanceDouble(
+          LatLng portalLoc = LocationHelper.getPortalLoc(portal);
+          var distanceDouble = DistanceUtilities.getDistanceDouble(
               portalLoc, mostRecentLoc, useImperialUnits);
           listOfVM.add(TargetListViewModel(
               targetId: target.iD,
@@ -55,7 +52,7 @@ class TargetListViewModel {
               distanceDouble: distanceDouble,
               distanceString: mostRecentLoc == null
                   ? ""
-                  : MarkerUtilities.getDistanceString(
+                  : DistanceUtilities.getDistanceString(
                       distanceDouble, useImperialUnits),
               imagePath:
                   "assets/dialog_icons/${MarkerUtilities.getImagePath(target, googleId, MarkerUtilities.SEGMENT_ICON)}",
