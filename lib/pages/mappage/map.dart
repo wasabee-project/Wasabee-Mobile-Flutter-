@@ -18,6 +18,7 @@ import 'package:wasabee/pages/linkspage/linklistvm.dart';
 import 'package:wasabee/pages/linkspage/links.dart';
 import 'package:wasabee/pages/linkspage/linksortdialog.dart';
 import 'package:wasabee/pages/loginpage/login.dart';
+import 'package:wasabee/pages/mappage/mapview.dart';
 import 'package:wasabee/pages/settingspage/settings.dart';
 import '../../location/locationhelper.dart';
 import '../../network/networkcalls.dart';
@@ -73,7 +74,6 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   bool useImperialUnitsValue;
   Operation loadedOperation;
   GoogleMapController mapController;
-  GoogleMap mapView;
   CameraPosition passedPosition;
   List<Op> operationList = List();
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
@@ -88,8 +88,14 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
     Tab(text: 'Links'),
   ];
 
-  MapPageState(List<Op> ops, googleId, alertFilterDropdownValue,
-      alertSortDropdownValue, linkFilterDropdownValue, linkSortDropDownValue, useImperialUnitsValue) {
+  MapPageState(
+      List<Op> ops,
+      googleId,
+      alertFilterDropdownValue,
+      alertSortDropdownValue,
+      linkFilterDropdownValue,
+      linkSortDropDownValue,
+      useImperialUnitsValue) {
     this.operationList = ops;
     this.googleId = googleId;
     this.alertFilterDropdownValue = alertFilterDropdownValue;
@@ -158,7 +164,12 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
                     ? Center(
                         child: CircularProgressIndicator(),
                       )
-                    : getPageContent(),
+                    : MapViewWidget(
+                        mapPageState: this,
+                        markers: markers,
+                        polylines: polylines,
+                        visibleRegion: _visibleRegion,
+                        passedPosition: passedPosition),
                 isLoading
                     ? Center(
                         child: CircularProgressIndicator(),
@@ -209,38 +220,6 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
                     ),
                   ),
           );
-  }
-
-  Scaffold getPageContent() {
-    populateMapView();
-    return Scaffold(
-      body: mapView,
-    );
-  }
-
-  populateMapView() {
-    var center = _visibleRegion == null
-        ? MapUtilities.computeCentroid(List<Marker>.of(markers.values))
-        : MapUtilities.getCenterFromBounds(_visibleRegion);
-    var bounds = _visibleRegion == null
-        ? MapUtilities.getBounds(List<Marker>.of(markers.values))
-        : _visibleRegion;
-    var fromExistingLocation = _visibleRegion != null;
-    mapView = GoogleMap(
-      onMapCreated: onMapCreated,
-      mapType: MapType.normal,
-      myLocationEnabled: true,
-      myLocationButtonEnabled: true,
-      markers: Set<Marker>.of(markers.values),
-      polylines: Set<Polyline>.of(polylines.values),
-      initialCameraPosition: passedPosition == null
-          ? CameraPosition(
-              target: center,
-              zoom: MapUtilities.getViewCircleZoomLevel(
-                  center, bounds, fromExistingLocation))
-          : passedPosition,
-    );
-    passedPosition = null;
   }
 
   void onMapCreated(GoogleMapController controller) {
@@ -479,11 +458,11 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   populateEverything() async {
     markers.clear();
     polylines.clear();
-    populateBank();
+    await populateBank();
     bitmapBank.bank.clear();
-    populateAnchors(loadedOperation);
-    populateLinks(loadedOperation);
-    populateTargets(loadedOperation);
+    await populateAnchors(loadedOperation);
+    await populateLinks(loadedOperation);
+    await populateTargets(loadedOperation);
   }
 
   finishedTargetActionCall(String response) {

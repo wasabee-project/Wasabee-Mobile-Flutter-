@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wasabee/classutils/link.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
 import 'package:wasabee/pages/linkspage/linkfiltermanager.dart';
 import 'package:wasabee/pages/linkspage/linklistvm.dart';
@@ -76,6 +77,7 @@ class LinksPage {
                 LinkListViewModel vm = listOfVM[index];
                 return InkWell(
                     onTap: () {
+                      onLinkRowTap(vm, mapPageState);
                       //mapPageState.makeZoomedPositionFromLatLng(vm.latLng);
                       //mapPageState.tabController.animateTo(0);
                     },
@@ -134,5 +136,17 @@ class LinksPage {
                     ]));
               }))
     ]));
+  }
+
+  static onLinkRowTap(LinkListViewModel vm, MapPageState state) {
+    LocalStorageUtils.getGoogleId().then((googleId) {
+      showDialog<void>(
+        context: state.context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return LinkUtils.getLinkInfoAlert(context, vm, googleId);
+        },
+      );
+    });
   }
 }
