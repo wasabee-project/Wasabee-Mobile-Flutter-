@@ -132,6 +132,7 @@ class Link {
   String toPortalId;
   String description;
   String assignedTo;
+  String assignedNickname;
   int throwOrderPos;
   bool completed;
 
@@ -141,6 +142,7 @@ class Link {
       this.toPortalId,
       this.description,
       this.assignedTo,
+      this.assignedNickname,
       this.throwOrderPos,
       this.completed});
 
@@ -150,6 +152,7 @@ class Link {
     toPortalId = json['toPortalId'];
     description = json['description'];
     assignedTo = json['assignedTo'];
+    assignedNickname = json['assignedToNickname'];
     throwOrderPos = json['throwOrderPos'];
     completed = json['completed'];
   }
@@ -161,6 +164,7 @@ class Link {
     data['toPortalId'] = this.toPortalId;
     data['description'] = this.description;
     data['assignedTo'] = this.assignedTo;
+    data['assignedToNickname'] = this.assignedNickname;
     data['throwOrderPos'] = this.throwOrderPos;
     data['completed'] = this.completed;
     return data;

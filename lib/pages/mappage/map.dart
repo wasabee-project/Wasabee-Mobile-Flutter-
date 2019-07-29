@@ -74,7 +74,6 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   bool useImperialUnitsValue;
   Operation loadedOperation;
   GoogleMapController mapController;
-  CameraPosition passedPosition;
   List<Op> operationList = List();
   Map<MarkerId, Marker> markers = <MarkerId, Marker>{};
   Map<PolylineId, Polyline> polylines = <PolylineId, Polyline>{};
@@ -168,8 +167,7 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
                         mapPageState: this,
                         markers: markers,
                         polylines: polylines,
-                        visibleRegion: _visibleRegion,
-                        passedPosition: passedPosition),
+                        visibleRegion: _visibleRegion),
                 isLoading
                     ? Center(
                         child: CircularProgressIndicator(),
@@ -677,8 +675,9 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   }
 
   makeZoomedPositionFromLatLng(LatLng latLng) {
-    passedPosition = CameraPosition(target: latLng, zoom: ZOOMED_ZOOM_LEVEL);
-    setState(() {});
+    mapController.animateCamera(CameraUpdate.newCameraPosition(
+        CameraPosition(target: latLng, zoom: ZOOMED_ZOOM_LEVEL),
+      ));
   }
 
   setAlerFilterDropdownValue(AlertFilterType value) {

@@ -9,7 +9,6 @@ class MapViewWidget extends StatefulWidget {
   final Map<MarkerId, Marker> markers;
   final Map<PolylineId, Polyline> polylines;
   final LatLngBounds visibleRegion;
-  final CameraPosition passedPosition;
 
   MapViewWidget({
     Key key,
@@ -17,10 +16,9 @@ class MapViewWidget extends StatefulWidget {
     this.markers,
     this.polylines,
     this.visibleRegion,
-    this.passedPosition,
   }) : super(key: key);
-  MapViewState createState() => MapViewState(
-      mapPageState, markers, polylines, visibleRegion, passedPosition);
+  MapViewState createState() =>
+      MapViewState(mapPageState, markers, polylines, visibleRegion);
 }
 
 class MapViewState extends State<MapViewWidget>
@@ -29,15 +27,12 @@ class MapViewState extends State<MapViewWidget>
   Map<MarkerId, Marker> markers;
   Map<PolylineId, Polyline> polylines;
   LatLngBounds visibleRegion;
-  CameraPosition passedPosition;
 
-  MapViewState(
-      mapPageState, markers, polylines, visibleRegion, passedPosition) {
+  MapViewState(mapPageState, markers, polylines, visibleRegion) {
     this.mapPageState = mapPageState;
     this.markers = markers;
     this.polylines = polylines;
     this.visibleRegion = visibleRegion;
-    this.passedPosition = passedPosition;
   }
   @override
   bool get wantKeepAlive => true;
@@ -64,12 +59,10 @@ class MapViewState extends State<MapViewWidget>
         myLocationButtonEnabled: true,
         markers: Set<Marker>.of(markers.values),
         polylines: Set<Polyline>.of(polylines.values),
-        initialCameraPosition: passedPosition == null
-            ? CameraPosition(
-                target: center,
-                zoom: MapUtilities.getViewCircleZoomLevel(
-                    center, bounds, fromExistingLocation))
-            : passedPosition,
+        initialCameraPosition: CameraPosition(
+            target: center,
+            zoom: MapUtilities.getViewCircleZoomLevel(
+                center, bounds, fromExistingLocation)),
       ),
     );
   }

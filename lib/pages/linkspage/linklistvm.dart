@@ -11,13 +11,24 @@ class LinkListViewModel {
   double length;
   String lengthString;
   bool completed;
+  String fromPortalId;
+  String toPortalId;
+  String comment;
+  String assignedNickname;
+  String assignedTo;
+
   LinkListViewModel(
       {this.fromPortalName,
       this.toPortalName,
       this.linkOrder,
       this.length,
       this.lengthString,
-      this.completed});
+      this.completed,
+      this.fromPortalId,
+      this.toPortalId,
+      this.comment,
+      this.assignedNickname,
+      this.assignedTo});
 
   static List<LinkListViewModel> fromOperationData(
       List<Link> linkList,
@@ -40,15 +51,20 @@ class LinkListViewModel {
               fromPortalLoc, toPortalLoc, useImperialUnits);
           var distanceString = fromPortalLoc == null || toPortalLoc == null
                   ? ""
-                  : DistanceUtilities.getDistanceString(
-                      distanceDouble, useImperialUnits);
+                  : "Length: ${DistanceUtilities.getDistanceString(
+                      distanceDouble, useImperialUnits)}";
           listOfVM.add(LinkListViewModel(
               fromPortalName: fromPortalName,
               toPortalName: toPortalName,
               linkOrder: link.throwOrderPos,
               length: distanceDouble,
               lengthString: distanceString,
-              completed: link.completed));
+              completed: link.completed,
+              fromPortalId: fromPortal.id,
+              toPortalId: toPortal.id,
+              comment: link.description,
+              assignedNickname: link.assignedNickname,
+              assignedTo: link.assignedTo));
         }
       }
 

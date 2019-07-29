@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:wasabee/classutils/dialog.dart';
 import 'package:wasabee/pages/alertspage/alertfiltermanager.dart';
 import 'package:wasabee/pages/mappage/map.dart';
 import 'package:wasabee/pages/mappage/markerutilities.dart';
 import 'package:wasabee/network/networkcalls.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
 import 'package:wasabee/network/urlmanager.dart';
+import 'package:wasabee/pages/settingspage/constants.dart';
 
 class TargetUtils {
   static const DestroyPortalAlert = "DestroyPortalAlert";
@@ -21,11 +23,6 @@ class TargetUtils {
   static const STATE_ASSIGNED = "assigned";
   static const STATE_ACKNOWLEDGED = "acknowledged";
   static const STATE_COMPLETED = "completed";
-
-  static const MARGIN_DEFAULT = 8.0;
-  static const MARGIN_SMALL = 4.0;
-
-  static const DIVIDER_HEIGHT_DEFAULT = 25.0;
 
   static String getDisplayType(Target target) {
     var displayType = "";
@@ -93,22 +90,34 @@ class TargetUtils {
   static AlertDialog getTargetInfoAlert(BuildContext context, Portal portal,
       Target target, String googleId, String opId, MapPageState mapPageState) {
     List<Widget> dialogWidgets = <Widget>[
-      Center(child: Text(portal.name)),
-      Divider(color: Colors.green, height: DIVIDER_HEIGHT_DEFAULT),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          new Image.asset(
-            "assets/dialog_icons/${MarkerUtilities.getImagePath(target, googleId, MarkerUtilities.SEGMENT_ICON)}",
-            width: 50.0,
-            height: 50.0,
-            fit: BoxFit.fitHeight,
-          ),
-          VerticalDivider(color: Colors.green),
-          Text(getDisplayState(target, googleId))
-        ],
-      ),
-      Divider(color: Colors.green, height: DIVIDER_HEIGHT_DEFAULT),
+      Card(
+          color: WasabeeConstants.CARD_COLOR,
+          child: Container(
+            margin: EdgeInsets.all(WasabeeConstants.CARD_MARGIN),
+              child: Column(
+            children: <Widget>[
+              Center(
+                  child: Text(
+                portal.name,
+                style: TextStyle(color: Colors.white),
+              )),
+              Divider(color: WasabeeConstants.CARD_COLOR),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  new Image.asset(
+                    "assets/dialog_icons/${MarkerUtilities.getImagePath(target, googleId, MarkerUtilities.SEGMENT_ICON)}",
+                    width: 50.0,
+                    height: 50.0,
+                    fit: BoxFit.fitHeight,
+                  ),
+                  VerticalDivider(color: Colors.green),
+                  Text(getDisplayState(target, googleId),
+                      style: TextStyle(color: Colors.white))
+                ],
+              ),
+            ],
+          )))
     ];
     dialogWidgets.add(getOpenOnIntelButton(portal));
     if (target.assignedTo?.isNotEmpty == true &&
@@ -119,10 +128,11 @@ class TargetUtils {
     dialogWidgets.addAll(
         getCompleteIncompleteButton(target, opId, context, mapPageState));
     if (target.comment?.isNotEmpty == true)
-      dialogWidgets.add(getInfoAlertCommentWidget(target));
+      dialogWidgets.add(DialogUtils.getInfoAlertCommentWidget(target.comment));
     if (target.assignedNickname?.isNotEmpty == true &&
         target.assignedTo != googleId)
-      dialogWidgets.add(addAssignedToWidget(target));
+      dialogWidgets
+          .add(DialogUtils.addAssignedToWidget(target.assignedNickname));
     return AlertDialog(
       title: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -153,40 +163,6 @@ class TargetUtils {
           children: dialogWidgets,
         ),
       ),
-    );
-  }
-
-  static Widget getInfoAlertCommentWidget(Target target) {
-    return Column(
-      children: <Widget>[
-        Text(
-          'Operator\'s Notes:',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        Container(
-          child: Text('${target.comment}'),
-          margin: EdgeInsets.only(top: MARGIN_SMALL),
-        ),
-        Divider(color: Colors.green, height: DIVIDER_HEIGHT_DEFAULT),
-      ],
-      crossAxisAlignment: CrossAxisAlignment.start,
-    );
-  }
-
-  static Widget addAssignedToWidget(Target target) {
-    return Column(
-      children: <Widget>[
-        Text(
-          'Agent Assigned:',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        Container(
-          child: Text('${target.assignedNickname}'),
-          margin: EdgeInsets.only(top: MARGIN_SMALL),
-        ),
-        Divider(color: Colors.green, height: DIVIDER_HEIGHT_DEFAULT),
-      ],
-      crossAxisAlignment: CrossAxisAlignment.start,
     );
   }
 
@@ -300,7 +276,6 @@ class TargetUtils {
             doTargetDialogAction(url, context, mapPageState);
           },
           color: Colors.green),
-      Divider(color: Colors.green, height: DIVIDER_HEIGHT_DEFAULT),
     ];
   }
 
@@ -323,18 +298,28 @@ class TargetUtils {
   }
 
   static List<Target> getUnassignedList(List<Target> targetList) {
-    return targetList == null ? List<Target>() : targetList.where((i) => i.state == STATE_PENDING || i.state.isEmpty).toList();
+    return targetList == null
+        ? List<Target>()
+        : targetList
+            .where((i) => i.state == STATE_PENDING || i.state.isEmpty)
+            .toList();
   }
 
   static int getCountOfMine(List<Target> targetList, String googleId) {
     return getMyList(targetList, googleId).length;
-  } 
-
-  static List<Target> getMyList(List<Target> targetList, String googleId) {
-    return targetList == null ? List<Target>() : targetList.where((i) => i.assignedTo?.isNotEmpty == true && i.assignedTo == googleId).toList();
   }
 
-  static List<Target> getFilteredMarkers(List<Target> targetList, AlertFilterType type, String googleId) {
+  static List<Target> getMyList(List<Target> targetList, String googleId) {
+    return targetList == null
+        ? List<Target>()
+        : targetList
+            .where((i) =>
+                i.assignedTo?.isNotEmpty == true && i.assignedTo == googleId)
+            .toList();
+  }
+
+  static List<Target> getFilteredMarkers(
+      List<Target> targetList, AlertFilterType type, String googleId) {
     var returningList = List<Target>();
     switch (type) {
       case AlertFilterType.All:

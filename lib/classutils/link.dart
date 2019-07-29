@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:wasabee/classutils/dialog.dart';
+import 'package:wasabee/classutils/operation.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
+import 'package:wasabee/network/urlmanager.dart';
 import 'package:wasabee/pages/linkspage/linkfiltermanager.dart';
 import 'package:wasabee/pages/linkspage/linklistvm.dart';
-import 'package:wasabee/pages/mappage/map.dart';
+import 'package:wasabee/pages/settingspage/constants.dart';
 
 class LinkUtils {
   static const DIVIDER_HEIGHT_DEFAULT = 25.0;
-
+  static const DIVIDER_HEIGHT_SMALL = 10.0;
   static int getCountOfUnassigned(List<Link> linkList) {
     return getUnassignedList(linkList).length;
   }
@@ -75,23 +78,30 @@ class LinkUtils {
     return returningList;
   }
 
-  static AlertDialog getLinkInfoAlert(
-      BuildContext context, LinkListViewModel vm, String googleId) {
-    //var fromPortal = vm.fromPortalId;
-    //var toPortal = vm.toPortalId;
+  static AlertDialog getLinkInfoAlert(BuildContext context,
+      LinkListViewModel vm, String googleId, Operation operation) {
+    print('assignedNickname -> ${vm.assignedNickname}');
+    var fromPortal = OperationUtils.getPortalFromID(vm.fromPortalId, operation);
+    var toPortal = OperationUtils.getPortalFromID(vm.toPortalId, operation);
     List<Widget> dialogWidgets = <Widget>[
-      Center(child: Text("${vm.fromPortalName} -> ${vm.toPortalName}")),
-      Divider(color: Colors.green, height: DIVIDER_HEIGHT_DEFAULT),
+      RaisedButton(
+        color: Colors.green,
+        child: Text(
+          'View Link On Map',
+          style: TextStyle(color: Colors.white),
+        ),
+        onPressed: () {},
+      ),
     ];
-    // dialogWidgets.add(getPortalIntelButton(fromPortal));
-    // dialogWidgets.add(getPortalIntelButton(toPortal));
+    dialogWidgets.add(getPortalSection(fromPortal, true));
+    dialogWidgets.add(getPortalSection(toPortal, false));
     // dialogWidgets.addAll(
     //     getCompleteIncompleteButton(target, opId, context, mapPageState));
-    // if (vm.comment?.isNotEmpty == true)
-    //   dialogWidgets.add(getInfoAlertCommentWidget(target));
-    // if (target.assignedNickname?.isNotEmpty == true &&
-    //     target.assignedTo != googleId)
-    //   dialogWidgets.add(addAssignedToWidget(target));
+    if (vm.comment?.isNotEmpty == true)
+      dialogWidgets.add(DialogUtils.getInfoAlertCommentWidget(vm.comment));
+
+    if (vm.assignedNickname?.isNotEmpty == true && vm.assignedTo != googleId)
+      dialogWidgets.add(DialogUtils.addAssignedToWidget(vm.assignedNickname));
     return AlertDialog(
       title: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -123,5 +133,43 @@ class LinkUtils {
         ),
       ),
     );
+  }
+
+  static Widget getPortalSection(Portal portal, bool isFromPortal) {
+    var titleStringSegment = "To";
+    if (isFromPortal) titleStringSegment = "From";
+    return Card(
+        color: WasabeeConstants.CARD_COLOR,
+        child: Column(
+          children: <Widget>[
+            Divider(color: WasabeeConstants.CARD_COLOR),
+            Text(
+              '$titleStringSegment',
+              style: TextStyle(
+                  fontStyle: FontStyle.italic,
+                  fontSize: 20,
+                  color: WasabeeConstants.CARD_TEXT_COLOR),
+            ),
+            Text(
+              '${portal.name}',
+              style: TextStyle(color: WasabeeConstants.CARD_TEXT_COLOR),
+            ),
+            Divider(
+              color: Colors.white,
+            ),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+              IconButton(
+                  icon: Image.asset('assets/icons/icon_iitc.png'),
+                  onPressed: () {
+                    UrlManager.launchIntelUrl(portal.lat, portal.lng);
+                  }),
+              VerticalDivider(),
+              IconButton(
+                  icon: Icon(Icons.directions, color: Colors.white),
+                  onPressed: () {
+                  })
+            ]),
+          ],
+        ));
   }
 }
