@@ -78,8 +78,6 @@ class LinksPage {
                 return InkWell(
                     onTap: () {
                       onLinkRowTap(vm, mapPageState);
-                      //mapPageState.makeZoomedPositionFromLatLng(vm.latLng);
-                      //mapPageState.tabController.animateTo(0);
                     },
                     child: Column(children: <Widget>[
                       Row(
@@ -144,7 +142,7 @@ class LinksPage {
         context: state.context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return LinkUtils.getLinkInfoAlert(context, vm, googleId, state.loadedOperation);
+          return LinkUtils.getLinkInfoAlert(context, vm, googleId, state.loadedOperation, state);
         },
       );
     });
