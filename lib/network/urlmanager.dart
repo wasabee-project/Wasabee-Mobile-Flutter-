@@ -8,6 +8,7 @@ class UrlManager {
   static const URL_FRAG_GET_TEAM = "/api/v1/team/";
   static const URL_FRAG_DRAW = "/draw/";
   static const URL_FRAG_MARKER = "/marker/";
+  static const URL_FRAG_LINK = "/link/";
   static const URL_FRAG_COMPLETE = "/complete";
   static const URL_FRAG_INCOMPLETE = "/incomplete";
   static const URL_FRAG_REJECT = "/reject";
@@ -19,6 +20,15 @@ class UrlManager {
   static const FULL_OPERATION_URL = "$BASE_API_URL$URL_FRAG_OPERATION";
   static const FULL_LAT_LNG_URL = "$BASE_API_URL$URL_FRAG_API_V1$URL_FRAG_ME?";
   static const FULL_GET_TEAM_URL = "$BASE_API_URL$URL_FRAG_GET_TEAM";
+
+  static String getCompleteLinkUrl(String opId, String linkId) {
+    return "$BASE_API_URL$URL_FRAG_API_V1$URL_FRAG_DRAW$opId$URL_FRAG_LINK$linkId$URL_FRAG_COMPLETE";
+  }
+
+  static String getInCompleteLinkUrl(String opId, String linkId) {
+    return "$BASE_API_URL$URL_FRAG_API_V1$URL_FRAG_DRAW$opId$URL_FRAG_LINK$linkId$URL_FRAG_INCOMPLETE";
+  }
+
   static String getCompleteMarkerUrl(String opId, String markerId) {
     return "$BASE_API_URL$URL_FRAG_API_V1$URL_FRAG_DRAW$opId$URL_FRAG_MARKER$markerId$URL_FRAG_COMPLETE";
   }

@@ -204,7 +204,8 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
                                 loadedOperation.opportals),
                             googleId,
                             linkSortDropDownValue,
-                            useImperialUnitsValue),
+                            useImperialUnitsValue,
+                            selectedOperation.iD),
                         loadedOperation.links,
                         this),
               ],
@@ -445,9 +446,12 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
         var url = "${UrlManager.FULL_GET_TEAM_URL}${selectedOperation.teamID}";
         NetworkCalls.doNetworkCall(
             url, Map<String, String>(), gotTeam, false, NetWorkCallType.GET);
-      } else
+      } else {
+        print("operation is null");
         parsingOperationFailed();
+      }
     } catch (e) {
+      print('Failed get op -> $e');
       parsingOperationFailed();
       setIsNotLoading();
     }

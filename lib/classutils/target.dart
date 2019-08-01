@@ -126,7 +126,7 @@ class TargetUtils {
       dialogWidgets
           .add(getAssignmentButtons(target, opId, context, mapPageState));
     dialogWidgets.addAll(
-        getCompleteIncompleteButton(target, opId, context, mapPageState));
+        DialogUtils.getCompleteIncompleteButton(target.state == STATE_COMPLETED, opId, context, mapPageState, target.iD, true));
     if (target.comment?.isNotEmpty == true)
       dialogWidgets.add(DialogUtils.getInfoAlertCommentWidget(target.comment));
     if (target.assignedNickname?.isNotEmpty == true &&
@@ -205,7 +205,7 @@ class TargetUtils {
                       mainAxisSize: MainAxisSize.max,
                     ),
                     onPressed: () {
-                      doTargetDialogAction(
+                      DialogUtils.doTargetDialogAction(
                           UrlManager.getRejectMarkerUrl(opId, target.iD),
                           context,
                           mapPageState);
@@ -233,7 +233,7 @@ class TargetUtils {
                       mainAxisSize: MainAxisSize.max,
                     ),
                     onPressed: () {
-                      doTargetDialogAction(
+                      DialogUtils.doTargetDialogAction(
                           UrlManager.getAcknowledgeMarkerUrl(opId, target.iD),
                           context,
                           mapPageState);
@@ -243,54 +243,6 @@ class TargetUtils {
       mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.max,
     );
-  }
-
-  static List<Widget> getCompleteIncompleteButton(Target target, String opId,
-      BuildContext context, MapPageState mapPageState) {
-    return <Widget>[
-      RaisedButton(
-          child: Row(
-            children: <Widget>[
-              Container(
-                child: Icon(
-                  target.state == STATE_COMPLETED
-                      ? Icons.cancel
-                      : Icons.sentiment_very_satisfied,
-                  color: Colors.white,
-                ),
-                margin: EdgeInsets.only(right: 10),
-              ),
-              Text(
-                target.state == STATE_COMPLETED
-                    ? 'Mark Incomplete'
-                    : 'Mark Complete',
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-            mainAxisAlignment: MainAxisAlignment.center,
-          ),
-          onPressed: () {
-            var url = target.state == STATE_COMPLETED
-                ? UrlManager.getInCompleteMarkerUrl(opId, target.iD)
-                : UrlManager.getCompleteMarkerUrl(opId, target.iD);
-            doTargetDialogAction(url, context, mapPageState);
-          },
-          color: Colors.green),
-    ];
-  }
-
-  static doTargetDialogAction(
-      String url, BuildContext context, MapPageState mapPageState) async {
-    try {
-      Navigator.of(context).pop();
-      await mapPageState.updateVisibleRegion();
-      NetworkCalls.doNetworkCall(url, Map<String, String>(),
-          mapPageState.finishedTargetActionCall, false, NetWorkCallType.GET);
-      mapPageState.setIsLoading();
-    } catch (e) {
-      mapPageState.setIsNotLoading();
-      print(e);
-    }
   }
 
   static int getCountOfUnassigned(List<Target> targetList) {

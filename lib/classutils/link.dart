@@ -113,9 +113,9 @@ class LinkUtils {
     dialogWidgets
         .add(getPortalSection(fromPortal, true, mapPageState, context));
     dialogWidgets.add(getPortalSection(toPortal, false, mapPageState, context));
-    //TODO add complete/incomplete if is assigned.
-    // dialogWidgets.addAll(
-    //     DialogUtils.getCompleteIncompleteButton(target, opId, context, mapPageState));
+    if (googleId == vm.assignedTo)
+      dialogWidgets.addAll(DialogUtils.getCompleteIncompleteButton(
+          vm.completed, vm.opId, context, mapPageState, vm.linkId, false));
     if (vm.comment?.isNotEmpty == true)
       dialogWidgets.add(DialogUtils.getInfoAlertCommentWidget(vm.comment));
 
@@ -160,48 +160,52 @@ class LinkUtils {
     if (isFromPortal) titleStringSegment = "From";
     return Card(
         color: WasabeeConstants.CARD_COLOR,
-        child: Column(
-          children: <Widget>[
-            Divider(color: WasabeeConstants.CARD_COLOR),
-            Text(
-              '$titleStringSegment',
-              style: TextStyle(
-                  fontStyle: FontStyle.italic,
-                  fontSize: 20,
-                  color: WasabeeConstants.CARD_TEXT_COLOR),
-            ),
-            Text(
-              '${portal.name}',
-              style: TextStyle(color: WasabeeConstants.CARD_TEXT_COLOR),
-            ),
-            Divider(
-              color: Colors.white,
-            ),
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-              IconButton(
-                  icon: Image.asset('assets/icons/icon_iitc.png'),
-                  onPressed: () {
-                    UrlManager.launchIntelUrl(portal.lat, portal.lng);
-                  }),
-              VerticalDivider(),
-              IconButton(
-                  icon: Icon(Icons.filter_center_focus, color: Colors.white),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    mapPageState.makeZoomedPositionFromLatLng(
-                        LocationHelper.getPortalLoc(portal));
-                    mapPageState.tabController.animateTo(0);
-                  }),
-              VerticalDivider(),
-              IconButton(
-                  icon: Icon(Icons.directions, color: Colors.white),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    MapUtilities.launchMaps(
-                        LocationHelper.getPortalLoc(portal));
-                  })
-            ]),
-          ],
+        child: Container(
+          child: Column(
+            children: <Widget>[
+              Divider(color: WasabeeConstants.CARD_COLOR),
+              Text(
+                '$titleStringSegment',
+                style: TextStyle(
+                    fontStyle: FontStyle.italic,
+                    fontSize: 20,
+                    color: WasabeeConstants.CARD_TEXT_COLOR),
+              ),
+              Text(
+                '${portal.name}',
+                style: TextStyle(color: WasabeeConstants.CARD_TEXT_COLOR),
+              ),
+              Divider(
+                color: Colors.white,
+              ),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: <
+                  Widget>[
+                IconButton(
+                    icon: Image.asset('assets/icons/icon_iitc.png'),
+                    onPressed: () {
+                      UrlManager.launchIntelUrl(portal.lat, portal.lng);
+                    }),
+                VerticalDivider(),
+                IconButton(
+                    icon: Icon(Icons.filter_center_focus, color: Colors.white),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      mapPageState.makeZoomedPositionFromLatLng(
+                          LocationHelper.getPortalLoc(portal));
+                      mapPageState.tabController.animateTo(0);
+                    }),
+                VerticalDivider(),
+                IconButton(
+                    icon: Icon(Icons.directions, color: Colors.white),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      MapUtilities.launchMaps(
+                          LocationHelper.getPortalLoc(portal), portal.name);
+                    })
+              ]),
+            ],
+          ),
+          margin: EdgeInsets.only(left: 10.0, right: 10.0, bottom: 6.0),
         ));
   }
 }

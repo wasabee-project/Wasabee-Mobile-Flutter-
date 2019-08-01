@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 import 'package:url_launcher/url_launcher.dart';
@@ -130,17 +131,22 @@ class MapUtilities {
     return LatLng(centerLat, centerLng);
   }
 
-  static launchMaps(LatLng location) async {
+  static launchMaps(LatLng location, String label) async {
     String googleUrl =
         'https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}';
     String appleUrl =
-        'https://maps.apple.com/?sll=${location.latitude},${location.longitude}';
-    if (await canLaunch(googleUrl)) {
-      print('launching com googleUrl -> $googleUrl');
-      await launch(googleUrl);
-    } else if (await canLaunch(appleUrl)) {
-      print('launching apple url');
-      await launch(appleUrl);
+        'https://maps.apple.com/?ll=${location.latitude},${location.longitude}&q=${Uri.encodeFull(label)}';
+    if (Platform.isIOS) {
+      print('$appleUrl');
+      if (await canLaunch(appleUrl)) {
+        await launch(appleUrl);
+      } else if (await canLaunch(googleUrl)) {
+        await launch(googleUrl);
+      }
+    } else {
+      if (await canLaunch(googleUrl)) {
+        await launch(googleUrl);
+      }
     }
   }
 }

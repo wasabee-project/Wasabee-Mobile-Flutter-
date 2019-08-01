@@ -16,6 +16,8 @@ class LinkListViewModel {
   String comment;
   String assignedNickname;
   String assignedTo;
+  String opId;
+  String linkId;
 
   LinkListViewModel(
       {this.fromPortalName,
@@ -28,31 +30,38 @@ class LinkListViewModel {
       this.toPortalId,
       this.comment,
       this.assignedNickname,
-      this.assignedTo});
+      this.assignedTo,
+      this.opId,
+      this.linkId});
 
   static List<LinkListViewModel> fromOperationData(
       List<Link> linkList,
       Map<String, Portal> portalMap,
       String googleId,
       LinkSortType sortType,
-      bool useImperialUnits) {
+      bool useImperialUnits,
+      String opId) {
     var listOfVM = List<LinkListViewModel>();
     if (linkList != null && linkList.length > 0)
       for (var link in linkList) {
         var toPortal = portalMap[link.toPortalId];
         var fromPortal = portalMap[link.fromPortalId];
-        if (fromPortal != null && toPortal != null) {
+        if (fromPortal?.lat != null &&
+            fromPortal?.lng != null &&
+            toPortal?.lat != null &&
+            toPortal?.lng != null) {
           LatLng fromPortalLoc = LocationHelper.getPortalLoc(fromPortal);
           LatLng toPortalLoc = LocationHelper.getPortalLoc(toPortal);
 
           var fromPortalName = "${fromPortal.name}";
           var toPortalName = "${toPortal.name}";
-          var distanceDouble = DistanceUtilities.getDistanceDouble(
-              fromPortalLoc, toPortalLoc, useImperialUnits);
+          var distanceDouble = fromPortalLoc == null || toPortalLoc == null
+              ? ""
+              : DistanceUtilities.getDistanceDouble(
+                  fromPortalLoc, toPortalLoc, useImperialUnits);
           var distanceString = fromPortalLoc == null || toPortalLoc == null
-                  ? ""
-                  : "Length: ${DistanceUtilities.getDistanceString(
-                      distanceDouble, useImperialUnits)}";
+              ? ""
+              : "Length: ${DistanceUtilities.getDistanceString(distanceDouble, useImperialUnits)}";
           listOfVM.add(LinkListViewModel(
               fromPortalName: fromPortalName,
               toPortalName: toPortalName,
@@ -64,7 +73,9 @@ class LinkListViewModel {
               toPortalId: toPortal.id,
               comment: link.description,
               assignedNickname: link.assignedNickname,
-              assignedTo: link.assignedTo));
+              assignedTo: link.assignedTo,
+              opId: opId,
+              linkId: link.iD));
         }
       }
 
