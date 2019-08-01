@@ -631,7 +631,7 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
         barrierDismissible: false,
         builder: (BuildContext context) {
           return TargetUtils.getTargetInfoAlert(
-              context, portal, target, googleId, selectedOperation.iD, this);
+              context, portal, target, googleId, selectedOperation.iD, this, MediaQuery.of(context).size.width);
         },
       );
     });

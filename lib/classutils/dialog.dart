@@ -50,41 +50,48 @@ class DialogUtils {
                   margin: EdgeInsets.only(top: WasabeeConstants.MARGIN_SMALL),
                 ),
               ],
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
             )));
   }
 
-  static List<Widget> getCompleteIncompleteButton(bool complete, String opId,
-      BuildContext context, MapPageState mapPageState, String objectId, bool isMarker) {
+  static List<Widget> getCompleteIncompleteButton(
+      bool complete,
+      String opId,
+      BuildContext context,
+      MapPageState mapPageState,
+      String objectId,
+      bool isMarker) {
     return <Widget>[
-      RaisedButton(
-          child: Row(
-            children: <Widget>[
-              Container(
-                child: Icon(
-                  complete
-                      ? Icons.cancel
-                      : Icons.sentiment_very_satisfied,
-                  color: Colors.white,
-                ),
-                margin: EdgeInsets.only(right: 10),
+      Container(
+          margin: EdgeInsets.only(left: 10.0, right: 10.0),
+          child: RaisedButton(
+              child: Row(
+                children: <Widget>[
+                  Container(
+                    child: Icon(
+                      complete ? Icons.cancel : Icons.sentiment_very_satisfied,
+                      color: Colors.white,
+                    ),
+                    margin: EdgeInsets.only(right: 10),
+                  ),
+                  Text(
+                    complete ? 'Mark Incomplete' : 'Mark Complete',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ],
+                mainAxisAlignment: MainAxisAlignment.center,
               ),
-              Text(
-                complete
-                    ? 'Mark Incomplete'
-                    : 'Mark Complete',
-                style: TextStyle(color: Colors.white),
-              ),
-            ],
-            mainAxisAlignment: MainAxisAlignment.center,
-          ),
-          onPressed: () {
-            var url = complete
-                ? isMarker ? UrlManager.getInCompleteMarkerUrl(opId, objectId) : UrlManager.getInCompleteLinkUrl(opId, objectId)
-                : isMarker ? UrlManager.getCompleteMarkerUrl(opId, objectId) : UrlManager.getCompleteLinkUrl(opId, objectId);
-            doTargetDialogAction(url, context, mapPageState);
-          },
-          color: Colors.green),
+              onPressed: () {
+                var url = complete
+                    ? isMarker
+                        ? UrlManager.getInCompleteMarkerUrl(opId, objectId)
+                        : UrlManager.getInCompleteLinkUrl(opId, objectId)
+                    : isMarker
+                        ? UrlManager.getCompleteMarkerUrl(opId, objectId)
+                        : UrlManager.getCompleteLinkUrl(opId, objectId);
+                doTargetDialogAction(url, context, mapPageState);
+              },
+              color: Colors.green)),
     ];
   }
 

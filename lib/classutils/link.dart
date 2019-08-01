@@ -82,16 +82,48 @@ class LinkUtils {
     return returningList;
   }
 
-  static AlertDialog getLinkInfoAlert(
+  static Widget getLinkInfoAlert(
       BuildContext context,
       LinkListViewModel vm,
       String googleId,
       Operation operation,
-      MapPageState mapPageState) {
+      MapPageState mapPageState,
+      double maxWidth) {
     var fromPortal = OperationUtils.getPortalFromID(vm.fromPortalId, operation);
     var toPortal = OperationUtils.getPortalFromID(vm.toPortalId, operation);
     List<Widget> dialogWidgets = <Widget>[
-      RaisedButton(
+      Card(
+          color: WasabeeConstants.CARD_COLOR,
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Text(
+                    "Link",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white),
+                  )),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Container(
+                  color: Colors.transparent,
+                  child: IconButton(
+                    icon: Icon(Icons.close),
+                    color: Colors.white,
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ),
+              )
+            ],
+          )),
+      Container(
+        constraints: BoxConstraints(minWidth: maxWidth),
+        margin: EdgeInsets.only(left: 10.0, right: 10.0),
+          child: RaisedButton(
         color: Colors.green,
         child: Text(
           'View Link On Map',
@@ -108,7 +140,7 @@ class LinkUtils {
               MapUtilities.getViewCircleZoomLevel(center, bounds, false));
           mapPageState.tabController.animateTo(0);
         },
-      ),
+      )),
     ];
     dialogWidgets
         .add(getPortalSection(fromPortal, true, mapPageState, context));
@@ -121,37 +153,13 @@ class LinkUtils {
 
     if (vm.assignedNickname?.isNotEmpty == true && vm.assignedTo != googleId)
       dialogWidgets.add(DialogUtils.addAssignedToWidget(vm.assignedNickname));
-    return AlertDialog(
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Align(
-              alignment: Alignment.bottomCenter,
-              child: Text(
-                "Link",
-                textAlign: TextAlign.center,
-              )),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Container(
-              color: Colors.transparent,
-              child: IconButton(
-                icon: Icon(Icons.close),
-                color: Colors.black,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ),
-          )
-        ],
-      ),
-      content: SingleChildScrollView(
-        child: ListBody(
-          children: dialogWidgets,
-        ),
-      ),
-    );
+    return Container(
+        color: Colors.grey[300],
+        child: SingleChildScrollView(
+          child: Column(
+            children: dialogWidgets,
+          ),
+        ));
   }
 
   static Widget getPortalSection(Portal portal, bool isFromPortal,
@@ -178,31 +186,34 @@ class LinkUtils {
               Divider(
                 color: Colors.white,
               ),
-              Row(mainAxisAlignment: MainAxisAlignment.center, children: <
-                  Widget>[
-                IconButton(
-                    icon: Image.asset('assets/icons/icon_iitc.png'),
-                    onPressed: () {
-                      UrlManager.launchIntelUrl(portal.lat, portal.lng);
-                    }),
-                VerticalDivider(),
-                IconButton(
-                    icon: Icon(Icons.filter_center_focus, color: Colors.white),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      mapPageState.makeZoomedPositionFromLatLng(
-                          LocationHelper.getPortalLoc(portal));
-                      mapPageState.tabController.animateTo(0);
-                    }),
-                VerticalDivider(),
-                IconButton(
-                    icon: Icon(Icons.directions, color: Colors.white),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      MapUtilities.launchMaps(
-                          LocationHelper.getPortalLoc(portal), portal.name);
-                    })
-              ]),
+              Row(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    IconButton(
+                        icon: Image.asset('assets/icons/icon_iitc.png'),
+                        onPressed: () {
+                          UrlManager.launchIntelUrl(portal.lat, portal.lng);
+                        }),
+                    VerticalDivider(),
+                    IconButton(
+                        icon: Icon(Icons.filter_center_focus,
+                            color: Colors.white),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          mapPageState.makeZoomedPositionFromLatLng(
+                              LocationHelper.getPortalLoc(portal));
+                          mapPageState.tabController.animateTo(0);
+                        }),
+                    VerticalDivider(),
+                    IconButton(
+                        icon: Icon(Icons.directions, color: Colors.white),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          MapUtilities.launchMaps(
+                              LocationHelper.getPortalLoc(portal), portal.name);
+                        })
+                  ]),
             ],
           ),
           margin: EdgeInsets.only(left: 10.0, right: 10.0, bottom: 6.0),

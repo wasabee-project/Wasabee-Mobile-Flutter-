@@ -87,162 +87,183 @@ class TargetUtils {
     return "${getDisplayType(target)} - $portalName";
   }
 
-  static AlertDialog getTargetInfoAlert(BuildContext context, Portal portal,
-      Target target, String googleId, String opId, MapPageState mapPageState) {
+  static Widget getTargetInfoAlert(
+      BuildContext context,
+      Portal portal,
+      Target target,
+      String googleId,
+      String opId,
+      MapPageState mapPageState,
+      double maxWidth) {
     List<Widget> dialogWidgets = <Widget>[
       Card(
           color: WasabeeConstants.CARD_COLOR,
-          child: Container(
-            margin: EdgeInsets.all(WasabeeConstants.CARD_MARGIN),
-              child: Column(
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Center(
+              Align(
+                  alignment: Alignment.bottomCenter,
                   child: Text(
-                portal.name,
-                style: TextStyle(color: Colors.white),
-              )),
-              Divider(color: WasabeeConstants.CARD_COLOR),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  new Image.asset(
-                    "assets/dialog_icons/${MarkerUtilities.getImagePath(target, googleId, MarkerUtilities.SEGMENT_ICON)}",
-                    width: 50.0,
-                    height: 50.0,
-                    fit: BoxFit.fitHeight,
+                    "Target - ${TargetUtils.getDisplayType(target)}",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.white),
+                  )),
+              Align(
+                alignment: Alignment.centerRight,
+                child: Container(
+                  color: Colors.transparent,
+                  child: IconButton(
+                    icon: Icon(Icons.close),
+                    color: Colors.white,
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
                   ),
-                  VerticalDivider(color: Colors.green),
-                  Text(getDisplayState(target, googleId),
-                      style: TextStyle(color: Colors.white))
-                ],
-              ),
+                ),
+              )
             ],
-          )))
+          )),
+      Card(
+          color: WasabeeConstants.CARD_COLOR,
+          child: Container(
+              margin: EdgeInsets.all(WasabeeConstants.CARD_MARGIN),
+              child: Column(
+                children: <Widget>[
+                  Center(
+                      child: Text(
+                    portal.name,
+                    style: TextStyle(color: Colors.white),
+                  )),
+                  Divider(color: WasabeeConstants.CARD_COLOR),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      new Image.asset(
+                        "assets/dialog_icons/${MarkerUtilities.getImagePath(target, googleId, MarkerUtilities.SEGMENT_ICON)}",
+                        width: 50.0,
+                        height: 50.0,
+                        fit: BoxFit.fitHeight,
+                      ),
+                      VerticalDivider(color: Colors.green),
+                      Text(getDisplayState(target, googleId),
+                          style: TextStyle(color: Colors.white))
+                    ],
+                  ),
+                ],
+              )))
     ];
-    dialogWidgets.add(getOpenOnIntelButton(portal));
+    dialogWidgets.add(getOpenOnIntelButton(portal, maxWidth));
     if (target.assignedTo?.isNotEmpty == true &&
         target.assignedTo == googleId &&
         target.state == STATE_ASSIGNED)
       dialogWidgets
           .add(getAssignmentButtons(target, opId, context, mapPageState));
-    dialogWidgets.addAll(
-        DialogUtils.getCompleteIncompleteButton(target.state == STATE_COMPLETED, opId, context, mapPageState, target.iD, true));
+    dialogWidgets.addAll(DialogUtils.getCompleteIncompleteButton(
+        target.state == STATE_COMPLETED,
+        opId,
+        context,
+        mapPageState,
+        target.iD,
+        true));
     if (target.comment?.isNotEmpty == true)
       dialogWidgets.add(DialogUtils.getInfoAlertCommentWidget(target.comment));
     if (target.assignedNickname?.isNotEmpty == true &&
         target.assignedTo != googleId)
       dialogWidgets
           .add(DialogUtils.addAssignedToWidget(target.assignedNickname));
-    return AlertDialog(
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Align(
-              alignment: Alignment.bottomCenter,
-              child: Text(
-                "Target - ${TargetUtils.getDisplayType(target)}",
-                textAlign: TextAlign.center,
-              )),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Container(
-              color: Colors.transparent,
-              child: IconButton(
-                icon: Icon(Icons.close),
-                color: Colors.black,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ),
-          )
-        ],
-      ),
-      content: SingleChildScrollView(
-        child: ListBody(
-          children: dialogWidgets,
-        ),
-      ),
-    );
+    return Container(
+        color: Colors.grey[300],
+        child: SingleChildScrollView(
+          child: Column(
+            children: dialogWidgets,
+          ),
+        ));
   }
 
-  static Widget getOpenOnIntelButton(Portal portal) {
-    return RaisedButton(
-      onPressed: () {
-        UrlManager.launchIntelUrl(portal.lat, portal.lng);
-      },
-      child: Text(
-        'Open On Intel',
-        style: TextStyle(color: Colors.white),
-      ),
-      color: Colors.green,
-    );
+  static Widget getOpenOnIntelButton(Portal portal, maxWidth) {
+    return Container(
+        constraints: BoxConstraints(minWidth: maxWidth),
+        margin: EdgeInsets.only(left: 10.0, right: 10.0),
+        child: RaisedButton(
+          onPressed: () {
+            UrlManager.launchIntelUrl(portal.lat, portal.lng);
+          },
+          child: Text(
+            'Open On Intel',
+            style: TextStyle(color: Colors.white),
+          ),
+          color: Colors.green,
+        ));
   }
 
   static Widget getAssignmentButtons(Target target, String opId,
       BuildContext context, MapPageState mapPageState) {
-    return Row(
-      children: <Widget>[
-        Expanded(
-            child: Container(
-                margin: EdgeInsets.only(right: 2.5),
-                child: RaisedButton(
-                    child: Row(
-                      children: <Widget>[
-                        Container(
-                          child: Icon(
-                            Icons.cancel,
-                            color: Colors.white,
-                          ),
-                          margin: EdgeInsets.only(right: 10),
+    return Container(
+        margin: EdgeInsets.only(left: 10.0, right: 10.0),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+                child: Container(
+                    margin: EdgeInsets.only(right: 2.5),
+                    child: RaisedButton(
+                        child: Row(
+                          children: <Widget>[
+                            Container(
+                              child: Icon(
+                                Icons.cancel,
+                                color: Colors.white,
+                              ),
+                              margin: EdgeInsets.only(right: 10),
+                            ),
+                            Text(
+                              'Reject',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ],
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.max,
                         ),
-                        Text(
-                          'Reject',
-                          style: TextStyle(color: Colors.white),
+                        onPressed: () {
+                          DialogUtils.doTargetDialogAction(
+                              UrlManager.getRejectMarkerUrl(opId, target.iD),
+                              context,
+                              mapPageState);
+                        },
+                        color: Colors.green))),
+            Expanded(
+                child: Container(
+                    margin: EdgeInsets.only(left: 2.5),
+                    child: RaisedButton(
+                        child: Row(
+                          children: <Widget>[
+                            Container(
+                              child: Icon(
+                                Icons.check_circle,
+                                color: Colors.white,
+                              ),
+                              margin: EdgeInsets.only(right: 10),
+                            ),
+                            Text(
+                              'Accept',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ],
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.max,
                         ),
-                      ],
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.max,
-                    ),
-                    onPressed: () {
-                      DialogUtils.doTargetDialogAction(
-                          UrlManager.getRejectMarkerUrl(opId, target.iD),
-                          context,
-                          mapPageState);
-                    },
-                    color: Colors.green))),
-        Expanded(
-            child: Container(
-                margin: EdgeInsets.only(left: 2.5),
-                child: RaisedButton(
-                    child: Row(
-                      children: <Widget>[
-                        Container(
-                          child: Icon(
-                            Icons.check_circle,
-                            color: Colors.white,
-                          ),
-                          margin: EdgeInsets.only(right: 10),
-                        ),
-                        Text(
-                          'Accept',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ],
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.max,
-                    ),
-                    onPressed: () {
-                      DialogUtils.doTargetDialogAction(
-                          UrlManager.getAcknowledgeMarkerUrl(opId, target.iD),
-                          context,
-                          mapPageState);
-                    },
-                    color: Colors.green)))
-      ],
-      mainAxisAlignment: MainAxisAlignment.center,
-      mainAxisSize: MainAxisSize.max,
-    );
+                        onPressed: () {
+                          DialogUtils.doTargetDialogAction(
+                              UrlManager.getAcknowledgeMarkerUrl(
+                                  opId, target.iD),
+                              context,
+                              mapPageState);
+                        },
+                        color: Colors.green)))
+          ],
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+        ));
   }
 
   static int getCountOfUnassigned(List<Target> targetList) {

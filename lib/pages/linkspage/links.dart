@@ -142,7 +142,7 @@ class LinksPage {
         context: state.context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return LinkUtils.getLinkInfoAlert(context, vm, googleId, state.loadedOperation, state);
+          return LinkUtils.getLinkInfoAlert(context, vm, googleId, state.loadedOperation, state, MediaQuery.of(context).size.width);
         },
       );
     });
