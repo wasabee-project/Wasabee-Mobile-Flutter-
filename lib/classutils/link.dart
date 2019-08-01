@@ -8,6 +8,7 @@ import 'package:wasabee/network/urlmanager.dart';
 import 'package:wasabee/pages/linkspage/linkfiltermanager.dart';
 import 'package:wasabee/pages/linkspage/linklistvm.dart';
 import 'package:wasabee/pages/mappage/map.dart';
+import 'package:wasabee/pages/mappage/utilities.dart';
 import 'package:wasabee/pages/settingspage/constants.dart';
 
 class LinkUtils {
@@ -97,7 +98,14 @@ class LinkUtils {
           style: TextStyle(color: Colors.white),
         ),
         onPressed: () {
-          //mapPageState.makeZoomedPositionFromLatLng(vm.latLng);
+          var listOfLoc = List<LatLng>();
+          listOfLoc.add(LocationHelper.getPortalLoc(fromPortal));
+          listOfLoc.add(LocationHelper.getPortalLoc(toPortal));
+          var bounds = MapUtilities.getBounds(listOfLoc);
+          var center = MapUtilities.getCenterFromBounds(bounds);
+          Navigator.of(context).pop();
+          mapPageState.makePositionFromLatLng(center,
+              MapUtilities.getViewCircleZoomLevel(center, bounds, false));
           mapPageState.tabController.animateTo(0);
         },
       ),
@@ -105,6 +113,7 @@ class LinkUtils {
     dialogWidgets
         .add(getPortalSection(fromPortal, true, mapPageState, context));
     dialogWidgets.add(getPortalSection(toPortal, false, mapPageState, context));
+    //TODO add complete/incomplete if is assigned.
     // dialogWidgets.addAll(
     //     DialogUtils.getCompleteIncompleteButton(target, opId, context, mapPageState));
     if (vm.comment?.isNotEmpty == true)
@@ -187,7 +196,9 @@ class LinkUtils {
               IconButton(
                   icon: Icon(Icons.directions, color: Colors.white),
                   onPressed: () {
-                    //TODO add navigate with map thing
+                    Navigator.of(context).pop();
+                    MapUtilities.launchMaps(
+                        LocationHelper.getPortalLoc(portal));
                   })
             ]),
           ],

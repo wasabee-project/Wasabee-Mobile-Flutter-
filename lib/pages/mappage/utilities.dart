@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'dart:ui';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:vector_math/vector_math.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/material.dart';
@@ -50,7 +51,16 @@ class MapUtilities {
     return zoomlevel;
   }
 
-  static LatLng computeCentroid(List<Marker> markers) {
+  static List<LatLng> getLatLngListFromMarkers(List<Marker> markers) {
+    var list = List<LatLng>();
+    for (var marker in markers) {
+      if (!marker.markerId.value.startsWith("agent_"))
+        list.add(marker.position);
+    }
+    return list;
+  }
+
+  static LatLng computeCentroid(List<LatLng> markers) {
     double latitude = 0;
     double longitude = 0;
 
@@ -58,53 +68,46 @@ class MapUtilities {
     listToAverage.add(getSouthWest(markers));
     listToAverage.add(getNorthEast(markers));
     for (LatLng point in listToAverage) {
-        latitude += point.latitude;
-        longitude += point.longitude;
+      latitude += point.latitude;
+      longitude += point.longitude;
     }
 
-    return new LatLng(latitude / listToAverage.length, longitude / listToAverage.length);
+    return new LatLng(
+        latitude / listToAverage.length, longitude / listToAverage.length);
   }
 
-  static LatLngBounds getBounds(List<Marker> markers) {
+  static LatLngBounds getBounds(List<LatLng> markers) {
     return new LatLngBounds(
         northeast: getNorthEast(markers), southwest: getSouthWest(markers));
   }
 
-  static LatLng getNorthEast(List<Marker> markers) {
+  static LatLng getNorthEast(List<LatLng> markers) {
     double finalLat = 0;
     double finalLon = 0;
     for (var marker in markers) {
-      if (!marker.markerId.value.startsWith("agent_")) {
-        if (finalLat == 0)
-          finalLat = marker.position.latitude;
-        else if (marker.position.latitude > finalLat)
-          finalLat = marker.position.latitude;
+      if (finalLat == 0)
+        finalLat = marker.latitude;
+      else if (marker.latitude > finalLat) finalLat = marker.latitude;
 
-        if (finalLon == 0)
-          finalLon = marker.position.longitude;
-        else if (marker.position.longitude > finalLon)
-          finalLon = marker.position.longitude;
-      }
+      if (finalLon == 0)
+        finalLon = marker.longitude;
+      else if (marker.longitude > finalLon) finalLon = marker.longitude;
     }
     return LatLng(finalLat, finalLon);
   }
 
-  static LatLng getSouthWest(List<Marker> markers) {
+  static LatLng getSouthWest(List<LatLng> markers) {
     double finalLat = 0;
     double finalLon = 0;
 
     for (var marker in markers) {
-      if (!marker.markerId.value.startsWith("agent_")) {
-        if (finalLat == 0)
-          finalLat = marker.position.latitude;
-        else if (marker.position.latitude < finalLat)
-          finalLat = marker.position.latitude;
+      if (finalLat == 0)
+        finalLat = marker.latitude;
+      else if (marker.latitude < finalLat) finalLat = marker.latitude;
 
-        if (finalLon == 0)
-          finalLon = marker.position.longitude;
-        else if (marker.position.longitude < finalLon)
-          finalLon = marker.position.longitude;
-      }
+      if (finalLon == 0)
+        finalLon = marker.longitude;
+      else if (marker.longitude < finalLon) finalLon = marker.longitude;
     }
     return LatLng(finalLat, finalLon);
   }
@@ -125,6 +128,20 @@ class MapUtilities {
     var centerLat = (southWestLat + northEastLat) / 2;
     var centerLng = (southWestLon + northEastLon) / 2;
     return LatLng(centerLat, centerLng);
+  }
+
+  static launchMaps(LatLng location) async {
+    String googleUrl =
+        'https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}';
+    String appleUrl =
+        'https://maps.apple.com/?sll=${location.latitude},${location.longitude}';
+    if (await canLaunch(googleUrl)) {
+      print('launching com googleUrl -> $googleUrl');
+      await launch(googleUrl);
+    } else if (await canLaunch(appleUrl)) {
+      print('launching apple url');
+      await launch(appleUrl);
+    }
   }
 }
 

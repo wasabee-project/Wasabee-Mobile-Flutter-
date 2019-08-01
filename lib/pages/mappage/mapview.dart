@@ -44,11 +44,12 @@ class MapViewState extends State<MapViewWidget>
   }
 
   Widget getMapContent() {
+    var locationList = MapUtilities.getLatLngListFromMarkers(List<Marker>.of(markers.values));
     var center = visibleRegion == null
-        ? MapUtilities.computeCentroid(List<Marker>.of(markers.values))
+        ? MapUtilities.computeCentroid(locationList)
         : MapUtilities.getCenterFromBounds(visibleRegion);
     var bounds = visibleRegion == null
-        ? MapUtilities.getBounds(List<Marker>.of(markers.values))
+        ? MapUtilities.getBounds(locationList)
         : visibleRegion;
     var fromExistingLocation = visibleRegion != null;
     return Scaffold(

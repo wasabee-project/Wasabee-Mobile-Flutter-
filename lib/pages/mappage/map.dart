@@ -676,8 +676,14 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
 
   makeZoomedPositionFromLatLng(LatLng latLng) {
     mapController.animateCamera(CameraUpdate.newCameraPosition(
-        CameraPosition(target: latLng, zoom: ZOOMED_ZOOM_LEVEL),
-      ));
+      CameraPosition(target: latLng, zoom: ZOOMED_ZOOM_LEVEL),
+    ));
+  }
+
+  makePositionFromLatLng(LatLng latLng, double zoomLevel) {
+    mapController.animateCamera(CameraUpdate.newCameraPosition(
+      CameraPosition(target: latLng, zoom: zoomLevel),
+    ));
   }
 
   setAlerFilterDropdownValue(AlertFilterType value) {
