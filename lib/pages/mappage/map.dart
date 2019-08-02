@@ -20,6 +20,7 @@ import 'package:wasabee/pages/linkspage/linksortdialog.dart';
 import 'package:wasabee/pages/loginpage/login.dart';
 import 'package:wasabee/pages/mappage/mapview.dart';
 import 'package:wasabee/pages/settingspage/settings.dart';
+import 'package:wasabee/pages/teamspage/team.dart';
 import '../../location/locationhelper.dart';
 import '../../network/networkcalls.dart';
 import '../../network/urlmanager.dart';
@@ -250,6 +251,7 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
       listOfElements.add(getDrawerHeader());
       listOfElements.add(getShareLocationViews());
       listOfElements.add(getRefreshOpListButton());
+      listOfElements.add(getEditTeamsButton());
       for (var op in operationList) {
         listOfElements.add(ListTile(
           title: Text(op.name),
@@ -333,6 +335,24 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
           ),
           onPressed: () {
             tappedRefreshAllOps();
+          },
+        ));
+  }
+
+  Widget getEditTeamsButton() {
+    return Container(
+        margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+        child: RaisedButton(
+          color: Colors.green,
+          child: Text(
+            'Edit My Teams',
+            style: TextStyle(color: Colors.white),
+          ),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => TeamPage()),
+            );
           },
         ));
   }
@@ -631,7 +651,13 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
         barrierDismissible: false,
         builder: (BuildContext context) {
           return TargetUtils.getTargetInfoAlert(
-              context, portal, target, googleId, selectedOperation.iD, this, MediaQuery.of(context).size.width);
+              context,
+              portal,
+              target,
+              googleId,
+              selectedOperation.iD,
+              this,
+              MediaQuery.of(context).size.width);
         },
       );
     });
