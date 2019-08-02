@@ -5,10 +5,11 @@ import 'package:wasabee/pages/mappage/map.dart';
 import 'package:wasabee/pages/settingspage/constants.dart';
 
 class DialogUtils {
-  static Widget getInfoAlertCommentWidget(String comment) {
+  static Widget getInfoAlertCommentWidget(String comment, double maxWidth) {
     return Card(
         color: WasabeeConstants.CARD_COLOR,
         child: Container(
+            constraints: BoxConstraints(minWidth: maxWidth),
             margin: EdgeInsets.all(10),
             child: Column(
               children: <Widget>[
@@ -107,5 +108,16 @@ class DialogUtils {
       mapPageState.setIsNotLoading();
       print(e);
     }
+  }
+
+  static Widget wrapInDialog(List<Widget> widgetList) {
+    return Container(
+      margin: EdgeInsets.all(10.0),
+      color: Colors.grey[300],
+      child: ListView(
+        shrinkWrap: true,
+        children: widgetList,
+      ),
+    );
   }
 }

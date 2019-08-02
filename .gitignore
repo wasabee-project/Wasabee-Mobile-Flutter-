@@ -25,3 +25,6 @@ android/app/src/main/AndroidManifest.xml
 ios/Pods/*
 ios/Flutter/*
 android/.gradle/*
+android/key.properties
+android/app/wasabeeMobileKeystore.jks
+android/app/proguard-rules.pro

@@ -149,17 +149,11 @@ class LinkUtils {
       dialogWidgets.addAll(DialogUtils.getCompleteIncompleteButton(
           vm.completed, vm.opId, context, mapPageState, vm.linkId, false));
     if (vm.comment?.isNotEmpty == true)
-      dialogWidgets.add(DialogUtils.getInfoAlertCommentWidget(vm.comment));
+      dialogWidgets.add(DialogUtils.getInfoAlertCommentWidget(vm.comment, maxWidth));
 
     if (vm.assignedNickname?.isNotEmpty == true && vm.assignedTo != googleId)
       dialogWidgets.add(DialogUtils.addAssignedToWidget(vm.assignedNickname));
-    return Container(
-        color: Colors.grey[300],
-        child: SingleChildScrollView(
-          child: Column(
-            children: dialogWidgets,
-          ),
-        ));
+    return DialogUtils.wrapInDialog(dialogWidgets);
   }
 
   static Widget getPortalSection(Portal portal, bool isFromPortal,

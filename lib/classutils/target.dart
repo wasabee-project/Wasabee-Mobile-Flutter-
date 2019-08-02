@@ -167,18 +167,12 @@ class TargetUtils {
         target.iD,
         true));
     if (target.comment?.isNotEmpty == true)
-      dialogWidgets.add(DialogUtils.getInfoAlertCommentWidget(target.comment));
+      dialogWidgets.add(DialogUtils.getInfoAlertCommentWidget(target.comment, maxWidth));
     if (target.assignedNickname?.isNotEmpty == true &&
         target.assignedTo != googleId)
       dialogWidgets
           .add(DialogUtils.addAssignedToWidget(target.assignedNickname));
-    return Container(
-        color: Colors.grey[300],
-        child: SingleChildScrollView(
-          child: Column(
-            children: dialogWidgets,
-          ),
-        ));
+    return DialogUtils.wrapInDialog(dialogWidgets);
   }
 
   static Widget getOpenOnIntelButton(Portal portal, maxWidth) {
