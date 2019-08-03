@@ -3,7 +3,7 @@ import 'package:wasabee/pages/alertspage/alertfiltermanager.dart';
 import 'package:wasabee/pages/alertspage/alertsortdialog.dart';
 import 'package:wasabee/pages/linkspage/linkfiltermanager.dart';
 import 'package:wasabee/pages/linkspage/linksortdialog.dart';
-import 'package:wasabee/pages/linkspage/linksortmanager.dart';
+import 'package:wasabee/pages/teamspage/teamsortdialog.dart';
 
 class LocalStorageUtils {
   static const KEY_SELECTED_OPERATION = "KEY_SELECTED_OPERATION";
@@ -12,7 +12,7 @@ class LocalStorageUtils {
   static const KEY_ALERT_FILTER = "KEY_ALERT_FILTER";
   static const KEY_ALERT_SORT = "KEY_ALERT_SORT";
   static const KEY_USE_IMPERIAL = "KEY_USE_IMPERIAL";
-
+  static const KEY_TEAM_SORT = "KEY_TEAM_SORT";
   static Future<String> getSelectedOpId() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(KEY_SELECTED_OPERATION) ?? '';
@@ -79,7 +79,7 @@ class LocalStorageUtils {
     await prefs.setString(KEY_ALERT_SORT, sort.toString());
   }
 
-   static Future<LinkSortType> getLinkSort() async {
+  static Future<LinkSortType> getLinkSort() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return LinkFilterManager.getSortTypeAsString(
             prefs.getString(KEY_ALERT_SORT)) ??
@@ -89,6 +89,18 @@ class LocalStorageUtils {
   static Future<dynamic> setLinkSort(LinkSortType sort) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(KEY_ALERT_SORT, sort.toString());
+  }
+
+  static Future<TeamSortType> getTeamSort() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return LinkFilterManager.getSortTypeAsString(
+            prefs.getString(KEY_TEAM_SORT)) ??
+        TeamSortType.AlphaName;
+  }
+
+  static Future<dynamic> setTeamSort(TeamSortType sort) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(KEY_TEAM_SORT, sort.toString());
   }
 
   static Future<bool> getUseImperialUnits() async {

@@ -21,6 +21,7 @@ import 'package:wasabee/pages/loginpage/login.dart';
 import 'package:wasabee/pages/mappage/mapview.dart';
 import 'package:wasabee/pages/settingspage/settings.dart';
 import 'package:wasabee/pages/teamspage/team.dart';
+import 'package:wasabee/pages/teamspage/teamlistvm.dart';
 import '../../location/locationhelper.dart';
 import '../../network/networkcalls.dart';
 import '../../network/urlmanager.dart';
@@ -345,14 +346,18 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
         child: RaisedButton(
           color: Colors.green,
           child: Text(
-            'Edit My Teams',
+            'Manage My Teams',
             style: TextStyle(color: Colors.white),
           ),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => TeamPage()),
-            );
+            LocalStorageUtils.getTeamSort().then((sortValue) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) {
+                  return TeamPage(teamSortDropDownValue: sortValue);
+                }),
+              );
+            });
           },
         ));
   }

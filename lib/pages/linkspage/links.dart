@@ -75,65 +75,66 @@ class LinksPage {
               itemCount: listOfVM.length,
               itemBuilder: (BuildContext context, int index) {
                 LinkListViewModel vm = listOfVM[index];
-                return InkWell(
-                    onTap: () {
-                      onLinkRowTap(vm, mapPageState);
-                    },
-                    child: Column(children: <Widget>[
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            CircleAvatar(
-                              child: vm.completed == true
-                                  ? Icon(Icons.check)
-                                  : Text('${vm.linkOrder}'),
-                            ),
-                            VerticalDivider(
-                              width: 15,
-                            ),
-                            Flexible(
-                                child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    Text(
-                                      vm.fromPortalName,
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    VerticalDivider(
-                                      width: 5,
-                                    ),
-                                    Icon(Icons.arrow_right),
-                                    VerticalDivider(width: 5),
-                                    Flexible(
-                                      child: Text(
-                                        vm.toPortalName,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Divider(
-                                  height: 4.0,
-                                  color: Colors.green,
-                                ),
-                                Text(vm.lengthString),
-                              ],
-                            ))
-                          ]),
-                      Divider(
-                        height: 10.0,
-                        color: Colors.grey,
-                      )
-                    ]));
+                return getListItem(vm, context, mapPageState);
               }))
     ]));
+  }
+
+  static Widget getListItem(
+      LinkListViewModel vm, BuildContext context, MapPageState mapPageState) {
+    return InkWell(
+        onTap: () {
+          onLinkRowTap(vm, mapPageState);
+        },
+        child: Column(children: <Widget>[
+          Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
+            CircleAvatar(
+              child: vm.completed == true
+                  ? Icon(Icons.check)
+                  : Text('${vm.linkOrder}'),
+            ),
+            VerticalDivider(
+              width: 15,
+            ),
+            Flexible(
+                child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      vm.fromPortalName,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    VerticalDivider(
+                      width: 5,
+                    ),
+                    Icon(Icons.arrow_right),
+                    VerticalDivider(width: 5),
+                    Flexible(
+                      child: Text(
+                        vm.toPortalName,
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                Divider(
+                  height: 4.0,
+                  color: Colors.green,
+                ),
+                Text(vm.lengthString),
+              ],
+            ))
+          ]),
+          Divider(
+            height: 10.0,
+            color: Colors.grey,
+          )
+        ]));
   }
 
   static onLinkRowTap(LinkListViewModel vm, MapPageState state) {
@@ -142,7 +143,8 @@ class LinksPage {
         context: state.context,
         barrierDismissible: false,
         builder: (BuildContext context) {
-          return LinkUtils.getLinkInfoAlert(context, vm, googleId, state.loadedOperation, state, MediaQuery.of(context).size.width);
+          return LinkUtils.getLinkInfoAlert(context, vm, googleId,
+              state.loadedOperation, state, MediaQuery.of(context).size.width);
         },
       );
     });
