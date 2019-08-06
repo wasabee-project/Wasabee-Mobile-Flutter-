@@ -11,7 +11,7 @@ class TeamListViewModel {
       {this.teamId, this.titleString, this.teamName, this.teamState});
 
   static List<TeamListViewModel> fromTeamData(
-      List<Team> teamList, List<Team> ownedTeamList, TeamSortType sortType) {
+      List<Team> teamList, List<Team> ownedTeamList, TeamSortType sortType, bool useImperialUnits) {
     var listOfVM = List<TeamListViewModel>();
     if (teamList != null && teamList.length > 0)
       for (var team in teamList) {

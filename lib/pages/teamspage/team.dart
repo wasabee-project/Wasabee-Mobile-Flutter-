@@ -55,13 +55,35 @@ class TeamPageState extends State<TeamPage> {
             appBar: AppBar(
               title: Text(title),
             ),
-            body: Center(child: Text('TeamPage')));
+            body: getBody());
   }
 
   setTeamSortDropdownValue(TeamSortType value) {
     setState(() {
       teamSortDropDownValue = value;
     });
+  }
+
+  Widget getBody() {
+    return ListView.builder(
+        padding: const EdgeInsets.all(8.0),
+        itemCount: vmList.length,
+        itemBuilder: (BuildContext context, int index) {
+          TeamListViewModel vm = vmList[index];
+          return InkWell(
+              onTap: () {
+                //TODO open details alert
+              },
+              child: Column(children: <Widget>[
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[Text('${vm.titleString}')]),
+                Divider(
+                  height: 10.0,
+                  color: Colors.grey,
+                )
+              ]));
+        });
   }
 
   getTeams() {
@@ -86,8 +108,9 @@ class TeamPageState extends State<TeamPage> {
       var useImperialUnits = await LocalStorageUtils.getUseImperialUnits();
       var teamList = meResponse.teams;
       var ownedTeamList = meResponse.ownedTeams;
-      print('$response');
       setState(() {
+        vmList = TeamListViewModel.fromTeamData(
+            teamList, ownedTeamList, teamSortType, useImperialUnits);
         isLoading = false;
       });
     } catch (e) {
