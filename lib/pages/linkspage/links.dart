@@ -71,70 +71,70 @@ class LinksPage {
       ),
       Expanded(
           child: ListView.builder(
-              padding: const EdgeInsets.all(8.0),
               itemCount: listOfVM.length,
               itemBuilder: (BuildContext context, int index) {
                 LinkListViewModel vm = listOfVM[index];
-                return getListItem(vm, context, mapPageState);
+                return getListItem(vm, context, mapPageState, index);
               }))
     ]));
   }
 
-  static Widget getListItem(
-      LinkListViewModel vm, BuildContext context, MapPageState mapPageState) {
+  static Widget getListItem(LinkListViewModel vm, BuildContext context,
+      MapPageState mapPageState, int index) {
     return InkWell(
+      splashColor: (index % 2 == 0) ? Colors.green : Colors.purple,
         onTap: () {
           onLinkRowTap(vm, mapPageState);
         },
-        child: Column(children: <Widget>[
-          Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
-            CircleAvatar(
-              child: vm.completed == true
-                  ? Icon(Icons.check)
-                  : Text('${vm.linkOrder}'),
-            ),
-            VerticalDivider(
-              width: 15,
-            ),
-            Flexible(
-                child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(
-                  mainAxisSize: MainAxisSize.min,
+        child: Container(
+            padding: const EdgeInsets.all(8.0),
+            color:  (index % 2 == 0) ? Colors.white : Colors.grey[200],
+            child: Column(children: <Widget>[
+              Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    Text(
-                      vm.fromPortalName,
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    CircleAvatar(
+                      backgroundColor:
+                          (index % 2 == 0) ? Colors.green : Colors.purple,
+                      child: vm.completed == true
+                          ? Icon(Icons.check)
+                          : Text('${vm.linkOrder}'),
                     ),
                     VerticalDivider(
-                      width: 5,
+                      width: 15,
                     ),
-                    Icon(Icons.arrow_right),
-                    VerticalDivider(width: 5),
                     Flexible(
-                      child: Text(
-                        vm.toPortalName,
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                ),
-                Divider(
-                  height: 4.0,
-                  color: Colors.green,
-                ),
-                Text(vm.lengthString),
-              ],
-            ))
-          ]),
-          Divider(
-            height: 10.0,
-            color: Colors.grey,
-          )
-        ]));
+                        child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                              vm.fromPortalName,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Icon(Icons.arrow_right),
+                            VerticalDivider(width: 5),
+                            Flexible(
+                              child: Text(
+                                vm.toPortalName,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Divider(
+                          height: 4.0,
+                          color: Colors.green,
+                        ),
+                        Text(vm.lengthString),
+                      ],
+                    ))
+                  ]),
+            ])));
   }
 
   static onLinkRowTap(LinkListViewModel vm, MapPageState state) {
