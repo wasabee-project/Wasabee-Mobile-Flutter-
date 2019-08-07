@@ -3,6 +3,7 @@ import 'package:wasabee/pages/alertspage/alertfiltermanager.dart';
 import 'package:wasabee/pages/alertspage/alertsortdialog.dart';
 import 'package:wasabee/pages/linkspage/linkfiltermanager.dart';
 import 'package:wasabee/pages/linkspage/linksortdialog.dart';
+import 'package:wasabee/pages/teamspage/teamfiltermanager.dart';
 import 'package:wasabee/pages/teamspage/teamsortdialog.dart';
 
 class LocalStorageUtils {
@@ -13,6 +14,8 @@ class LocalStorageUtils {
   static const KEY_ALERT_SORT = "KEY_ALERT_SORT";
   static const KEY_USE_IMPERIAL = "KEY_USE_IMPERIAL";
   static const KEY_TEAM_SORT = "KEY_TEAM_SORT";
+  static const KEY_TEAM_FILTER = "KEY_TEAM_FILTER";
+  
   static Future<String> getSelectedOpId() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return prefs.getString(KEY_SELECTED_OPERATION) ?? '';
@@ -93,7 +96,7 @@ class LocalStorageUtils {
 
   static Future<TeamSortType> getTeamSort() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    return LinkFilterManager.getSortTypeAsString(
+    return TeamFilterManager.getSortTypeAsString(
             prefs.getString(KEY_TEAM_SORT)) ??
         TeamSortType.AlphaName;
   }
@@ -101,6 +104,18 @@ class LocalStorageUtils {
   static Future<dynamic> setTeamSort(TeamSortType sort) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString(KEY_TEAM_SORT, sort.toString());
+  }
+
+    static Future<TeamFilterType> getTeamFilter() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return TeamFilterManager.getFilterTypeAsString(
+            prefs.getString(KEY_TEAM_FILTER)) ??
+        TeamFilterType.All;
+  }
+
+  static Future<dynamic> setTeamFilter(TeamFilterType filter) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString(KEY_TEAM_FILTER, filter.toString());
   }
 
   static Future<bool> getUseImperialUnits() async {

@@ -30,21 +30,23 @@ class TargetListViewModel {
       this.targetState,
       this.targetPortalName});
 
-  static List<TargetListViewModel> fromOperationData(
+  static Future<List<TargetListViewModel>> fromOperationData(
       List<Target> targetList,
       Map<String, Portal> portalMap,
       String googleId,
       LatLng mostRecentLoc,
       AlertSortType sortType,
-      bool useImperialUnits) {
+      bool useImperialUnits) async {
     var listOfVM = List<TargetListViewModel>();
     if (targetList != null && targetList.length > 0)
       for (var target in targetList) {
         var portal = portalMap[target.portalId];
         if (portal != null) {
           LatLng portalLoc = LocationHelper.getPortalLoc(portal);
+          var distanceMeters = await DistanceUtilities.getDistanceMeters(
+              portalLoc, mostRecentLoc);
           var distanceDouble = DistanceUtilities.getDistanceDouble(
-              portalLoc, mostRecentLoc, useImperialUnits);
+              useImperialUnits, distanceMeters);
           listOfVM.add(TargetListViewModel(
               targetId: target.iD,
               titleString: TargetUtils.getMarkerTitle(portal.name, target),

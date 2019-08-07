@@ -7,6 +7,7 @@ import 'package:wasabee/network/responses/operationFullResponse.dart';
 import 'package:wasabee/network/urlmanager.dart';
 import 'package:wasabee/pages/linkspage/linkfiltermanager.dart';
 import 'package:wasabee/pages/linkspage/linklistvm.dart';
+import 'package:wasabee/pages/linkspage/links.dart';
 import 'package:wasabee/pages/mappage/map.dart';
 import 'package:wasabee/pages/mappage/utilities.dart';
 import 'package:wasabee/pages/settingspage/constants.dart';
@@ -94,53 +95,61 @@ class LinkUtils {
     List<Widget> dialogWidgets = <Widget>[
       Card(
           color: WasabeeConstants.CARD_COLOR,
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Column(
             children: <Widget>[
-              Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Text(
-                    "Link",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white),
-                  )),
-              Align(
-                alignment: Alignment.centerRight,
-                child: Container(
-                  color: Colors.transparent,
-                  child: IconButton(
-                    icon: Icon(Icons.close),
-                    color: Colors.white,
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ),
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Text(
+                        "Link",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white),
+                      )),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Container(
+                      color: Colors.transparent,
+                      child: IconButton(
+                        icon: Icon(Icons.close),
+                        color: Colors.white,
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ),
+                  )
+                ],
+              ),
+              Container(
+                child: LinksPage.getLinkInfoLayout(vm, true),
+                padding: EdgeInsets.only(bottom: 8, right: 8, left: 8),
               )
             ],
           )),
       Container(
-        constraints: BoxConstraints(minWidth: maxWidth),
-        margin: EdgeInsets.only(left: 10.0, right: 10.0),
+          constraints: BoxConstraints(minWidth: maxWidth),
+          margin: EdgeInsets.only(left: 10.0, right: 10.0),
           child: RaisedButton(
-        color: Colors.green,
-        child: Text(
-          'View Link On Map',
-          style: TextStyle(color: Colors.white),
-        ),
-        onPressed: () {
-          var listOfLoc = List<LatLng>();
-          listOfLoc.add(LocationHelper.getPortalLoc(fromPortal));
-          listOfLoc.add(LocationHelper.getPortalLoc(toPortal));
-          var bounds = MapUtilities.getBounds(listOfLoc);
-          var center = MapUtilities.getCenterFromBounds(bounds);
-          Navigator.of(context).pop();
-          mapPageState.makePositionFromLatLng(center,
-              MapUtilities.getViewCircleZoomLevel(center, bounds, false));
-          mapPageState.tabController.animateTo(0);
-        },
-      )),
+            color: Colors.green,
+            child: Text(
+              'View Link On Map',
+              style: TextStyle(color: Colors.white),
+            ),
+            onPressed: () {
+              var listOfLoc = List<LatLng>();
+              listOfLoc.add(LocationHelper.getPortalLoc(fromPortal));
+              listOfLoc.add(LocationHelper.getPortalLoc(toPortal));
+              var bounds = MapUtilities.getBounds(listOfLoc);
+              var center = MapUtilities.getCenterFromBounds(bounds);
+              Navigator.of(context).pop();
+              mapPageState.makePositionFromLatLng(center,
+                  MapUtilities.getViewCircleZoomLevel(center, bounds, false));
+              mapPageState.tabController.animateTo(0);
+            },
+          )),
     ];
     dialogWidgets
         .add(getPortalSection(fromPortal, true, mapPageState, context));
@@ -149,7 +158,8 @@ class LinkUtils {
       dialogWidgets.addAll(DialogUtils.getCompleteIncompleteButton(
           vm.completed, vm.opId, context, mapPageState, vm.linkId, false));
     if (vm.comment?.isNotEmpty == true)
-      dialogWidgets.add(DialogUtils.getInfoAlertCommentWidget(vm.comment, maxWidth));
+      dialogWidgets
+          .add(DialogUtils.getInfoAlertCommentWidget(vm.comment, maxWidth));
 
     if (vm.assignedNickname?.isNotEmpty == true && vm.assignedTo != googleId)
       dialogWidgets.add(DialogUtils.addAssignedToWidget(vm.assignedNickname));

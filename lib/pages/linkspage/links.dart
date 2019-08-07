@@ -6,7 +6,6 @@ import 'package:wasabee/pages/linkspage/linkfiltermanager.dart';
 import 'package:wasabee/pages/linkspage/linklistvm.dart';
 import 'package:wasabee/pages/linkspage/linksortdialog.dart';
 import 'package:wasabee/pages/mappage/map.dart';
-import 'package:wasabee/pages/mappage/utilities.dart';
 import 'package:wasabee/storage/localstorage.dart';
 
 class LinksPage {
@@ -84,9 +83,10 @@ class LinksPage {
   static Widget getListItem(LinkListViewModel vm, BuildContext context,
       MapPageState mapPageState, int index) {
     var orderColor = DialogUtils.getLinkListOrderBg(vm.linkOrder);
+    var listBGColor = DialogUtils.getListBgColor(index);
     var margin = 8.0;
     return Container(
-        color: DialogUtils.getListBgColor(index),
+        color: listBGColor,
         child: Material(
             color: Colors.transparent,
             child: InkWell(
@@ -111,6 +111,7 @@ class LinksPage {
                         ),
                         VerticalDivider(
                           width: 15,
+                          color: listBGColor,
                         ),
                         Flexible(
                             child: Column(
@@ -125,53 +126,61 @@ class LinksPage {
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                   overflow: TextOverflow.ellipsis,
                                 )),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Icon(Icons.arrow_right),
-                                VerticalDivider(width: 5),
-                                Flexible(
-                                  child: Container(
-                                      padding: EdgeInsets.only(right: margin),
-                                      child: Text(
-                                        vm.toPortalName,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                        overflow: TextOverflow.ellipsis,
-                                      )),
-                                ),
-                              ],
-                            ),
                             Container(
-                                padding: EdgeInsets.only(
-                                    bottom: margin, right: margin),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: <Widget>[
-                                    Icon(
-                                      Icons.redo,
-                                      color: Colors.black,
-                                    ),
-                                    VerticalDivider(
-                                      width: 5,
-                                    ),
-                                    Text(vm.lengthString),
-                                    VerticalDivider(
-                                      width: 5,
-                                    ),
-                                    Expanded(
-                                        child: Divider(
-                                      height: 4.0,
-                                      color: Colors.green,
-                                    )),
-                                    VerticalDivider(width: 5,),
-                                    Text('L${MapUtilities.getPortalLevel(vm.lengthMeters).toStringAsFixed(2)}')
-                                  ],
-                                ))
+                                padding: EdgeInsets.only(right: margin),
+                                child: getLinkInfoLayout(vm, false)),
+                            Flexible(
+                              child: Container(
+                                  padding: EdgeInsets.only(
+                                    right: margin,
+                                    bottom: margin,
+                                  ),
+                                  child: Text(
+                                    vm.toPortalName,
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold),
+                                    overflow: TextOverflow.ellipsis,
+                                  )),
+                            )
                           ],
                         ))
                       ])),
                 ]))));
+  }
+
+  static Widget getLinkInfoLayout(LinkListViewModel vm, bool useWhite) {
+    var colorToUse = useWhite ? Colors.white : vm.portalReqColor;
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      children: <Widget>[
+        Icon(
+          useWhite ? Icons.redo : Icons.arrow_downward,
+          color: colorToUse,
+        ),
+        VerticalDivider(
+          width: 5,
+        ),
+        Text(
+          vm.lengthString,
+          style: TextStyle(color: colorToUse),
+        ),
+        VerticalDivider(
+          width: 5,
+        ),
+        Expanded(
+            child: Divider(
+          height: 4.0,
+          color: colorToUse,
+        )),
+        VerticalDivider(
+          width: 5,
+        ),
+        Text(
+          'L${vm.portalReqLevel.toStringAsFixed(2)}',
+          style: TextStyle(color: colorToUse),
+        )
+      ],
+    );
   }
 
   static onLinkRowTap(LinkListViewModel vm, MapPageState state) {

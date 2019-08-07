@@ -131,9 +131,9 @@ class DialogUtils {
 
   static Color getLinkListOrderBg(int order) {
     if ((order % 2 == 0)) {
-      return Colors.green[300];
+      return Colors.green[500];
     } else {
-      return Colors.purple[300];
+      return Colors.green[300];
     }
   }
 }

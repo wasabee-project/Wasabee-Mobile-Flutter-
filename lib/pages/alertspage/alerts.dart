@@ -74,7 +74,6 @@ class AlertsPage {
               itemBuilder: (BuildContext context, int index) {
                 TargetListViewModel vm = listOfVM[index];
                 return Container(
-                  padding: EdgeInsets.all(8),
                     color: DialogUtils.getListBgColor(index),
                     child: Material(
                         color: Colors.transparent,
@@ -88,11 +87,14 @@ class AlertsPage {
                               Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: <Widget>[
-                                    Image.asset(
-                                      vm.imagePath,
-                                      width: 50.0,
-                                      height: 50.0,
-                                      fit: BoxFit.fitHeight,
+                                    Container(
+                                      child: Image.asset(
+                                        vm.imagePath,
+                                        width: 50.0,
+                                        height: 50.0,
+                                        fit: BoxFit.fitHeight,
+                                      ),
+                                      padding: EdgeInsets.all(8),
                                     ),
                                     VerticalDivider(),
                                     Flexible(

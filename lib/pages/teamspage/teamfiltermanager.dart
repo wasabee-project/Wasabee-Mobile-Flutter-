@@ -1,7 +1,5 @@
-
-
 import 'package:wasabee/classutils/team.dart';
-import 'package:wasabee/network/responses/meResponse.dart';
+import 'package:wasabee/pages/teamspage/teamlistvm.dart';
 import 'package:wasabee/pages/teamspage/teamsortdialog.dart';
 
 class TeamFilterManager {
@@ -10,11 +8,12 @@ class TeamFilterManager {
     filterTypeList.add(TeamFilterType.All);
     filterTypeList.add(TeamFilterType.Active);
     filterTypeList.add(TeamFilterType.Inactive);
+    filterTypeList.add(TeamFilterType.Owned);
     return filterTypeList;
   }
 
-  static String getDisplayStringFromEnum(
-      TeamFilterType type, List<Team> teamFilter, String googleId) {
+  static String getDisplayStringFromEnum(TeamFilterType type,
+      List<TeamListViewModel> teamFilter, String googleId) {
     String displayString = "";
     switch (type) {
       case TeamFilterType.All:
@@ -26,14 +25,17 @@ class TeamFilterManager {
       case TeamFilterType.Inactive:
         displayString = "Inactive Teams";
         break;
+      case TeamFilterType.Owned:
+        displayString = "Owned Teams";
+        break;
     }
     return teamFilter == null
         ? displayString
         : "$displayString (${getCountFromTeamFilter(type, teamFilter, googleId)})";
   }
 
-  static int getCountFromTeamFilter(
-      TeamFilterType type, List<Team> teamFilter, String googleId) {
+  static int getCountFromTeamFilter(TeamFilterType type,
+      List<TeamListViewModel> teamFilter, String googleId) {
     int count = 0;
     switch (type) {
       case TeamFilterType.All:
@@ -45,8 +47,31 @@ class TeamFilterManager {
       case TeamFilterType.Inactive:
         count = TeamUtils.getCountOfInactive(teamFilter);
         break;
+      case TeamFilterType.Owned:
+        count = TeamUtils.getCountOfOwned(teamFilter);
+        break;
     }
     return count;
+  }
+
+  static List<TeamListViewModel> getFilteredTeams(
+      List<TeamListViewModel> teamList, TeamFilterType type) {
+    var returningList = List<TeamListViewModel>();
+    switch (type) {
+      case TeamFilterType.All:
+        returningList = teamList;
+        break;
+      case TeamFilterType.Active:
+        returningList = TeamUtils.getActiveList(teamList);
+        break;
+      case TeamFilterType.Inactive:
+        returningList = TeamUtils.getInactiveList(teamList);
+        break;
+      case TeamFilterType.Owned:
+        returningList = TeamUtils.getOwnedList(teamList);
+        break;
+    }
+    return returningList;
   }
 
   static TeamFilterType getFilterTypeAsString(String typeAsString) {
@@ -68,4 +93,4 @@ class TeamFilterManager {
   }
 }
 
-enum TeamFilterType { All, Active, Inactive }
+enum TeamFilterType { All, Active, Inactive, Owned }

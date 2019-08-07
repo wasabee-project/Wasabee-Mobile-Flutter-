@@ -42,6 +42,28 @@ class OperationUtils {
     return HexColor(hexString);
   }
 
+  static Color getPortalLevelColor(double portalLevel) {
+    String hexString = '#FECE5A';
+    if (portalLevel >= 1 && portalLevel < 2) {
+      hexString = 'FECE5A';
+    } else if (portalLevel >= 2 && portalLevel < 3) {
+      hexString = 'FFA630';
+    } else if (portalLevel >= 3 && portalLevel < 4) {
+      hexString = 'FF7315';
+    } else if (portalLevel >= 4 && portalLevel < 5) {
+      hexString = 'E40000';
+    } else if (portalLevel >= 5 && portalLevel < 6) {
+      hexString = 'FD2992';
+    } else if (portalLevel >= 6 && portalLevel < 7) {
+      hexString = 'EB26CD';
+    } else if (portalLevel >= 7 && portalLevel < 8) {
+      hexString = 'C124E0';
+    } else if (portalLevel >= 8) {
+      hexString = '9627F4';
+    }
+    return HexColor(hexString);
+  }
+
   static Portal getPortalFromID(String id, Operation operation) {
     for (var portal in operation.opportals) {
       if (portal.id == id) return portal;

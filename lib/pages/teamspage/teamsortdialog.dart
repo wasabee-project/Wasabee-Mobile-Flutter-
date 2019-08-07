@@ -68,4 +68,5 @@ class TeamSortDialogState extends State<TeamSortDialog> {
 enum TeamSortType {
   AlphaName, //alphabetical name
   CurrentState, //off or on
+  Owned, //if user owns the team
 }

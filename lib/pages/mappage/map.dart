@@ -21,7 +21,6 @@ import 'package:wasabee/pages/loginpage/login.dart';
 import 'package:wasabee/pages/mappage/mapview.dart';
 import 'package:wasabee/pages/settingspage/settings.dart';
 import 'package:wasabee/pages/teamspage/team.dart';
-import 'package:wasabee/pages/teamspage/teamlistvm.dart';
 import '../../location/locationhelper.dart';
 import '../../network/networkcalls.dart';
 import '../../network/urlmanager.dart';
@@ -125,12 +124,29 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder<Widget>(
+      future: getPageContent(),
+      builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+        if (snapshot.hasData) {
+          return snapshot.data;
+        } else {
+          return getLoadingView();
+        }
+      },
+    );
+  }
+
+  Widget getLoadingView() {
+    return Container(
+        color: Colors.white,
+        child: Center(
+          child: CircularProgressIndicator(),
+        ));
+  }
+
+  Future<Widget> getPageContent() async {
     return isLoading
-        ? Container(
-            color: Colors.white,
-            child: Center(
-              child: CircularProgressIndicator(),
-            ))
+        ? getLoadingView()
         : Scaffold(
             appBar: AppBar(
               bottom: TabBar(
@@ -162,20 +178,16 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
               physics: NeverScrollableScrollPhysics(),
               children: [
                 isLoading
-                    ? Center(
-                        child: CircularProgressIndicator(),
-                      )
+                    ? getLoadingView()
                     : MapViewWidget(
                         mapPageState: this,
                         markers: markers,
                         polylines: polylines,
                         visibleRegion: _visibleRegion),
                 isLoading
-                    ? Center(
-                        child: CircularProgressIndicator(),
-                      )
+                    ? getLoadingView()
                     : AlertsPage.getPageContent(
-                        TargetListViewModel.fromOperationData(
+                        await TargetListViewModel.fromOperationData(
                             alertFilterDropdownValue != null
                                 ? TargetUtils.getFilteredMarkers(
                                     loadedOperation.markers,
@@ -191,11 +203,9 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
                         loadedOperation.markers,
                         this),
                 isLoading
-                    ? Center(
-                        child: CircularProgressIndicator(),
-                      )
+                    ? getLoadingView()
                     : LinksPage.getPageContent(
-                        LinkListViewModel.fromOperationData(
+                        await LinkListViewModel.fromOperationData(
                             linkFilterDropdownValue != null
                                 ? LinkUtils.getFilteredLinks(
                                     loadedOperation.links,
@@ -351,12 +361,14 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
           ),
           onPressed: () {
             LocalStorageUtils.getTeamSort().then((sortValue) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) {
-                  return TeamPage(teamSortDropDownValue: sortValue);
-                }),
-              );
+              LocalStorageUtils.getTeamFilter().then((filterValue) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) {
+                    return TeamPage(teamSortDropDownValue: sortValue, teamFilterDropDownValue: filterValue, googleId: googleId);
+                  }),
+                );
+              });
             });
           },
         ));

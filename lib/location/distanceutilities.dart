@@ -1,3 +1,4 @@
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:latlong/latlong.dart' as latLong;
 
@@ -6,28 +7,25 @@ class DistanceUtilities {
   static const CONVERT_METERS_TO_YARDS_CONST = 1.0936;
   static const CONVERT_MILES_TO_YARDS_CONST = 1760;
 
-  static double getDistanceMeters(LatLng firstPoint, LatLng secondPoint) {
-    //THIS IS WRONG! D:
-    final latLong.Distance distance = new latLong.Distance();
-    return distance(latLong.LatLng(firstPoint.latitude, firstPoint.longitude),
-        latLong.LatLng(secondPoint.latitude, firstPoint.longitude));
+  static Future<double> getDistanceMeters(
+      LatLng firstPoint, LatLng secondPoint) async {
+    if (firstPoint != null && secondPoint != null) {
+      return await Geolocator().distanceBetween(firstPoint.latitude,
+          firstPoint.longitude, secondPoint.latitude, secondPoint.longitude);
+    } else {
+      return 0;
+    }
   }
 
   static double getDistanceDouble(
-      LatLng firstPoint, LatLng secondPoint, bool useImperialUnits) {
+      bool useImperialUnits, double distanceMeters) {
     double finalDistance = 0.0;
-    if (firstPoint != null && secondPoint != null) {
-      double distanceDouble = getDistanceMeters(firstPoint, secondPoint);
-      if (useImperialUnits) {
-        //MILES
-        finalDistance = distanceDouble * CONVERT_METERS_TO_MILES_CONST;
-      } else {
-        //KM
-        finalDistance = distanceDouble / 1000;
-        print('from -> ${firstPoint.latitude}, ${firstPoint.longitude}');
-        print('to -> ${secondPoint.latitude}, ${secondPoint.longitude}');
-        print('finalDistance -> $finalDistance');
-      }
+    if (useImperialUnits) {
+      //MILES
+      finalDistance = distanceMeters * CONVERT_METERS_TO_MILES_CONST;
+    } else {
+      //KM
+      finalDistance = distanceMeters / 1000;
     }
     return finalDistance;
   }

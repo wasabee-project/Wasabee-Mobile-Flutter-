@@ -17,6 +17,9 @@ class TeamSortManager {
       case TeamSortType.CurrentState:
         displayString = "Current State";
         break;
+      case TeamSortType.Owned:
+        displayString = "Ownership";
+        break;
     }
     return displayString;
   }

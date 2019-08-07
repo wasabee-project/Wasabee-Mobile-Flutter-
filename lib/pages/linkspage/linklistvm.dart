@@ -1,8 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:wasabee/classutils/operation.dart';
 import 'package:wasabee/location/distanceutilities.dart';
 import 'package:wasabee/location/locationhelper.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
 import 'package:wasabee/pages/linkspage/linksortdialog.dart';
+import 'package:wasabee/pages/mappage/utilities.dart';
 
 class LinkListViewModel {
   String fromPortalName;
@@ -19,6 +22,8 @@ class LinkListViewModel {
   String assignedTo;
   String opId;
   String linkId;
+  double portalReqLevel;
+  Color portalReqColor;
 
   LinkListViewModel(
       {this.fromPortalName,
@@ -34,15 +39,17 @@ class LinkListViewModel {
       this.assignedNickname,
       this.assignedTo,
       this.opId,
-      this.linkId});
+      this.linkId,
+      this.portalReqLevel,
+      this.portalReqColor});
 
-  static List<LinkListViewModel> fromOperationData(
+  static Future<List<LinkListViewModel>> fromOperationData(
       List<Link> linkList,
       Map<String, Portal> portalMap,
       String googleId,
       LinkSortType sortType,
       bool useImperialUnits,
-      String opId) {
+      String opId) async {
     var listOfVM = List<LinkListViewModel>();
     if (linkList != null && linkList.length > 0)
       for (var link in linkList) {
@@ -57,17 +64,15 @@ class LinkListViewModel {
 
           var fromPortalName = "${fromPortal.name}";
           var toPortalName = "${toPortal.name}";
-          print('$fromPortalName -> $toPortalName');
-          var distanceDouble = fromPortalLoc == null || toPortalLoc == null
-              ? 0
-              : DistanceUtilities.getDistanceDouble(
-                  fromPortalLoc, toPortalLoc, useImperialUnits);
-          var distanceMeters = fromPortalLoc == null || toPortalLoc == null
-              ? 0
-              : DistanceUtilities.getDistanceMeters(fromPortalLoc, toPortalLoc);
-          var distanceString = fromPortalLoc == null || toPortalLoc == null
-              ? ""
-              : "${DistanceUtilities.getDistanceString(distanceDouble, useImperialUnits)}";
+          var distanceMeters = await DistanceUtilities.getDistanceMeters(
+              fromPortalLoc, toPortalLoc);
+          var distanceDouble = DistanceUtilities.getDistanceDouble(
+              useImperialUnits, distanceMeters);
+          var distanceString =
+              "${DistanceUtilities.getDistanceString(distanceDouble, useImperialUnits)}";
+          var portalReqLevel = MapUtilities.getPortalLevel(distanceMeters);
+          var portalReqColor =
+              OperationUtils.getPortalLevelColor(portalReqLevel);
           listOfVM.add(LinkListViewModel(
               fromPortalName: fromPortalName,
               toPortalName: toPortalName,
@@ -82,7 +87,9 @@ class LinkListViewModel {
               assignedNickname: link.assignedNickname,
               assignedTo: link.assignedTo,
               opId: opId,
-              linkId: link.iD));
+              linkId: link.iD,
+              portalReqLevel: portalReqLevel,
+              portalReqColor: portalReqColor));
         }
       }
 
