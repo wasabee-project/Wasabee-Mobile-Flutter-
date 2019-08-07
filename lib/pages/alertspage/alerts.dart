@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wasabee/classutils/dialog.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
 import 'package:wasabee/pages/alertspage/alertfiltermanager.dart';
 import 'package:wasabee/pages/alertspage/alertsortdialog.dart';
@@ -69,50 +70,53 @@ class AlertsPage {
       ),
       Expanded(
           child: ListView.builder(
-              padding: const EdgeInsets.all(8.0),
               itemCount: listOfVM.length,
               itemBuilder: (BuildContext context, int index) {
                 TargetListViewModel vm = listOfVM[index];
-                return InkWell(
-                    onTap: () {
-                      mapPageState.makeZoomedPositionFromLatLng(vm.latLng);
-                      mapPageState.tabController.animateTo(0);
-                    },
-                    child: Column(children: <Widget>[
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            Image.asset(
-                              vm.imagePath,
-                              width: 50.0,
-                              height: 50.0,
-                              fit: BoxFit.fitHeight,
-                            ),
-                            VerticalDivider(),
-                            Flexible(
-                                child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text(
-                                  vm.titleString,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                Divider(
-                                  height: 8.0,
-                                  color: Colors.green,
-                                  endIndent: 15.0,
-                                ),
-                                Text(vm.stateString),
-                                Text(vm.distanceString),
-                              ],
-                            ))
-                          ]),
-                      Divider(
-                        height: 10.0,
-                        color: Colors.grey,
-                      )
-                    ]));
+                return Container(
+                  padding: EdgeInsets.all(8),
+                    color: DialogUtils.getListBgColor(index),
+                    child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                            onTap: () {
+                              mapPageState
+                                  .makeZoomedPositionFromLatLng(vm.latLng);
+                              mapPageState.tabController.animateTo(0);
+                            },
+                            child: Column(children: <Widget>[
+                              Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Image.asset(
+                                      vm.imagePath,
+                                      width: 50.0,
+                                      height: 50.0,
+                                      fit: BoxFit.fitHeight,
+                                    ),
+                                    VerticalDivider(),
+                                    Flexible(
+                                        child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text(
+                                          vm.titleString,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Divider(
+                                          height: 8.0,
+                                          color: Colors.green,
+                                          endIndent: 15.0,
+                                        ),
+                                        Text(vm.stateString),
+                                        Text(vm.distanceString),
+                                      ],
+                                    ))
+                                  ]),
+                            ]))));
               }))
     ]));
   }

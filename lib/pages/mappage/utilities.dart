@@ -39,6 +39,22 @@ class MapUtilities {
     return distance;
   }
 
+  static double getPortalLevel(double distance,
+      {int agents = 0, bool allowMods}) {
+    if (distance < 160.0) {
+      return 1.0;
+    }
+    if (distance > 6553000.0) {
+      // link amp required
+      return 8.0;
+    }
+    return (getRoot(distance, 4)) / (2 * getRoot(10, 4));
+  }
+
+  static double getRoot(double base, int n) {
+    return pow(e, log(base) / n);
+  }
+
   static double getZoomLevel(Circle circle, bool fromExistingLocation) {
     double zoomlevel = 14.0;
     if (circle != null) {

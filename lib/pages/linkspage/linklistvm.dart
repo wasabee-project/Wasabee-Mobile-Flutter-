@@ -9,6 +9,7 @@ class LinkListViewModel {
   String toPortalName;
   int linkOrder;
   double length;
+  double lengthMeters;
   String lengthString;
   bool completed;
   String fromPortalId;
@@ -24,6 +25,7 @@ class LinkListViewModel {
       this.toPortalName,
       this.linkOrder,
       this.length,
+      this.lengthMeters,
       this.lengthString,
       this.completed,
       this.fromPortalId,
@@ -55,18 +57,23 @@ class LinkListViewModel {
 
           var fromPortalName = "${fromPortal.name}";
           var toPortalName = "${toPortal.name}";
+          print('$fromPortalName -> $toPortalName');
           var distanceDouble = fromPortalLoc == null || toPortalLoc == null
-              ? ""
+              ? 0
               : DistanceUtilities.getDistanceDouble(
                   fromPortalLoc, toPortalLoc, useImperialUnits);
+          var distanceMeters = fromPortalLoc == null || toPortalLoc == null
+              ? 0
+              : DistanceUtilities.getDistanceMeters(fromPortalLoc, toPortalLoc);
           var distanceString = fromPortalLoc == null || toPortalLoc == null
               ? ""
-              : "Length: ${DistanceUtilities.getDistanceString(distanceDouble, useImperialUnits)}";
+              : "${DistanceUtilities.getDistanceString(distanceDouble, useImperialUnits)}";
           listOfVM.add(LinkListViewModel(
               fromPortalName: fromPortalName,
               toPortalName: toPortalName,
               linkOrder: link.throwOrderPos,
               length: distanceDouble,
+              lengthMeters: distanceMeters,
               lengthString: distanceString,
               completed: link.completed,
               fromPortalId: fromPortal.id,

@@ -6,20 +6,27 @@ class DistanceUtilities {
   static const CONVERT_METERS_TO_YARDS_CONST = 1.0936;
   static const CONVERT_MILES_TO_YARDS_CONST = 1760;
 
+  static double getDistanceMeters(LatLng firstPoint, LatLng secondPoint) {
+    //THIS IS WRONG! D:
+    final latLong.Distance distance = new latLong.Distance();
+    return distance(latLong.LatLng(firstPoint.latitude, firstPoint.longitude),
+        latLong.LatLng(secondPoint.latitude, firstPoint.longitude));
+  }
+
   static double getDistanceDouble(
       LatLng firstPoint, LatLng secondPoint, bool useImperialUnits) {
-    final latLong.Distance distance = new latLong.Distance();
     double finalDistance = 0.0;
     if (firstPoint != null && secondPoint != null) {
-      double distanceDouble = distance(
-          latLong.LatLng(firstPoint.latitude, firstPoint.longitude),
-          latLong.LatLng(secondPoint.latitude, firstPoint.longitude));
+      double distanceDouble = getDistanceMeters(firstPoint, secondPoint);
       if (useImperialUnits) {
         //MILES
         finalDistance = distanceDouble * CONVERT_METERS_TO_MILES_CONST;
       } else {
         //KM
         finalDistance = distanceDouble / 1000;
+        print('from -> ${firstPoint.latitude}, ${firstPoint.longitude}');
+        print('to -> ${secondPoint.latitude}, ${secondPoint.longitude}');
+        print('finalDistance -> $finalDistance');
       }
     }
     return finalDistance;

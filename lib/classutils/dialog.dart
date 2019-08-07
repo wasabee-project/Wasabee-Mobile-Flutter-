@@ -120,4 +120,20 @@ class DialogUtils {
       ),
     );
   }
+
+  static Color getListBgColor(int index) {
+    if ((index % 2 == 0)) {
+      return Colors.white;
+    } else {
+      return Colors.grey[200];
+    }
+  }
+
+  static Color getLinkListOrderBg(int order) {
+    if ((order % 2 == 0)) {
+      return Colors.green[300];
+    } else {
+      return Colors.purple[300];
+    }
+  }
 }
