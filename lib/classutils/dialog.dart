@@ -111,13 +111,9 @@ class DialogUtils {
   }
 
   static Widget wrapInDialog(List<Widget> widgetList) {
-    return Container(
-      margin: EdgeInsets.all(10.0),
-      color: Colors.grey[300],
-      child: ListView(
-        shrinkWrap: true,
-        children: widgetList,
-      ),
+    return SimpleDialog(
+      children: widgetList,
+      backgroundColor: Colors.grey[300],
     );
   }
 

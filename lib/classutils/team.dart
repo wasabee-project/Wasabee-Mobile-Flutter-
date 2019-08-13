@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:wasabee/classutils/dialog.dart';
+import 'package:wasabee/pages/settingspage/constants.dart';
 import 'package:wasabee/pages/teamspage/teamlistvm.dart';
 
 class TeamUtils {
@@ -32,5 +35,43 @@ class TeamUtils {
     return teamList == null
         ? List<TeamListViewModel>()
         : teamList.where((i) => i.isOwned == true).toList();
+  }
+
+  static Widget getTeamInfoAlert(
+      BuildContext context, TeamListViewModel vm) {
+    List<Widget> dialogWidgets = <Widget>[
+      Card(
+          color: WasabeeConstants.CARD_COLOR,
+          child: Column(
+            children: <Widget>[
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Text(
+                        "Team",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white),
+                      )),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Container(
+                      color: Colors.transparent,
+                      child: IconButton(
+                        icon: Icon(Icons.close),
+                        color: Colors.white,
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ],
+          ))
+    ];
+    
+    return DialogUtils.wrapInDialog(dialogWidgets);
   }
 }

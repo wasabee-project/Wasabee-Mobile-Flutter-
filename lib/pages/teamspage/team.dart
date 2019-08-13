@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:wasabee/classutils/dialog.dart';
+import 'package:wasabee/classutils/team.dart';
 import 'package:wasabee/network/cookies.dart';
 import 'package:wasabee/network/networkcalls.dart';
 import 'package:wasabee/network/responses/meResponse.dart';
@@ -38,7 +39,7 @@ class TeamPageState extends State<TeamPage> {
   List<Team> ownedTeamList;
   String googleId;
   bool isLoading = true;
-
+  bool someThingChanged = false;
   TeamPageState(TeamSortType teamSortDropDownValue,
       TeamFilterType teamFilterDropDownValue, String googleId) {
     this.teamSortDropDownValue = teamSortDropDownValue;
@@ -55,6 +56,16 @@ class TeamPageState extends State<TeamPage> {
   @override
   Widget build(BuildContext context) {
     var title = "Teams";
+    return WillPopScope(
+        onWillPop: () async {
+          Navigator.pop(context, someThingChanged);
+          debugPrint("Will pop");
+          return false;
+        },
+        child: getBody(title));
+  }
+
+  Widget getBody(String title) {
     return isLoading == true
         ? Scaffold(
             appBar: AppBar(
@@ -65,10 +76,10 @@ class TeamPageState extends State<TeamPage> {
                 child: Center(
                   child: CircularProgressIndicator(),
                 )))
-        : getBody(title);
+        : getLoadedBody(title);
   }
 
-  Widget getBody(String title) {
+  Widget getLoadedBody(String title) {
     return Scaffold(
         appBar: AppBar(
           title: Text(title),
@@ -146,6 +157,12 @@ class TeamPageState extends State<TeamPage> {
   Widget getListItem(TeamListViewModel vm, int index) {
     var teamRowWidgets = <Widget>[
       Container(
+          padding: EdgeInsets.all(8),
+          child: CircleAvatar(
+            radius: 8,
+            backgroundColor: vm.isEnabled ? Colors.green : Colors.red,
+          )),
+      Container(
           padding: EdgeInsets.only(top: 8, left: 8, bottom: 8),
           child: Text(
             '${vm.titleString}',
@@ -160,14 +177,7 @@ class TeamPageState extends State<TeamPage> {
     ];
     if (vm.isOwned)
       teamRowWidgets.add(Container(
-          padding: EdgeInsets.only(left: 8),
-          child: Icon(Icons.verified_user)));
-    teamRowWidgets.add(Container(
-        padding: EdgeInsets.all(8),
-        child: CircleAvatar(
-          radius: 8,
-          backgroundColor: vm.isEnabled ? Colors.green : Colors.red,
-        )));
+          padding: EdgeInsets.only(left: 8), child: Icon(Icons.verified_user)));
     return Container(
         color: DialogUtils.getListBgColor(index),
         child: Material(
@@ -184,8 +194,13 @@ class TeamPageState extends State<TeamPage> {
   }
 
   tappedTeam(TeamListViewModel vm) {
-    print('TEAM -> ${vm.teamName}');
-    print('TEAM STATE -> ${vm.teamState}');
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return TeamUtils.getTeamInfoAlert(context, vm);
+      },
+    );
   }
 
   getTeams() {

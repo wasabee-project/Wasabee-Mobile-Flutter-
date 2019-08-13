@@ -345,7 +345,7 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
             style: TextStyle(color: Colors.white),
           ),
           onPressed: () {
-            tappedRefreshAllOps();
+            tappedRefreshAllOps(true);
           },
         ));
   }
@@ -365,9 +365,17 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) {
-                    return TeamPage(teamSortDropDownValue: sortValue, teamFilterDropDownValue: filterValue, googleId: googleId);
+                    return TeamPage(
+                        teamSortDropDownValue: sortValue,
+                        teamFilterDropDownValue: filterValue,
+                        googleId: googleId);
                   }),
-                );
+                ).then((onValue) {
+                  if (onValue) {
+                    tappedRefreshAllOps(false);
+                  }
+                  print('returned settings with -> $onValue');
+                });
               });
             });
           },
@@ -395,14 +403,23 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
     print("gotLocation -> $response");
   }
 
-  tappedRefreshAllOps() {
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return OperationUtils.getRefreshOpListDialog(context);
-      },
-    );
+  tappedRefreshAllOps(bool shouldShowDialog) {
+    if (shouldShowDialog)
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return OperationUtils.getRefreshOpListDialog(context);
+        },
+      );
+    else
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => LoginPage(
+                  title: MyApp.APP_TITLE,
+                )),
+      );
   }
 
   doRefresh(Op op, bool resetVisibleRegion) async {
@@ -639,6 +656,8 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
             OperationUtils.getPortalFromID(link.fromPortalId, operation);
         final Portal toPortal =
             OperationUtils.getPortalFromID(link.toPortalId, operation);
+        print('fromPortalId -> ${link.fromPortalId} - $fromPortal');
+        print('toPortalId -> ${link.toPortalId} - $toPortal');
         final List<LatLng> points = <LatLng>[];
         points.add(
             LatLng(double.parse(fromPortal.lat), double.parse(fromPortal.lng)));
@@ -783,7 +802,6 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
       }
       print('returned settings with -> $onValue');
     });
-    //TODO settings -> Frequency of gps sharing
   }
 
   doFullRefresh() {
