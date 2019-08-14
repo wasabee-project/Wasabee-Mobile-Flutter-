@@ -390,7 +390,7 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
             var url =
                 "${UrlManager.FULL_LAT_LNG_URL}lat=${userPosition.latitude}&lon=${userPosition.longitude}";
             NetworkCalls.doNetworkCall(url, Map<String, String>(), gotLocation,
-                false, NetWorkCallType.GET);
+                false, NetWorkCallType.GET, null);
           } catch (e) {
             print(e);
           }
@@ -399,7 +399,7 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
     }
   }
 
-  gotLocation(String response) {
+  gotLocation(String response, dynamic object) {
     print("gotLocation -> $response");
   }
 
@@ -479,14 +479,14 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
     try {
       var url = "${UrlManager.FULL_OPERATION_URL}${op.iD}";
       NetworkCalls.doNetworkCall(
-          url, Map<String, String>(), gotOperation, false, NetWorkCallType.GET);
+          url, Map<String, String>(), gotOperation, false, NetWorkCallType.GET, null);
     } catch (e) {
       setIsNotLoading();
       print(e);
     }
   }
 
-  gotOperation(String response) async {
+  gotOperation(String response, dynamic object) async {
     print('got operation! -> $response');
     try {
       var operation = Operation.fromJson(json.decode(response));
@@ -499,7 +499,7 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
         await populateEverything();
         var url = "${UrlManager.FULL_GET_TEAM_URL}${selectedOperation.teamID}";
         NetworkCalls.doNetworkCall(
-            url, Map<String, String>(), gotTeam, false, NetWorkCallType.GET);
+            url, Map<String, String>(), gotTeam, false, NetWorkCallType.GET, null);
       } else {
         print("operation is null");
         parsingOperationFailed();
@@ -521,12 +521,12 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
     await populateTargets(loadedOperation);
   }
 
-  finishedTargetActionCall(String response) {
+  finishedTargetActionCall(String response, dynamic object) {
     doRefresh(selectedOperation, false);
     //gotOperation(response);
   }
 
-  gotTeam(String response) {
+  gotTeam(String response, dynamic object) {
     var team = FullTeam.fromJson(json.decode(response));
     populateTeamMembers(team.agents);
     setIsNotLoading();
@@ -656,8 +656,6 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
             OperationUtils.getPortalFromID(link.fromPortalId, operation);
         final Portal toPortal =
             OperationUtils.getPortalFromID(link.toPortalId, operation);
-        print('fromPortalId -> ${link.fromPortalId} - $fromPortal');
-        print('toPortalId -> ${link.toPortalId} - $toPortal');
         final List<LatLng> points = <LatLng>[];
         points.add(
             LatLng(double.parse(fromPortal.lat), double.parse(fromPortal.lng)));

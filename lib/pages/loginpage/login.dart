@@ -27,12 +27,12 @@ class _LoginPageState extends State<LoginPage> {
   bool isLoading = true;
   bool isInitialLoad = true;
 
-  void callMe(String response) {
+  void callMe(String response, dynamic object) {
     var url = UrlManager.FULL_ME_URL;
 
     try {
       NetworkCalls.doNetworkCall(url, Map<String, String>(), finishedCallMe,
-          true, NetWorkCallType.GET);
+          true, NetWorkCallType.GET, null);
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -41,7 +41,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void finishedCallMe(String response) async {
+  void finishedCallMe(String response, dynamic object) async {
     try {
       var meResponse = MeResponse.fromJson(json.decode(response));
       var googleId = meResponse.googleID;
@@ -164,7 +164,7 @@ class _LoginPageState extends State<LoginPage> {
       checkWasabeeCookie().then((foundCookie) {
         if (foundCookie) {
           print('FOUND COOKIE!');
-          callMe(null);
+          callMe(null, null);
         } else {
           setState(() {
             isLoading = false;
@@ -225,7 +225,7 @@ class _LoginPageState extends State<LoginPage> {
 
     try {
       NetworkCalls.doNetworkCall(
-          url, data, callMe, false, NetWorkCallType.POST);
+          url, data, callMe, false, NetWorkCallType.POST, null);
     } catch (e) {
       setState(() {
         isLoading = false;

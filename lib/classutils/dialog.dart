@@ -102,7 +102,7 @@ class DialogUtils {
       Navigator.of(context).pop();
       await mapPageState.updateVisibleRegion();
       NetworkCalls.doNetworkCall(url, Map<String, String>(),
-          mapPageState.finishedTargetActionCall, false, NetWorkCallType.GET);
+          mapPageState.finishedTargetActionCall, false, NetWorkCallType.GET, null);
       mapPageState.setIsLoading();
     } catch (e) {
       mapPageState.setIsNotLoading();

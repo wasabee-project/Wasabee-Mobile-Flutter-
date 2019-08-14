@@ -7,6 +7,7 @@ import 'package:wasabee/classutils/team.dart';
 import 'package:wasabee/network/cookies.dart';
 import 'package:wasabee/network/networkcalls.dart';
 import 'package:wasabee/network/responses/meResponse.dart';
+import 'package:wasabee/network/responses/teamResponse.dart';
 import 'package:wasabee/network/urlmanager.dart';
 import 'package:wasabee/pages/teamspage/teamfiltermanager.dart';
 import 'package:wasabee/pages/teamspage/teamlistvm.dart';
@@ -194,20 +195,17 @@ class TeamPageState extends State<TeamPage> {
   }
 
   tappedTeam(TeamListViewModel vm) {
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return TeamUtils.getTeamInfoAlert(context, vm);
-      },
-    );
+    setState(() {
+      isLoading = true;
+    });
+    getIndividualTeam(vm);
   }
 
-  getTeams() {
-    var url = UrlManager.FULL_ME_URL;
+  getIndividualTeam(TeamListViewModel vm) {
+    var url = UrlManager.getTeamUrl(vm.teamId);
     try {
-      NetworkCalls.doNetworkCall(url, Map<String, String>(), finishedGetTeams,
-          true, NetWorkCallType.GET);
+      NetworkCalls.doNetworkCall(url, Map<String, String>(), finishedGetTeam,
+          true, NetWorkCallType.GET, vm);
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -216,7 +214,40 @@ class TeamPageState extends State<TeamPage> {
     }
   }
 
-  void finishedGetTeams(String response) async {
+  finishedGetTeam(String response, dynamic vm) async {
+    try {
+      print('name => ${vm.teamName}');
+      var teamResponse = TeamResponse.fromJson(json.decode(response));
+      showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return TeamUtils.getTeamInfoAlert(context, teamResponse);
+        },
+      );
+    } catch (e) {
+      await CookieUtils.clearAllCookies();
+      print("Exception In getTeams -> $e");
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  getTeams() {
+    var url = UrlManager.FULL_ME_URL;
+    try {
+      NetworkCalls.doNetworkCall(url, Map<String, String>(), finishedGetTeams,
+          true, NetWorkCallType.GET, null);
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print(e);
+    }
+  }
+
+  void finishedGetTeams(String response, dynamic object) async {
     try {
       var meResponse = MeResponse.fromJson(json.decode(response));
       var googleId = meResponse.googleID;

@@ -7,6 +7,7 @@ class UrlManager {
   static const URL_FRAG_OPERATION = "/api/v1/draw/";
   static const URL_FRAG_GET_TEAM = "/api/v1/team/";
   static const URL_FRAG_DRAW = "/draw/";
+  static const URL_FRAG_TEAM = "/team/";
   static const URL_FRAG_MARKER = "/marker/";
   static const URL_FRAG_LINK = "/link/";
   static const URL_FRAG_COMPLETE = "/complete";
@@ -43,6 +44,10 @@ class UrlManager {
 
   static String getAcknowledgeMarkerUrl(String opId, String markerId) {
     return "$BASE_API_URL$URL_FRAG_API_V1$URL_FRAG_DRAW$opId$URL_FRAG_MARKER$markerId$URL_FRAG_ACKNOWLEDGE";
+  }
+
+  static String getTeamUrl(String teamId) {
+    return "$BASE_API_URL$URL_FRAG_API_V1$URL_FRAG_TEAM$teamId";
   }
 
   static launchIntelUrl(String lat, String lng) {

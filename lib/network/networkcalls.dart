@@ -9,9 +9,10 @@ class NetworkCalls {
   static void doNetworkCall(
       String url,
       Map<String, String> sendData,
-      Function(String) callback,
+      Function(String, dynamic) callback,
       bool includeCookie,
-      NetWorkCallType callType) async {
+      NetWorkCallType callType,
+      dynamic object) async {
     var dio = new Dio();
 
     Directory appDocDirectory = await getApplicationDocumentsDirectory();
@@ -44,7 +45,7 @@ class NetworkCalls {
 
     print('Response for $url is -> $response');
     if (response != null && response.statusCode == 200) {
-      callback('$response');
+      callback('$response', object);
     } 
   }
 }
