@@ -50,10 +50,25 @@ class UrlManager {
     return "$BASE_API_URL$URL_FRAG_API_V1$URL_FRAG_TEAM$teamId";
   }
 
+  static String getModTeamUrl(String teamId) {
+    return "$BASE_API_URL$URL_FRAG_API_V1$URL_FRAG_ME/$teamId";
+  }
+
   static launchIntelUrl(String lat, String lng) {
     String url = 'https://intel.ingress.com/intel?ll=$lat,$lng&pll=$lat,$lng';
     canLaunch(url).then((canLaunch) {
       launch(url);
     });
+  }
+
+  static String addDataToUrl(String url, Map<String, String> data) {
+    String dataString = "";
+    data.forEach((k, v) {
+      if (dataString == "")
+        dataString = "?$k=$v";
+      else
+        dataString = "$dataString&$k=$v";
+    });
+    return "$url$dataString";
   }
 }

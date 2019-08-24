@@ -9,6 +9,7 @@ import 'package:wasabee/network/networkcalls.dart';
 import 'package:wasabee/network/responses/meResponse.dart';
 import 'package:wasabee/network/responses/teamResponse.dart';
 import 'package:wasabee/network/urlmanager.dart';
+import 'package:wasabee/pages/teamspage/teamdialogvm.dart';
 import 'package:wasabee/pages/teamspage/teamfiltermanager.dart';
 import 'package:wasabee/pages/teamspage/teamlistvm.dart';
 import 'package:wasabee/pages/teamspage/teamsortdialog.dart';
@@ -195,10 +196,13 @@ class TeamPageState extends State<TeamPage> {
   }
 
   tappedTeam(TeamListViewModel vm) {
-    setState(() {
-      isLoading = true;
-    });
-    getIndividualTeam(vm);
+    if (vm.isEnabled) {
+      setState(() {
+        isLoading = true;
+      });
+      getIndividualTeam(vm);
+    } else
+      showTeamDetailsAlert(vm, null);
   }
 
   getIndividualTeam(TeamListViewModel vm) {
@@ -218,13 +222,7 @@ class TeamPageState extends State<TeamPage> {
     try {
       print('name => ${vm.teamName}');
       var teamResponse = TeamResponse.fromJson(json.decode(response));
-      showDialog<void>(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return TeamUtils.getTeamInfoAlert(context, teamResponse);
-        },
-      );
+      showTeamDetailsAlert(vm, teamResponse);
     } catch (e) {
       await CookieUtils.clearAllCookies();
       print("Exception In getTeams -> $e");
@@ -232,6 +230,17 @@ class TeamPageState extends State<TeamPage> {
     setState(() {
       isLoading = false;
     });
+  }
+
+  showTeamDetailsAlert(TeamListViewModel vm, TeamResponse teamResponse) {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return TeamUtils.getTeamInfoAlert(
+            context, TeamDialogViewModel.fromObjects(vm, teamResponse), this);
+      },
+    );
   }
 
   getTeams() {
@@ -245,6 +254,28 @@ class TeamPageState extends State<TeamPage> {
       });
       print(e);
     }
+  }
+
+  toggleTeam(String teamId, Map<String, String> data) {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      String url = UrlManager.getModTeamUrl(teamId);
+      url = "${UrlManager.addDataToUrl(url, data)}";
+      NetworkCalls.doNetworkCall(url, data, finishedToggleTeam,
+          true, NetWorkCallType.GET, null);
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print(e);
+    }
+  }
+
+  finishedToggleTeam(String response, dynamic object) {
+    someThingChanged = true;
+    getTeams();
   }
 
   void finishedGetTeams(String response, dynamic object) async {
