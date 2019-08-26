@@ -35,8 +35,8 @@ class TeamPageState extends State<TeamPage> {
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
   TeamSortType teamSortDropDownValue;
   TeamFilterType teamFilterDropDownValue;
-  List<TeamListViewModel> vmList;
-  List<TeamListViewModel> totalVmList;
+  List<TeamListViewModel> vmList = List<TeamListViewModel>();
+  List<TeamListViewModel> totalVmList = List<TeamListViewModel>();
   List<Team> teamList;
   List<Team> ownedTeamList;
   String googleId;
@@ -220,16 +220,14 @@ class TeamPageState extends State<TeamPage> {
 
   finishedGetTeam(String response, dynamic vm) async {
     try {
-      print('name => ${vm.teamName}');
       var teamResponse = TeamResponse.fromJson(json.decode(response));
       showTeamDetailsAlert(vm, teamResponse);
+      setState(() {
+        isLoading = false;
+      });
     } catch (e) {
-      await CookieUtils.clearAllCookies();
-      print("Exception In getTeams -> $e");
+      NetworkCalls.checkNetworkException(e, context);
     }
-    setState(() {
-      isLoading = false;
-    });
   }
 
   showTeamDetailsAlert(TeamListViewModel vm, TeamResponse teamResponse) {
@@ -263,13 +261,12 @@ class TeamPageState extends State<TeamPage> {
       });
       String url = UrlManager.getModTeamUrl(teamId);
       url = "${UrlManager.addDataToUrl(url, data)}";
-      NetworkCalls.doNetworkCall(url, data, finishedToggleTeam,
-          true, NetWorkCallType.GET, null);
+      NetworkCalls.doNetworkCall(
+          url, data, finishedToggleTeam, true, NetWorkCallType.GET, null);
     } catch (e) {
       setState(() {
         isLoading = false;
       });
-      print(e);
     }
   }
 
@@ -292,11 +289,7 @@ class TeamPageState extends State<TeamPage> {
         isLoading = false;
       });
     } catch (e) {
-      await CookieUtils.clearAllCookies();
-      setState(() {
-        isLoading = false;
-      });
-      print("Exception In getTeams -> $e");
+      NetworkCalls.checkNetworkException(e, context);
     }
   }
 

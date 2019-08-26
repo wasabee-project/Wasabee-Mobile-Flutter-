@@ -478,8 +478,8 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
     pendingGrab = null;
     try {
       var url = "${UrlManager.FULL_OPERATION_URL}${op.iD}";
-      NetworkCalls.doNetworkCall(
-          url, Map<String, String>(), gotOperation, false, NetWorkCallType.GET, null);
+      NetworkCalls.doNetworkCall(url, Map<String, String>(), gotOperation,
+          false, NetWorkCallType.GET, null);
     } catch (e) {
       setIsNotLoading();
       print(e);
@@ -498,8 +498,8 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
 
         await populateEverything();
         var url = "${UrlManager.FULL_GET_TEAM_URL}${selectedOperation.teamID}";
-        NetworkCalls.doNetworkCall(
-            url, Map<String, String>(), gotTeam, false, NetWorkCallType.GET, null);
+        NetworkCalls.doNetworkCall(url, Map<String, String>(), gotTeam, false,
+            NetWorkCallType.GET, null);
       } else {
         print("operation is null");
         parsingOperationFailed();
@@ -527,20 +527,24 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   }
 
   gotTeam(String response, dynamic object) {
-    var team = FullTeam.fromJson(json.decode(response));
-    populateTeamMembers(team.agents);
-    setIsNotLoading();
-    if (loadedOperation != null) {
-      var dialogToShow =
-          OperationUtils.checkForAlertsMarkersLinks(loadedOperation, context);
-      if (dialogToShow != null)
-        showDialog<void>(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return dialogToShow;
-          },
-        );
+    try {
+      var team = FullTeam.fromJson(json.decode(response));
+      populateTeamMembers(team.agents);
+      setIsNotLoading();
+      if (loadedOperation != null) {
+        var dialogToShow =
+            OperationUtils.checkForAlertsMarkersLinks(loadedOperation, context);
+        if (dialogToShow != null)
+          showDialog<void>(
+            context: context,
+            barrierDismissible: false,
+            builder: (BuildContext context) {
+              return dialogToShow;
+            },
+          );
+      }
+    } catch (e) {
+      NetworkCalls.checkNetworkException(e, context);
     }
   }
 
