@@ -101,13 +101,38 @@ class DialogUtils {
     try {
       Navigator.of(context).pop();
       await mapPageState.updateVisibleRegion();
-      NetworkCalls.doNetworkCall(url, Map<String, String>(),
-          mapPageState.finishedTargetActionCall, false, NetWorkCallType.GET, null);
+      NetworkCalls.doNetworkCall(
+          url,
+          Map<String, String>(),
+          mapPageState.finishedTargetActionCall,
+          false,
+          NetWorkCallType.GET,
+          null);
       mapPageState.setIsLoading();
     } catch (e) {
       mapPageState.setIsNotLoading();
       print(e);
     }
+  }
+
+  static doConfirmationDialog(
+      String title, BuildContext context, Set Function() confirmedFunc) {
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (_) => AlertDialog(title: Text('$title'), actions: <Widget>[
+              FlatButton(
+                  child: Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  }),
+              FlatButton(
+                  child: Text('Confirm'),
+                  onPressed: () {
+                    confirmedFunc();
+                    Navigator.of(context).pop();
+                  })
+            ]));
   }
 
   static Widget wrapInDialog(List<Widget> widgetList) {

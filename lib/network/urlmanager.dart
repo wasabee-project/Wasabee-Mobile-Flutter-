@@ -1,4 +1,5 @@
 import 'package:url_launcher/url_launcher.dart';
+import 'package:wasabee/pages/settingspage/constants.dart';
 
 class UrlManager {
   static const URL_FRAG_ME = "/me";
@@ -13,6 +14,7 @@ class UrlManager {
   static const URL_FRAG_COMPLETE = "/complete";
   static const URL_FRAG_INCOMPLETE = "/incomplete";
   static const URL_FRAG_REJECT = "/reject";
+  static const URL_FRAG_DELETE = "/delete";
   static const URL_FRAG_ACKNOWLEDGE = "/acknowledge";
   static const BASE_API_URL = "https://server.wasabee.rocks";
 
@@ -54,8 +56,20 @@ class UrlManager {
     return "$BASE_API_URL$URL_FRAG_API_V1$URL_FRAG_ME/$teamId";
   }
 
+  static String getLeaveTeam(String teamId) {
+    return "$BASE_API_URL$URL_FRAG_API_V1$URL_FRAG_ME/$teamId$URL_FRAG_DELETE";
+  }
+
   static launchIntelUrl(String lat, String lng) {
     String url = 'https://intel.ingress.com/intel?ll=$lat,$lng&pll=$lat,$lng';
+    launchUrl(url);
+  }
+
+  static openWasabeeWebsite() {
+    launchUrl(WasabeeConstants.WASABEE_WEBSITE);
+  }
+
+  static launchUrl(String url) {
     canLaunch(url).then((canLaunch) {
       launch(url);
     });

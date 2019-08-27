@@ -1,11 +1,13 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:wasabee/network/urlmanager.dart';
 import 'package:wasabee/pages/loginpage/login.dart';
 import 'package:wasabee/pages/mappage/utilities.dart';
 import 'package:wasabee/network/cookies.dart';
 import 'package:wasabee/network/responses/meResponse.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
+import 'package:wasabee/pages/settingspage/constants.dart';
 import 'package:wasabee/storage/localstorage.dart';
 
 import '../main.dart';
@@ -148,6 +150,14 @@ class OperationUtils {
       ),
       actions: <Widget>[
         FlatButton(
+          child: Text('More Info'),
+          onPressed: () {
+            Navigator.of(context).pop();
+            CookieUtils.clearAllCookiesAndGotoLogin(context);
+            UrlManager.openWasabeeWebsite();
+          },
+        ),
+        FlatButton(
           child: Text('Ok'),
           onPressed: () {
             Navigator.of(context).pop();
@@ -179,13 +189,8 @@ class OperationUtils {
           child: Text('Ok'),
           onPressed: () {
             Navigator.of(context).pop();
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => LoginPage(
-                        title: MyApp.APP_TITLE,
-                      )),
-            );
+            Navigator.pushNamedAndRemoveUntil(
+                context, WasabeeConstants.LOGIN_ROUTE_NAME, (r) => false);
           },
         ),
       ],

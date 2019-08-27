@@ -270,6 +270,21 @@ class TeamPageState extends State<TeamPage> {
     }
   }
 
+  leaveTeam(String teamId) {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      String url = UrlManager.getLeaveTeam(teamId);
+      NetworkCalls.doNetworkCall(
+          url, Map<String, String>(), finishedToggleTeam, true, NetWorkCallType.GET, null);
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
   finishedToggleTeam(String response, dynamic object) {
     someThingChanged = true;
     getTeams();

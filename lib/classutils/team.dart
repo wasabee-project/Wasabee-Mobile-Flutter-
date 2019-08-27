@@ -100,6 +100,7 @@ class TeamUtils {
           )),
     ];
     dialogWidgets.addAll(getStatusSection(vm, state, context));
+    dialogWidgets.add(getLeaveSection(vm, state, context));
     if (vm.agentList != null && vm.agentList.length > 0)
       dialogWidgets.addAll(getAgentsSection(vm.agentList));
     return DialogUtils.wrapInDialog(dialogWidgets);
@@ -150,8 +151,32 @@ class TeamUtils {
         )
       ],
     ));
-
     return statusSectionWidgets;
+  }
+
+  static Widget getLeaveSection(
+      TeamDialogViewModel vm, TeamPageState state, BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Container(
+            padding: EdgeInsets.only(left: 8, right: 8),
+            child: RaisedButton(
+              color: Colors.green,
+              child: Text(
+                'Leave Team',
+                style: TextStyle(color: Colors.white),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                DialogUtils.doConfirmationDialog(
+                    "Are you sure you want to leave: ${vm.displayName}?",
+                    state.context,
+                    () => {state.leaveTeam(vm.iD)});
+              },
+            ))
+      ],
+    );
   }
 
   static List<Widget> getAgentsSection(List<Agent> agentList) {

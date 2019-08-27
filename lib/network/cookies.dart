@@ -2,6 +2,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:flutter/material.dart';
 import 'package:wasabee/main.dart';
 import 'package:wasabee/pages/loginpage/login.dart';
+import 'package:wasabee/pages/settingspage/constants.dart';
 import '../network/urlmanager.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
@@ -34,13 +35,8 @@ class CookieUtils {
 
   static clearAllCookiesAndGotoLogin(BuildContext context) {
     CookieUtils.clearAllCookies().then((completed) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => LoginPage(
-                  title: MyApp.APP_TITLE,
-                )),
-      );
+      Navigator.pushNamedAndRemoveUntil(
+          context, WasabeeConstants.LOGIN_ROUTE_NAME, (r) => false);
     });
   }
 }

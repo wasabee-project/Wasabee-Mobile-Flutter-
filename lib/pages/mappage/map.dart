@@ -19,6 +19,7 @@ import 'package:wasabee/pages/linkspage/links.dart';
 import 'package:wasabee/pages/linkspage/linksortdialog.dart';
 import 'package:wasabee/pages/loginpage/login.dart';
 import 'package:wasabee/pages/mappage/mapview.dart';
+import 'package:wasabee/pages/settingspage/constants.dart';
 import 'package:wasabee/pages/settingspage/settings.dart';
 import 'package:wasabee/pages/teamspage/team.dart';
 import '../../location/locationhelper.dart';
@@ -413,13 +414,8 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
         },
       );
     else
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => LoginPage(
-                  title: MyApp.APP_TITLE,
-                )),
-      );
+      Navigator.pushNamedAndRemoveUntil(
+          context, WasabeeConstants.LOGIN_ROUTE_NAME, (r) => false);
   }
 
   doRefresh(Op op, bool resetVisibleRegion) async {
@@ -808,12 +804,7 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
 
   doFullRefresh() {
     Navigator.of(context).pop();
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-          builder: (context) => LoginPage(
-                title: MyApp.APP_TITLE,
-              )),
-    );
+    Navigator.pushNamedAndRemoveUntil(
+        context, WasabeeConstants.LOGIN_ROUTE_NAME, (r) => false);
   }
 }

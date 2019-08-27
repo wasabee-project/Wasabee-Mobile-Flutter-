@@ -9,4 +9,6 @@ class WasabeeConstants {
   static var CARD_TEXT_COLOR = Colors.white;
   static const CARD_MARGIN = 10.0;
   static const LOGIN_ROUTE_NAME = '/login';
+
+  static const WASABEE_WEBSITE = "http://wasabee.rocks";
 }
