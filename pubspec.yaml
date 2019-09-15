@@ -11,7 +11,7 @@ description: A new Flutter project.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+2
+version: 1.0.0+5
 
 environment:
   sdk: ">=2.2.0 <3.0.0"
@@ -20,13 +20,13 @@ dependencies:
   flutter:
     sdk: flutter
     
-  google_sign_in: 3.2.4
+  google_sign_in: ^3.2.4
   flutter_auth_buttons: ^0.5.0
-  dio: 2.1.7
+  dio: ^2.1.7
   cookie_jar: ^1.0.0
   google_maps_flutter:
     path: google_maps_flutter
-  #google_maps_flutter: ^0.5.19  When the geodesic thing gets added to the main repo, go back to it.
+  #google_maps_flutter: ^0.5.19  
   shared_preferences: ^0.5.3+1
   location: ^2.3.5
   permission_handler: '^2.2.0'

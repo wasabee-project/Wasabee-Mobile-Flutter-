@@ -23,16 +23,12 @@ class MarkerUtilities {
        typePathSegment = "key_";
         break;
       case TargetUtils.FarmPortalMarker:
-          print('Target Type -> ${target.type}');
-
         typePathSegment = "key_";
         break;
       case TargetUtils.LinkPortalAlert:
         typePathSegment = "link_";
         break;
       case TargetUtils.GotoPortalMarker:
-          print('Target Type -> ${target.type}');
-
         typePathSegment = "meet_";
         break;
       case TargetUtils.MeetAgentPortalAlert:
