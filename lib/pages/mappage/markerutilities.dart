@@ -19,6 +19,31 @@ class MarkerUtilities {
       case TargetUtils.UseVirusPortalAlert:
         typePathSegment = "virus_";
         break;
+      case TargetUtils.GetKeyPortalAlert:
+       typePathSegment = "key_";
+        break;
+      case TargetUtils.FarmPortalMarker:
+          print('Target Type -> ${target.type}');
+
+        typePathSegment = "key_";
+        break;
+      case TargetUtils.LinkPortalAlert:
+        typePathSegment = "link_";
+        break;
+      case TargetUtils.GotoPortalMarker:
+          print('Target Type -> ${target.type}');
+
+        typePathSegment = "meet_";
+        break;
+      case TargetUtils.MeetAgentPortalAlert:
+        typePathSegment = "meet_";
+        break;
+      case TargetUtils.RechargePortalAlert:
+        typePathSegment = "recharge_";
+        break;
+      case TargetUtils.UpgradePortalAlert:
+        typePathSegment = "upgrade_";
+        break;
     }
     var statusPathSegment = getTargetStatusSegment(target, googleId);
     return "$baseSegment$typePathSegment$statusPathSegment$SEGMENT_FILE_EXT";

@@ -12,9 +12,11 @@ class TargetUtils {
   static const DestroyPortalAlert = "DestroyPortalAlert";
   static const UseVirusPortalAlert = "UseVirusPortalAlert";
   static const LetDecayPortalAlert = "LetDecayPortalAlert";
-  static const GetKeyPortalAlert = "GetKeyPortalAlert";
-  static const LinkPortalAlert = "LinkPortalAlert";
-  static const MeetAgentPortalAlert = "MeetAgentPortalAlert";
+  static const GetKeyPortalAlert = "GetKeyPortalMarker";
+  static const FarmPortalMarker = "FarmPortalMarker";
+  static const LinkPortalAlert = "CreateLinkAlert";
+  static const MeetAgentPortalAlert = "MeetAgentPortalMarker";
+  static const GotoPortalMarker = "GotoPortalMarker";
   static const OtherPortalAlert = "OtherPortalAlert";
   static const RechargePortalAlert = "RechargePortalAlert";
   static const UpgradePortalAlert = "UpgradePortalAlert";

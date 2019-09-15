@@ -242,6 +242,8 @@ class MapMarkerBitmapBank {
       case TargetUtils.OtherPortalAlert:
       case TargetUtils.RechargePortalAlert:
       case TargetUtils.UpgradePortalAlert:
+      case TargetUtils.GotoPortalMarker:
+      case TargetUtils.FarmPortalMarker:
         path =
             "assets/markers/${MarkerUtilities.getImagePath(target, googleId, MarkerUtilities.SEGMENT_MARKER)}";
         break;
