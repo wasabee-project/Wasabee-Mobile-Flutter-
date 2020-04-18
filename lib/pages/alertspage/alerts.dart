@@ -10,6 +10,7 @@ import 'package:wasabee/storage/localstorage.dart';
 class AlertsPage {
   static Widget getPageContent(List<TargetListViewModel> listOfVM,
       List<Target> listOfTargets, MapPageState mapPageState) {
+        print('getting alerts page');
     return Scaffold(
         body: Column(children: <Widget>[
       Container(

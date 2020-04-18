@@ -1,4 +1,4 @@
-framework module google_sign_in {
+module google_sign_in {
   umbrella header "google_sign_in-umbrella.h"
 
   export *

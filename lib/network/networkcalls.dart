@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:cookie_jar/cookie_jar.dart';
+import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'dart:convert' as convert;
@@ -46,7 +47,8 @@ class NetworkCalls {
     }
 
     print('Response for $url is -> $response');
-    if (response != null && response.statusCode == 200) {
+    print('STATUS CODE => ${response.statusCode}');
+    if (response != null && response.statusCode == 200 && callback != null) {
       callback('$response', object);
     }
   }

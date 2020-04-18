@@ -74,10 +74,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<bool> checkPermissions() async {
-    PermissionStatus locationPermission = await PermissionHandler()
-        .checkPermissionStatus(PermissionGroup.location);
-    PermissionStatus filePermission = await PermissionHandler()
-        .checkPermissionStatus(PermissionGroup.storage);
+    PermissionStatus locationPermission = await Permission.location.status;
+    PermissionStatus filePermission = await Permission.storage.status;
 
     var listOfPermissions = List<PermissionStatus>();
     listOfPermissions.add(locationPermission);
@@ -91,7 +89,6 @@ class _LoginPageState extends State<LoginPage> {
     if (listOfPermStatuses != null)
       for (var status in listOfPermStatuses) {
         if (status != PermissionStatus.granted) {
-          if (!(Platform.isIOS && status == PermissionStatus.unknown))
             foundNonEnabled = true;
         }
       }
@@ -122,8 +119,8 @@ class _LoginPageState extends State<LoginPage> {
             FlatButton(
               child: Text('Ok'),
               onPressed: () {
-                Navigator.of(context).pop();
                 requestPermissions(_context);
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -133,9 +130,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   requestPermissions(BuildContext _context) async {
-    Map<PermissionGroup, PermissionStatus> permissions =
-        await PermissionHandler().requestPermissions(
-            [PermissionGroup.location, PermissionGroup.storage]);
+    Map<Permission, PermissionStatus> permissions = await [
+      Permission.location,
+      Permission.storage,
+    ].request();
     print('PERMISSION RESULTS: $permissions');
     if (findNonEnabled(permissions.values.toList())) {
       showNonEnabledDialog(_context);

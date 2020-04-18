@@ -10,12 +10,12 @@
 #endif
 #endif
 
+#import "FLTGoogleMapsPlugin.h"
 #import "GoogleMapCircleController.h"
 #import "GoogleMapController.h"
 #import "GoogleMapMarkerController.h"
 #import "GoogleMapPolygonController.h"
 #import "GoogleMapPolylineController.h"
-#import "GoogleMapsPlugin.h"
 #import "JsonConversions.h"
 
 FOUNDATION_EXPORT double google_maps_flutterVersionNumber;

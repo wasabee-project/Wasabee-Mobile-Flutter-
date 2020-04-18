@@ -63,8 +63,9 @@ class MapViewState extends State<MapViewWidget>
         initialCameraPosition: CameraPosition(
             target: center,
             zoom: MapUtilities.getViewCircleZoomLevel(
-                center, bounds, fromExistingLocation)),
-      ),
+                center, bounds, fromExistingLocation)
+            ),
+       ),
     );
   }
 }

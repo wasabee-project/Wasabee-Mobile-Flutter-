@@ -20,14 +20,27 @@
 
     ],
     "GoogleSignIn": [
-      "~> 4.0"
+      "~> 5.0"
     ]
   },
   "static_framework": true,
   "platforms": {
-    "osx": null,
-    "ios": null,
-    "tvos": null,
-    "watchos": null
-  }
+    "ios": "8.0"
+  },
+  "pod_target_xcconfig": {
+    "DEFINES_MODULE": "YES",
+    "VALID_ARCHS[sdk=iphonesimulator*]": "x86_64"
+  },
+  "testspecs": [
+    {
+      "name": "Tests",
+      "test_type": "unit",
+      "source_files": "Tests/**/*",
+      "dependencies": {
+        "OCMock": [
+          "3.5"
+        ]
+      }
+    }
+  ]
 }

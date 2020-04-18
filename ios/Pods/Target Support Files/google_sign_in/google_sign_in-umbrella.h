@@ -10,7 +10,7 @@
 #endif
 #endif
 
-#import "GoogleSignInPlugin.h"
+#import "FLTGoogleSignInPlugin.h"
 
 FOUNDATION_EXPORT double google_sign_inVersionNumber;
 FOUNDATION_EXPORT const unsigned char google_sign_inVersionString[];

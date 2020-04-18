@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:wasabee/classutils/link.dart';
 import 'package:wasabee/classutils/operation.dart';
 import 'package:wasabee/classutils/target.dart';
@@ -146,6 +147,7 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   }
 
   Future<Widget> getPageContent() async {
+    print("Operation -> ${loadedOperation.toJson()}");
     return isLoading
         ? getLoadingView()
         : Scaffold(
@@ -488,9 +490,14 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
       var operation = Operation.fromJson(json.decode(response));
       if (operation != null) {
         loadedOperation = operation;
-        var recentPosition = await LocationHelper.locateUser();
-        mostRecentLoc =
-            LatLng(recentPosition.latitude, recentPosition.longitude);
+        Position recentPosition;
+        if (await Permission.location.request().isGranted) {
+          print('permission was granted');
+          recentPosition = await LocationHelper.locateUser();
+          mostRecentLoc =
+              LatLng(recentPosition.latitude, recentPosition.longitude);
+        } else
+          print('Permission was denied');
 
         await populateEverything();
         var url = "${UrlManager.FULL_GET_TEAM_URL}${selectedOperation.teamID}";
@@ -508,13 +515,19 @@ class MapPageState extends State<MapPage> with SingleTickerProviderStateMixin {
   }
 
   populateEverything() async {
-    markers.clear();
-    polylines.clear();
-    await populateBank();
-    bitmapBank.bank.clear();
-    await populateAnchors(loadedOperation);
-    await populateLinks(loadedOperation);
-    await populateTargets(loadedOperation);
+    print('populatingEverything -> ${loadedOperation.toJson()}');
+    try {
+      markers.clear();
+      polylines.clear();
+      await populateBank();
+      bitmapBank.bank.clear();
+      await populateAnchors(loadedOperation);
+      await populateLinks(loadedOperation);
+      await populateTargets(loadedOperation);
+    } catch (e) {
+      print("Exception In populateEverything -> $e");
+    }
+    print('finished populating');
   }
 
   finishedTargetActionCall(String response, dynamic object) {

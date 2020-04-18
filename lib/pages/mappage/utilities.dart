@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
-import 'dart:ui';
+import 'dart:typed_data';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:vector_math/vector_math.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -9,6 +10,7 @@ import 'package:wasabee/pages/mappage/markerutilities.dart';
 import 'package:wasabee/network/responses/operationFullResponse.dart';
 import '../../classutils/target.dart';
 import 'dart:async';
+import 'dart:ui' as ui;
 
 class MapUtilities {
   static const ZOOM_LEVEL_DIFF_CONST = 1.46661;
@@ -189,17 +191,28 @@ class MapMarkerBitmapBank {
       return bmd;
     } else {
       ImageConfiguration imageConfiguration =
-          createLocalImageConfiguration(context);
+          createLocalImageConfiguration(context, size: Size(5, 3));
       if (key.startsWith("agent_")) {
         bmd = await getAgentImage(key, imageConfiguration, context);
       } else {
         var path = getPathFromKey(key, target, googleId);
         if (target != null) key = path;
-        bmd = await BitmapDescriptor.fromAssetImage(imageConfiguration, path);
+        bmd = BitmapDescriptor.fromBytes(await getBytesFromAsset(path, 35));
+        // bmd = await BitmapDescriptor.fromAssetImage(imageConfiguration, path);
       }
       bank[key] = bmd;
       return bmd;
     }
+  }
+
+  Future<Uint8List> getBytesFromAsset(String path, int width) async {
+    ByteData data = await rootBundle.load(path);
+    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
+        targetWidth: width);
+    ui.FrameInfo fi = await codec.getNextFrame();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))
+        .buffer
+        .asUint8List();
   }
 
   Future<BitmapDescriptor> getAgentImage(String key,

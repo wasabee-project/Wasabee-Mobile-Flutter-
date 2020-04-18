@@ -11,6 +11,7 @@ import 'package:wasabee/storage/localstorage.dart';
 class LinksPage {
   static Widget getPageContent(List<LinkListViewModel> listOfVM,
       List<Link> listOfLinks, MapPageState mapPageState) {
+        print('got links page');
     return Scaffold(
         body: Column(children: <Widget>[
       Container(
@@ -75,6 +76,7 @@ class LinksPage {
               itemCount: listOfVM.length,
               itemBuilder: (BuildContext context, int index) {
                 LinkListViewModel vm = listOfVM[index];
+                print("LIST VIEW MODEL -> ${vm.toString()}");
                 return getListItem(vm, context, mapPageState, index);
               }))
     ]));

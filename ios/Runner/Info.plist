@@ -41,5 +41,70 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<!-- Google Sign-in Section -->
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<!-- TODO Replace this value: -->
+				<!-- Copied from GoogleService-Info.plist key REVERSED_CLIENT_ID -->
+				<string>com.googleusercontent.apps.269534461245-3g5derjb7qlju94uv0q4mnnmpgqk4ks2</string>
+			</array>
+		</dict>
+	</array>
+	<!-- End of the Google Sign-in Section -->
+
+	<key>io.flutter.embedded_views_preview</key>
+	<true/>
+	 <!-- Permission options for the `location` group -->
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>This application requires location services to work.</string>
+    <key>NSLocationUsageDescription</key>
+    <string>This application requires location services to work.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This application requires location services to work.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This application requires location services to work.</string>
+
+    <!-- Permission options for the `mediaLibrary` group -->
+    <key>NSAppleMusicUsageDescription</key>
+    <string>Music!</string>
+    <key>kTCCServiceMediaLibrary</key>
+    <string>media</string>
+
+    <!-- Permission options for the `calendar` group -->
+    <key>NSCalendarsUsageDescription</key>
+    <string>Calendars</string>
+
+    <!-- Permission options for the `camera` group -->
+    <key>NSCameraUsageDescription</key>
+    <string>camera</string>
+
+    <!-- Permission options for the `contacts` group -->
+    <key>NSContactsUsageDescription</key>
+    <string>contacts</string>
+
+    <!-- Permission options for the `microphone` group -->
+    <key>NSMicrophoneUsageDescription</key>
+    <string>microphone</string>
+
+    <!-- Permission options for the `speech` group -->
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>speech</string>
+
+    <!-- Permission options for the `sensors` group -->
+    <key>NSMotionUsageDescription</key>
+    <string>motion</string>
+
+    <!-- Permission options for the `photos` group -->
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>photos</string>
+
+    <!-- Permission options for the `reminder` group -->
+    <key>NSRemindersUsageDescription</key>
+    <string>reminders</string>
 </dict>
 </plist>
